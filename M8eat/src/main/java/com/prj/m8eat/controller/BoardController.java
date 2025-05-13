@@ -30,15 +30,26 @@ public class BoardController {
 		return new ResponseEntity<List<Board>>(boardList, HttpStatus.OK);
 	}
 	
-	@GetMapping("/{boardId}")
-	public ResponseEntity<Board> boardDetail(@PathVariable("boardId")int boardId){
-		Board board = boardService.getBoard(boardId);
+	@GetMapping("/{boardNo}")
+	public ResponseEntity<Board> boardDetail(@PathVariable("boardNo")int boardNo){
+		Board board = boardService.getBoard(boardNo);
 		if(board!=null) {
 			return ResponseEntity.ok(board);
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		
 	}
+	
+	@DeleteMapping("/{boardNo}")
+	public ResponseEntity<Integer> deleteBoard(@PathVariable("boardNo")int boardNo){
+		boolean isDeleted = boardService.removeBoard(boardNo);
+		if(isDeleted)
+			return ResponseEntity.status(HttpStatus.OK).body("게시글이 성공적으로 삭제되었습니다!");
+		boardService.removeBoard(boardNo);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("없는 게시글 번호입니다");
+	}
+	
+	
 	
 }
 
