@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.prj.m8eat.model.dao.BoardDao">
+	
+	<!-- 전체 게시글 조회 -->
+	<select id="selectBoardList" >
+		SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
+		reg_date as regDate
+		FROM board;
+	</select>
+	
+	<!-- 전체 게시글 조회 -->
+	<select id="selectBoard" resultType="Board" parameterType="int">
+		SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
+		reg_date as regDate, file_path as filePath
+		FROM board
+		WHERE board_no = #{boardId};
+	</select>
+	
+ </mapper>
