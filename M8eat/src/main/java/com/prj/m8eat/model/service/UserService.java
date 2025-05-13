@@ -1,0 +1,9 @@
+package com.prj.m8eat.model.service;
+
+import com.prj.m8eat.model.dto.User;
+
+public interface UserService {
+
+	public int signup(User user);
+
+}
