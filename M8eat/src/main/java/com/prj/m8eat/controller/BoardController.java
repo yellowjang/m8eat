@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,5 +29,16 @@ public class BoardController {
 		}
 		return new ResponseEntity<List<Board>>(boardList, HttpStatus.OK);
 	}
+	
+	@GetMapping("/{boardId}")
+	public ResponseEntity<Board> boardDetail(@PathVariable("boardId")int boardId){
+		Board board = boardService.getBoard(boardId);
+		if(board!=null) {
+			return ResponseEntity.ok(board);
+		}
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		
+	}
+	
 }
 

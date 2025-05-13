@@ -8,5 +8,7 @@ public interface BoardService {
 	//게시글 전체 조회
 	public List<Board> getBoardList();
 	
+	//게시글 조회 
+	public Board getBoard(int boardId);
 	
 }

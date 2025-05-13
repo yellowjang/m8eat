@@ -7,8 +7,16 @@
 	<!-- 전체 게시글 조회 -->
 	<select id="selectBoardList" >
 		SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
-		reg_date as regDate, file_path as filePath
+		reg_date as regDate
 		FROM board;
+	</select>
+	
+	<!-- 전체 게시글 조회 -->
+	<select id="selectBoard" resultType="Board" parameterType="int">
+		SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
+		reg_date as regDate, file_path as filePath
+		FROM board
+		WHERE board_no = #{boardId};
 	</select>
 	
  </mapper>
