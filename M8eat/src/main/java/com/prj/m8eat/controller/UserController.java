@@ -6,8 +6,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.prj.m8eat.model.dto.LoginResponse;
 import com.prj.m8eat.model.dto.User;
 import com.prj.m8eat.model.service.UserService;
+
+import jakarta.servlet.http.HttpSession;
 
 @RestController
 public class UserController {
@@ -24,7 +27,17 @@ public class UserController {
 		} else {
 			return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
 		}
-		
 	}
 	
+	@PostMapping("/auth/login")
+	public ResponseEntity<String> login(@ModelAttribute User user, HttpSession session) {
+		LoginResponse result = userService.login(user);
+		
+		if (result.isLogin()) {
+			session.setAttribute("loginUser", result.getId());
+			return ResponseEntity.ok(result.getMessage());
+		} else {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result.getMessage());
+		}
+	}
 }

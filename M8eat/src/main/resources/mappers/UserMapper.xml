@@ -10,4 +10,10 @@
  		 values (#{name}, #{id}, #{password}, #{role});
 	</insert>
 	
+	<!-- 로그인 -->
+	<select id="selectUser" parameterType="String" resultType="User">
+		SELECT * FROM users
+ 		 WHERE id = #{id};
+	</select>
+	
  </mapper>
