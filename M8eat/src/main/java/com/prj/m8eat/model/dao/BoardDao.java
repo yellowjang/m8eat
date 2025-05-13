@@ -10,5 +10,7 @@ import com.prj.m8eat.model.dto.Board;
 public interface BoardDao {
 	public List<Board> selectBoardList();
 
-	public Board selectBoard(int boardId);
+	public Board selectBoard(int boardNo);
+
+	public boolean deleteBoard(int boardNo);
 }

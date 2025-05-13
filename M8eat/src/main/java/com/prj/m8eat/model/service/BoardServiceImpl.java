@@ -24,8 +24,16 @@ public class BoardServiceImpl implements BoardService{
 
 
 	@Override
-	public Board getBoard(int boardId) {
-		return boardDao.selectBoard(boardId);
+	public Board getBoard(int boardNo) {
+		return boardDao.selectBoard(boardNo);
+	}
+
+
+
+	@Override
+	public boolean removeBoard(int boardNo) {
+		// TODO Auto-generated method stub
+		return boardDao.deleteBoard(boardNo);
 	}
 
 }
