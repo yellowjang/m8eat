@@ -4,4 +4,5 @@ public class ChatRoom {
 	private int roomNo;
 	private String roomType;
 	private String createdAt;
+	
 }
