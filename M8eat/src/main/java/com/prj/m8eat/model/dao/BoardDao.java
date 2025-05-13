@@ -9,4 +9,6 @@ import com.prj.m8eat.model.dto.Board;
 @Mapper
 public interface BoardDao {
 	public List<Board> selectBoardList();
+
+	public Board selectBoard(int boardId);
 }
