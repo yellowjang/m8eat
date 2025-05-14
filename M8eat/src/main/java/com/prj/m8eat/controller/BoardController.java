@@ -40,14 +40,14 @@ public class BoardController {
 		
 	}
 	
-//	@DeleteMapping("/{boardNo}")
-//	public ResponseEntity<Integer> deleteBoard(@PathVariable("boardNo")int boardNo){
-//		boolean isDeleted = boardService.removeBoard(boardNo);
-//		if(isDeleted)
-//			return ResponseEntity.status(HttpStatus.OK).body("게시글이 성공적으로 삭제되었습니다!");
-//		boardService.removeBoard(boardNo);
-//		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("없는 게시글 번호입니다");
-//	}
+	@DeleteMapping("/{boardNo}")
+	public ResponseEntity<Integer> deleteBoard(@PathVariable("boardNo")int boardNo){
+		boolean isDeleted = boardService.removeBoard(boardNo);
+		if(isDeleted)
+			return ResponseEntity.status(HttpStatus.OK).body("게시글이 성공적으로 삭제되었습니다!");
+		boardService.removeBoard(boardNo);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("없는 게시글 번호입니다");
+	}
 	
 	
 	
