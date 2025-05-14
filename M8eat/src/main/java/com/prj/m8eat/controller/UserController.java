@@ -43,9 +43,18 @@ public class UserController {
 		}
 	}
 	
+
 	@DeleteMapping("/auth/quit")
 	public ResponseEntity<Void> quit(@RequestBody int userNo) {
 		int result = userService.quit(userNo);
 		return null;
 	}
+
+	@PostMapping("/auth/logout")
+	public ResponseEntity<Void> logout(HttpSession session) {
+		session.invalidate();
+		return ResponseEntity.ok().build();
+	}
+	
+	
 }
