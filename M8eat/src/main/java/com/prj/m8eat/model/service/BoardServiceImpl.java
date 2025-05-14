@@ -32,8 +32,8 @@ public class BoardServiceImpl implements BoardService{
 
 	@Override
 	public boolean removeBoard(int boardNo) {
-		// TODO Auto-generated method stub
-		return boardDao.deleteBoard(boardNo);
+		boardDao.deleteBoard(boardNo);
+		return true;
 	}
 
 }
