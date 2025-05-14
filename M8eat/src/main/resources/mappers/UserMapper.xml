@@ -16,4 +16,10 @@
  		 WHERE id = #{id};
 	</select>
 	
+	<!-- 회원탈퇴 -->
+	<delete id="deleteUser" parameterType="int">
+		DELETE from users
+		 WHERE user_no = #{userNo};
+	</delete>
+	
  </mapper>
