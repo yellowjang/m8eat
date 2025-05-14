@@ -25,8 +25,21 @@
 		WHERE board_no = #{boardNo}
 	</delete>
 	
+	<!-- 게시글 등록-->
 	<insert id="insertBoard" parameterType="Board">
 		INSERT INTO board(user_no, title, content, file_path)
 		VALUES (#{userNo}, #{title}, #{content}, #{filePath})
 	</insert>
+	
+	<!-- 게시글 수정 -->
+	<update id="updateBoard" parameterType="Board">
+		UPDATE board
+		SET
+		title=#{title},
+		content=#{content},
+		file_path=#{filePath},
+		reg_date=now()
+		WHERE board_no = #{boardNo}
+	</update>
+	
  </mapper>

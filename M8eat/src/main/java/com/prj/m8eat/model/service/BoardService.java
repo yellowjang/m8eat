@@ -16,5 +16,8 @@ public interface BoardService {
 
 	//게시글 등록 
 	public int writeBoard(Board board);
+
+	//게시글 수정 
+	public int updateBoard(Board board);
 	
 }
