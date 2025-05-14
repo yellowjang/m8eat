@@ -40,4 +40,12 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result.getMessage());
 		}
 	}
+	
+	@PostMapping("/auth/logout")
+	public ResponseEntity<Void> logout(HttpSession session) {
+		session.invalidate();
+		return ResponseEntity.ok().build();
+	}
+	
+	
 }
