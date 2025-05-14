@@ -2,8 +2,10 @@ package com.prj.m8eat.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prj.m8eat.model.dto.LoginResponse;
@@ -39,5 +41,11 @@ public class UserController {
 		} else {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result.getMessage());
 		}
+	}
+	
+	@DeleteMapping("/auth/quit")
+	public ResponseEntity<Void> quit(@RequestBody int userNo) {
+		int result = userService.quit(userNo);
+		return null;
 	}
 }
