@@ -36,4 +36,12 @@ public class BoardServiceImpl implements BoardService{
 		return true;
 	}
 
+
+
+	@Override
+	public int writeBoard(Board board) {
+		return boardDao.insertBoard(board);
+		
+	}
+
 }
