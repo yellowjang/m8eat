@@ -11,12 +11,17 @@
 		FROM board;
 	</select>
 	
-	<!-- 전체 게시글 조회 -->
+	<!-- 게시글 상세 조회 -->
 	<select id="selectBoard" resultType="Board" parameterType="int">
 		SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
 		reg_date as regDate, file_path as filePath
 		FROM board
-		WHERE board_no = #{boardId};
+		WHERE board_no = #{boardNo};
 	</select>
 	
+	<!-- 게시글 삭제-->
+	<delete id="deleteBoard" parameterType="int">
+		DELETE FROM board
+		WHERE board_no = #{boardNo};
+	</delete>
  </mapper>
