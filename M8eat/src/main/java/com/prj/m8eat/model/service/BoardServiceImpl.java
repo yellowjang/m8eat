@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.prj.m8eat.model.dao.BoardDao;
 import com.prj.m8eat.model.dto.Board;
+import com.prj.m8eat.model.dto.BoardsComment;
 
 @Service
 public class BoardServiceImpl implements BoardService{
@@ -51,6 +52,34 @@ public class BoardServiceImpl implements BoardService{
 	public int updateBoard(Board board) {
 		return boardDao.updateBoard(board);
 		
+	}
+
+
+
+	@Override
+	public int writeComment(BoardsComment comment) {
+		return boardDao.insertBoardComment(comment);
+	}
+
+
+
+	@Override
+	public List<BoardsComment> getCommentList(int boardNo) {
+		return boardDao.selectCommentList(boardNo);
+	}
+
+
+
+	@Override
+	public int updateComment(BoardsComment comment, int boardNo) {
+		return boardDao.updateComment(comment,boardNo);
+	}
+
+
+
+	@Override
+	public boolean removeComment(int boardNo, int commentNo) {
+		return boardDao.deleteComment(boardNo,commentNo);
 	}
 
 }

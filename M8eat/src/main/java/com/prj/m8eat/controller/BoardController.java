@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.prj.m8eat.model.dto.Board;
+import com.prj.m8eat.model.dto.BoardsComment;
 import com.prj.m8eat.model.service.BoardService;
 
 @RestController
@@ -29,6 +31,7 @@ public class BoardController {
 		this.boardService = boardService;
 	}
 
+	//전체 게시글 조회 
 	@GetMapping
 	public ResponseEntity<?> boardList() {
 		List<Board> boardList = boardService.getBoardList();
@@ -38,6 +41,7 @@ public class BoardController {
 		return new ResponseEntity<List<Board>>(boardList, HttpStatus.OK);
 	}
 
+	//게시글 상세 조회 
 	@GetMapping("/{boardNo}")
 	public ResponseEntity<Board> boardDetail(@PathVariable int boardNo) {
 		Board board = boardService.getBoardDetail(boardNo);
@@ -80,6 +84,7 @@ public class BoardController {
 		}
 	}
 
+	//게시글 삭제  
 	@DeleteMapping("/{boardNo}")
 	public ResponseEntity<String> deleteBoard(@PathVariable int boardNo) {
 		boolean isDeleted = boardService.removeBoard(boardNo);
@@ -123,6 +128,49 @@ public class BoardController {
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("게시글 수정에 실패하였습니다");
 		}
+	}
+	
+	//게시글 댓글 작성
+	@PostMapping("/{boardNo}/comments")
+	public ResponseEntity<String> commentWrite(@ModelAttribute BoardsComment comment) {
+		int result = boardService.writeComment(comment);
+		if (result == 1) {
+			return ResponseEntity.ok("댓글 성공적으로 등록되었습니다!");
+		} else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("댓글 작성에 실패했습니다");
+		}
+	}
+	
+	//댓글 전체 조회 
+	@GetMapping("/{boardNo}/comments")
+	public ResponseEntity<?> commentsList(@PathVariable int boardNo) {
+		List<BoardsComment> commentList = boardService.getCommentList(boardNo);
+		if (commentList == null || commentList.size() == 0) {
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("아직 등록된 댓글이 없습니다.");
+		}
+		return new ResponseEntity<List<BoardsComment>>(commentList, HttpStatus.OK);
+	}
+	
+	// 댓글 수정 
+	@PutMapping("/{boardNo}/comments/{commentNo}")
+	public ResponseEntity<?> updateComment(@PathVariable("boardNo") int boardNo,@PathVariable("commentNo") int commentNo, @RequestBody BoardsComment comment) {
+		comment.setCommentNo(commentNo);
+		int isSuccess = boardService.updateComment(comment, boardNo);
+		if (isSuccess >= 0) {
+			return ResponseEntity.status(HttpStatus.OK).body(comment);
+		} else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("게시글 수정에 실패하였습니다");
+		}
+	}
+	
+	//게시글 삭제  
+	@DeleteMapping("/{boardNo}/comments/{commentNo}")
+	public ResponseEntity<String> deleteBoard(@PathVariable("boardNo") int boardNo,@PathVariable("commentNo") int commentNo) {
+		boolean isDeleted = boardService.removeComment(boardNo,commentNo);
+		if (isDeleted) {
+			return ResponseEntity.status(HttpStatus.OK).body("댓글이 성공적으로 삭제되었습니다!");
+		} else
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("댓글 삭제에 실패하였습니다");
 	}
 
 	}
