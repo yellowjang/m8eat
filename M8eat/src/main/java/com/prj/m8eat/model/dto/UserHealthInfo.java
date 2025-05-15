@@ -8,4 +8,6 @@ public class UserHealthInfo {
 	private String illness;
 	private String allergy;
 	private String purpose;
+	
+	
 }
