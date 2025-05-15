@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.prj.m8eat.model.dto.Board;
+import com.prj.m8eat.model.dto.BoardsComment;
 
 @Mapper
 public interface BoardDao {
@@ -19,4 +20,6 @@ public interface BoardDao {
 	public int updateBoard(Board board);
 	
 	public void updateViewCnt(int boardNo);
+
+	public int insertBoardComment(BoardsComment comment);
 }

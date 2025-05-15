@@ -3,6 +3,7 @@ package com.prj.m8eat.model.service;
 import java.util.List;
 
 import com.prj.m8eat.model.dto.Board;
+import com.prj.m8eat.model.dto.BoardsComment;
 
 public interface BoardService {
 	//게시글 전체 조회
@@ -19,5 +20,7 @@ public interface BoardService {
 
 	//게시글 수정 
 	public int updateBoard(Board board);
+
+	public int writeComment(BoardsComment comment);
 	
 }

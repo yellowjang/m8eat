@@ -50,4 +50,9 @@
 		WHERE board_no = #{boardNo}
 	</update>
 	
+	<insert id="insertBoardComment" parameterType="BoardsComment">
+		INSERT INTO boards_comment(board_no, user_no, content)
+		VALUES (#{boardNo},#{userNo},#{content})	
+	</insert>
+	
  </mapper>
