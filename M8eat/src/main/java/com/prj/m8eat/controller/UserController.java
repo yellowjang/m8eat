@@ -3,6 +3,7 @@ package com.prj.m8eat.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,9 +37,10 @@ public class UserController {
 	@PostMapping("/auth/login")
 	public ResponseEntity<String> login(@ModelAttribute User user, HttpSession session) {
 		LoginResponse result = userService.login(user);
-		
 		if (result.isLogin()) {
-			session.setAttribute("loginUser", result.getId());
+			User loginUser = result.getUser();
+			loginUser.setPassword(null);
+			session.setAttribute("loginUser", loginUser);
 			return ResponseEntity.ok(result.getMessage());
 		} else {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result.getMessage());
@@ -62,5 +64,6 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("요청이 정상적으로 처리되지 않았습니다.");
 		}
 	}
+	
 	
 }
