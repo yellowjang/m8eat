@@ -17,4 +17,6 @@ public interface BoardDao {
 	public int insertBoard(Board board);
 
 	public int updateBoard(Board board);
+	
+	public void updateViewCnt(int boardNo);
 }

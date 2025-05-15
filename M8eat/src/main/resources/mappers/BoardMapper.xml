@@ -19,6 +19,14 @@
 		WHERE board_no = #{boardNo}
 	</select>
 	
+	<!-- 게시글 조회수 증가 -->
+	<update id="updateViewCnt" parameterType="int">
+		UPDATE board
+		SET
+		view_cnt = view_cnt+1
+		WHERE board_no = #{boardNo}
+	</update>
+	
 	<!-- 게시글 삭제-->
 	<delete id="deleteBoard" parameterType="int">
 		DELETE FROM board
