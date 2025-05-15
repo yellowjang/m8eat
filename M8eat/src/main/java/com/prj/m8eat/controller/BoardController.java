@@ -40,14 +40,16 @@ public class BoardController {
 
 	@GetMapping("/{boardNo}")
 	public ResponseEntity<Board> boardDetail(@PathVariable int boardNo) {
-		Board board = boardService.getBoard(boardNo);
+		Board board = boardService.getBoardDetail(boardNo);
 		if (board != null) {
 			return ResponseEntity.ok(board);
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
 	}
+	
 
+	//게시글 등록 
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<String> boardWrite(@ModelAttribute Board board) {
 		MultipartFile file = board.getFile();
@@ -87,6 +89,7 @@ public class BoardController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("없는 게시글 번호입니다");
 	}
 
+	// 게시글 수정 
 	@PutMapping(value = "/{boardNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<String> updateBoard(@PathVariable int boardNo, @ModelAttribute Board board) {
 		board.setBoardNo(boardNo);

@@ -9,7 +9,7 @@ public interface BoardService {
 	public List<Board> getBoardList();
 	
 	//게시글 조회 
-	public Board getBoard(int boardNo);
+	public Board getBoardDetail(int boardNo);
 
 	//게시글 삭제
 	public boolean removeBoard(int boardNo);
