@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
 		User isUser = userDao.selectUser(user.getId());
 		if (isUser != null) { // 존재하는 아이디
 			if (user.getPassword().equals(isUser.getPassword())) { // 아이디 존재, 비밀번호 일치
-				return new LoginResponse(true, "로그인 되었습니다.", isUser.getId());
+				return new LoginResponse(true, "로그인 되었습니다.", isUser);
 			} else { // 아이디 존재, 비밀번호 불일치
 				return new LoginResponse(false, " 비밀번호가 일치하지 않습니다.", null);
 			}
