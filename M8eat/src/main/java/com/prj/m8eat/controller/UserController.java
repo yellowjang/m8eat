@@ -1,7 +1,6 @@
 package com.prj.m8eat.controller;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.prj.m8eat.model.dto.LoginResponse;
 import com.prj.m8eat.model.dto.User;
+import com.prj.m8eat.model.dto.UserHealthInfo;
 import com.prj.m8eat.model.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
@@ -25,8 +25,8 @@ public class UserController {
 	}
 	
 	@PostMapping("/auth/signup")
-	public ResponseEntity<Void> signup(@ModelAttribute User user) {
-		if (userService.signup(user) == 1) {
+	public ResponseEntity<Void> signup(@ModelAttribute User user, @ModelAttribute UserHealthInfo healthInfo) {
+		if (userService.signup(user, healthInfo) == 1) {
 			return new ResponseEntity<Void>(HttpStatus.CREATED);
 		} else {
 			return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
