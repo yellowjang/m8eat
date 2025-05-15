@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -75,5 +76,15 @@ public class UserController {
 		}
 		return ResponseEntity.notFound().build();
 	}
+	
+	@PutMapping("/user/mypage/{userNo}")
+	public ResponseEntity<String> updateMyInfo(@PathVariable("userNo") int userNo, @ModelAttribute User user) {
+		user.setUserNo(userNo);
+		if (userService.updateMyInfo(user) == 1) {
+			return ResponseEntity.ok().body("정상적으로 수정되었습니다.");
+		}
+		return ResponseEntity.badRequest().body("요청이 정상적으로 처리되지 않았습니다.");
+	}
+	
 	
 }

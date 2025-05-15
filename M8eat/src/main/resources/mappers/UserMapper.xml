@@ -27,5 +27,11 @@
 		 WHERE user_no = #{userNo};
 	</delete>
 	
+	<!-- 내 정보 수정 -->
+	<update id="updateUserInfo" parameterType="User">
+		UPDATE users
+		 SET name=#{name}, id=#{id}, password=#{password}, role=#{role}
+		 WHERE user_no=#{userNo};
+	</update>
 	
  </mapper>

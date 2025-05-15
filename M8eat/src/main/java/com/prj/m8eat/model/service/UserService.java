@@ -14,4 +14,6 @@ public interface UserService {
 
 	public User getMyInfo(String id);
 
+	public int updateMyInfo(User user);
+
 }
