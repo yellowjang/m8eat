@@ -4,14 +4,14 @@ public class LoginResponse {
 	
 	private boolean isLogin;
 	private String message;
-	private String id;
+	private User user;
 	
-	public LoginResponse(boolean isLogin, String message, String id) {
+	public LoginResponse(boolean isLogin, String message, User user) {
 		this.isLogin = isLogin;
 		this.message = message;
-		this.id = id;
+		this.user = user;
 	}
-	
+
 	public boolean isLogin() {
 		return isLogin;
 	}
@@ -24,12 +24,20 @@ public class LoginResponse {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	public String getId() {
-		return id;
+	public User getUser() {
+		return user;
 	}
-	public void setId(String id) {
-		this.id = id;
+	public void setUser(User user) {
+		this.user = user;
 	}
+
+	@Override
+	public String toString() {
+		return "LoginResponse [isLogin=" + isLogin + ", message=" + message + ", user=" + user + "]";
+	}
+	
+	
+	
 	
 	
 }
