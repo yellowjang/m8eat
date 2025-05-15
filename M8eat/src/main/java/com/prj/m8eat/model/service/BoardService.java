@@ -24,5 +24,7 @@ public interface BoardService {
 	public int writeComment(BoardsComment comment);
 
 	public List<BoardsComment> getCommentList(int boardNo);
+
+	public int updateComment(BoardsComment comment, int boardNo);
 	
 }

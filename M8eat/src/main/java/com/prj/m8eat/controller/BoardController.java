@@ -149,9 +149,19 @@ public class BoardController {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("아직 등록된 댓글이 없습니다.");
 		}
 		return new ResponseEntity<List<BoardsComment>>(commentList, HttpStatus.OK);
-
 	}
 	
+	// 댓글 수정 
+	@PutMapping("/{boardNo}/comments/{commentNo}")
+	public ResponseEntity<String> updateComment(@PathVariable("boardNo") int boardNo,@PathVariable("commentNo") int commentNo, @RequestBody BoardsComment comment) {
+		comment.setCommentNo(commentNo);
+		int isSuccess = boardService.updateComment(comment, boardNo);
+		if (isSuccess >= 0) {
+			return ResponseEntity.ok("댓글이 성공적으로 수정되었습니다!");
+		} else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("게시글 수정에 실패하였습니다");
+		}
+	}
 
 	}
 
