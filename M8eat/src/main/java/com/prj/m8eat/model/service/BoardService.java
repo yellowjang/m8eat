@@ -11,6 +11,13 @@ public interface BoardService {
 	//게시글 조회 
 	public Board getBoard(int boardNo);
 
+	//게시글 삭제
 	public boolean removeBoard(int boardNo);
+
+	//게시글 등록 
+	public int writeBoard(Board board);
+
+	//게시글 수정 
+	public int updateBoard(Board board);
 	
 }

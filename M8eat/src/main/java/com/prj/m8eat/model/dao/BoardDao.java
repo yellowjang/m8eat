@@ -13,4 +13,8 @@ public interface BoardDao {
 	public Board selectBoard(int boardNo);
 
 	public boolean deleteBoard(int boardNo);
+
+	public int insertBoard(Board board);
+
+	public int updateBoard(Board board);
 }

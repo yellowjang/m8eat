@@ -6,7 +6,7 @@
 	
 	<!-- 전체 게시글 조회 -->
 	<select id="selectBoardList" >
-		SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
+		SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,file_path as filePath,
 		reg_date as regDate
 		FROM board;
 	</select>
@@ -16,12 +16,30 @@
 		SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
 		reg_date as regDate, file_path as filePath
 		FROM board
-		WHERE board_no = #{boardNo};
+		WHERE board_no = #{boardNo}
 	</select>
 	
 	<!-- 게시글 삭제-->
 	<delete id="deleteBoard" parameterType="int">
 		DELETE FROM board
-		WHERE board_no = #{boardNo};
+		WHERE board_no = #{boardNo}
 	</delete>
+	
+	<!-- 게시글 등록-->
+	<insert id="insertBoard" parameterType="Board">
+		INSERT INTO board(user_no, title, content, file_path)
+		VALUES (#{userNo}, #{title}, #{content}, #{filePath})
+	</insert>
+	
+	<!-- 게시글 수정 -->
+	<update id="updateBoard" parameterType="Board">
+		UPDATE board
+		SET
+		title=#{title},
+		content=#{content},
+		file_path=#{filePath},
+		reg_date=now()
+		WHERE board_no = #{boardNo}
+	</update>
+	
  </mapper>
