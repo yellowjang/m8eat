@@ -12,4 +12,6 @@ public interface UserService {
 
 	public int quit(int userNo);
 
+	public User getMyInfo(String id);
+
 }
