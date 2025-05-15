@@ -75,4 +75,11 @@ public class BoardServiceImpl implements BoardService{
 		return boardDao.updateComment(comment,boardNo);
 	}
 
+
+
+	@Override
+	public boolean removeComment(int boardNo, int commentNo) {
+		return boardDao.deleteComment(boardNo,commentNo);
+	}
+
 }

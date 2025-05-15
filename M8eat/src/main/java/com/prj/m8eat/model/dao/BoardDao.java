@@ -27,4 +27,6 @@ public interface BoardDao {
 	public List<BoardsComment> selectCommentList(int boardNo);
 
 	public int updateComment(@Param("comment") BoardsComment comment, @Param("boardNo") int boardNo);
+
+	public boolean deleteComment(@Param("boardNo")int boardNo, @Param("commentNo")int commentNo);
 }

@@ -26,5 +26,7 @@ public interface BoardService {
 	public List<BoardsComment> getCommentList(int boardNo);
 
 	public int updateComment(BoardsComment comment, int boardNo);
+
+	public boolean removeComment(int boardNo, int commentNo);
 	
 }
