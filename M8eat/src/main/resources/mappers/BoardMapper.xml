@@ -71,4 +71,10 @@
 	   	updated_at = now()
 	    WHERE board_no = #{boardNo} AND comment_no = #{comment.commentNo}
 	</update>
+	
+	<!-- 댓글 삭제-->
+	<delete id="deleteComment" parameterType="map">
+		DELETE FROM boards_comment
+		WHERE board_no = #{boardNo} AND comment_no =#{commentNo}
+	</delete>
  </mapper>

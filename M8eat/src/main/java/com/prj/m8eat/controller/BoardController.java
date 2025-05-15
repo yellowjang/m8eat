@@ -153,14 +153,24 @@ public class BoardController {
 	
 	// 댓글 수정 
 	@PutMapping("/{boardNo}/comments/{commentNo}")
-	public ResponseEntity<String> updateComment(@PathVariable("boardNo") int boardNo,@PathVariable("commentNo") int commentNo, @RequestBody BoardsComment comment) {
+	public ResponseEntity<?> updateComment(@PathVariable("boardNo") int boardNo,@PathVariable("commentNo") int commentNo, @RequestBody BoardsComment comment) {
 		comment.setCommentNo(commentNo);
 		int isSuccess = boardService.updateComment(comment, boardNo);
 		if (isSuccess >= 0) {
-			return ResponseEntity.ok("댓글이 성공적으로 수정되었습니다!");
+			return ResponseEntity.status(HttpStatus.OK).body(comment);
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("게시글 수정에 실패하였습니다");
 		}
+	}
+	
+	//게시글 삭제  
+	@DeleteMapping("/{boardNo}/comments/{commentNo}")
+	public ResponseEntity<String> deleteBoard(@PathVariable("boardNo") int boardNo,@PathVariable("commentNo") int commentNo) {
+		boolean isDeleted = boardService.removeComment(boardNo,commentNo);
+		if (isDeleted) {
+			return ResponseEntity.status(HttpStatus.OK).body("댓글이 성공적으로 삭제되었습니다!");
+		} else
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("댓글 삭제에 실패하였습니다");
 	}
 
 	}
