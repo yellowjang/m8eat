@@ -61,4 +61,11 @@ public class BoardServiceImpl implements BoardService{
 		return boardDao.insertBoardComment(comment);
 	}
 
+
+
+	@Override
+	public List<BoardsComment> getCommentList(int boardNo) {
+		return boardDao.selectCommentList(boardNo);
+	}
+
 }

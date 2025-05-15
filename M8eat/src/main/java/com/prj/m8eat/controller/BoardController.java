@@ -84,7 +84,7 @@ public class BoardController {
 		}
 	}
 
-	//게시글 삭
+	//게시글 삭제  
 	@DeleteMapping("/{boardNo}")
 	public ResponseEntity<String> deleteBoard(@PathVariable int boardNo) {
 		boolean isDeleted = boardService.removeBoard(boardNo);
@@ -139,6 +139,17 @@ public class BoardController {
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("댓글 작성에 실패했습니다");
 		}
+	}
+	
+	//댓글 전체 조회 
+	@GetMapping("/{boardNo}/comments")
+	public ResponseEntity<?> commentsList(@PathVariable int boardNo) {
+		List<BoardsComment> commentList = boardService.getCommentList(boardNo);
+		if (commentList == null || commentList.size() == 0) {
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("아직 등록된 댓글이 없습니다.");
+		}
+		return new ResponseEntity<List<BoardsComment>>(commentList, HttpStatus.OK);
+
 	}
 	
 

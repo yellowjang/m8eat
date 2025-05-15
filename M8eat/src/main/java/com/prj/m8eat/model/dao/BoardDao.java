@@ -22,4 +22,6 @@ public interface BoardDao {
 	public void updateViewCnt(int boardNo);
 
 	public int insertBoardComment(BoardsComment comment);
+
+	public List<BoardsComment> selectCommentList(int boardNo);
 }

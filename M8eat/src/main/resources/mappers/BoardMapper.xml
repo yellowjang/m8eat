@@ -50,9 +50,17 @@
 		WHERE board_no = #{boardNo}
 	</update>
 	
+	<!-- 댓글 작성 -->
 	<insert id="insertBoardComment" parameterType="BoardsComment">
 		INSERT INTO boards_comment(board_no, user_no, content)
 		VALUES (#{boardNo},#{userNo},#{content})	
 	</insert>
+	
+	
+	<!-- 댓글 전체 조회  -->
+	<select id="selectCommentList" 	parameterType="int" resultType="BoardsComment">
+		SELECT * FROM boards_comment
+		WHERE board_no = #{boardNo}
+	</select>
 	
  </mapper>
