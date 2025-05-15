@@ -34,4 +34,9 @@ public class UserServiceImpl implements UserService {
 		
 	}
 
+	@Override
+	public int quit(int userNo) {
+		return userDao.deleteUser(userNo);
+	}
+
 }

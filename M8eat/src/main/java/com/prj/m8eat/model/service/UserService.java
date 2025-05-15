@@ -9,4 +9,6 @@ public interface UserService {
 
 	public LoginResponse login(User user);
 
+	public int quit(int userNo);
+
 }
