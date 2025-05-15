@@ -63,4 +63,12 @@
 		WHERE board_no = #{boardNo}
 	</select>
 	
+	<!-- 댓글 수정 -->
+	<update id="updateComment" parameterType="map">
+	    UPDATE boards_comment
+	    SET
+	    content = #{comment.content},
+	   	updated_at = now()
+	    WHERE board_no = #{boardNo} AND comment_no = #{comment.commentNo}
+	</update>
  </mapper>
