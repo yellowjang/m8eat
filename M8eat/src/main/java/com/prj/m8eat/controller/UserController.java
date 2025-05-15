@@ -1,6 +1,7 @@
 package com.prj.m8eat.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,5 +66,14 @@ public class UserController {
 		}
 	}
 	
+	@GetMapping("/user/mypage")
+	public ResponseEntity<User> getMyInfo(HttpSession session) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		User myInfo = userService.getMyInfo(loginUser.getId());
+		if (myInfo != null) {
+			return ResponseEntity.ok(myInfo);
+		}
+		return ResponseEntity.notFound().build();
+	}
 	
 }

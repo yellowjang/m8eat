@@ -15,7 +15,7 @@
  		 values (#{userNo}, #{height}, #{weight}, #{illness}, #{allergy}, #{purpose});
 	</insert>
 	
-	<!-- 로그인 -->
+	<!-- 로그인, 내 정보 조회 -->
 	<select id="selectUser" parameterType="String" resultType="User">
 		SELECT * FROM users
  		 WHERE id = #{id};
@@ -26,5 +26,6 @@
 		DELETE from users
 		 WHERE user_no = #{userNo};
 	</delete>
+	
 	
  </mapper>
