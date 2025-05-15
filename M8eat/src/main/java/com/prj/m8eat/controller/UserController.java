@@ -1,9 +1,13 @@
 package com.prj.m8eat.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prj.m8eat.model.dto.LoginResponse;
@@ -41,11 +45,22 @@ public class UserController {
 		}
 	}
 	
+
 	@PostMapping("/auth/logout")
 	public ResponseEntity<Void> logout(HttpSession session) {
 		session.invalidate();
 		return ResponseEntity.ok().build();
 	}
 	
+	
+	@DeleteMapping("/auth/quit/{userNo}")
+	public ResponseEntity<String> quit(@PathVariable("userNo") int userNo) {
+		int result = userService.quit(userNo);
+		if (result == 1) {
+			return ResponseEntity.status(HttpStatus.OK).body("정상적으로 탈퇴되었습니다.");
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("요청이 정상적으로 처리되지 않았습니다.");
+		}
+	}
 	
 }
