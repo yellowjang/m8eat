@@ -9,6 +9,7 @@ import com.prj.m8eat.model.dto.UserHealthInfo;
 
 @Service
 public class UserServiceImpl implements UserService {
+	
 
 	private final UserDao userDao;
 
@@ -53,6 +54,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public int updateMyInfo(User user) {
 		return userDao.updateUserInfo(user);
+	}
+
+	@Override
+	public int updateHealthInfo(UserHealthInfo userHealthInfo) {
+		return userDao.updateUserHealthInfo(userHealthInfo);
 	}
 
 }

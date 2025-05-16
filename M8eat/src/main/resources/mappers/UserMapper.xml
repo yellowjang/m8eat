@@ -34,4 +34,11 @@
 		 WHERE user_no=#{userNo};
 	</update>
 	
+	<!-- 건강 정보 수정 -->
+	<update id="updateUserHealthInfo" parameterType="UserHealthInfo">
+		UPDATE users_health_info
+		 SET height=#{height}, weight=#{weight}, illness=#{illness}, allergy=#{allergy}, purpose=#{purpose}
+		 WHERE user_no=#{userNo};
+	</update>
+	
  </mapper>
