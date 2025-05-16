@@ -86,5 +86,15 @@ public class UserController {
 		return ResponseEntity.badRequest().body("요청이 정상적으로 처리되지 않았습니다.");
 	}
 	
+	@PutMapping("/user/mypage/health-info")
+	public ResponseEntity<String> updateHealthInfo(@ModelAttribute UserHealthInfo userHealthInfo, HttpSession session) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		userHealthInfo.setUserNo(loginUser.getUserNo());
+		if (userService.updateHealthInfo(userHealthInfo) == 1) {
+			return ResponseEntity.status(HttpStatus.CREATED).body("수정되었습니다.");
+		}
+		
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("요청이 정상적으로 처리되지 않았습니다.");
+	}
 	
 }

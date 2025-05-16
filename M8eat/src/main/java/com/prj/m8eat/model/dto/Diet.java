@@ -2,11 +2,13 @@ package com.prj.m8eat.model.dto;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class Diets {
+public class Diet {
 	private int dietNo;
 	private int userNo;
 	private String regDate;
-	private MultipartFile file;
+	private MultipartFile file; //업로드용.. Request 시 사용
+	private String filePath; //DB에서 불러올 실제 경로
+	
 	public int getDietNo() {
 		return dietNo;
 	}
@@ -31,5 +33,19 @@ public class Diets {
 	public void setFile(MultipartFile file) {
 		this.file = file;
 	}
+	public String getFilePath() {
+		return filePath;
+	}
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+	
+	@Override
+	public String toString() {
+		return "Diet [dietNo=" + dietNo + ", userNo=" + userNo + ", regDate=" + regDate + ", file=" + file
+				+ ", filePath=" + filePath + "]";
+	}
+	
+	
 	
 }

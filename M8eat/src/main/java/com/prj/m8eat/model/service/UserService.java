@@ -16,4 +16,6 @@ public interface UserService {
 
 	public int updateMyInfo(User user);
 
+	public int updateHealthInfo(UserHealthInfo userHealthInfo);
+
 }
