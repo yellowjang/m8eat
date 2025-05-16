@@ -18,4 +18,6 @@ public interface UserDao {
 
 	public int updateUserInfo(User user);
 
+	public int updateUserHealthInfo(UserHealthInfo userHealthInfo);
+
 }
