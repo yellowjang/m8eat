@@ -97,5 +97,4 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("요청이 정상적으로 처리되지 않았습니다.");
 	}
 	
-	
 }
