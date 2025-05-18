@@ -1,14 +1,10 @@
 <template>
   <main class="main-content">
-    <!-- 식단 기록 영역 -->
     <section class="diet-record">
       <h3>식단 기록</h3>
-      <div class="diet-box">
-        <!-- 여기에 식단 내용이 들어갑니다 -->
-      </div>
+      <div class="diet-box"></div>
     </section>
 
-    <!-- 커뮤니티 영역 -->
     <section class="community">
       <h3>커뮤니티</h3>
       <div class="community-columns">
@@ -29,17 +25,16 @@
   </main>
 </template>
 
-<script setup>
-// API 연동 또는 props 전달은 여기에 추가
-</script>
+<script setup></script>
 
 <style lang="scss" scoped>
 .main-content {
   padding: 2rem;
-  max-width: 1000px;
+  //   max-width: 1000px;
   margin: 0 auto;
   font-family: "Noto Sans KR", sans-serif;
   background-color: #fdeeee;
+  min-height: 100vh;
 
   h3 {
     font-size: 1.3rem;
