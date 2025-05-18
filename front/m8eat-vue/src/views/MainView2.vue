@@ -24,9 +24,6 @@
       <div class="calendar-area">
         <p style="text-align: center">📅 달력</p>
       </div>
-
-      <!-- 오른쪽: 체크 아이콘 -->
-      <!-- <div class="check-icon">✅</div> -->
     </section>
 
     <!-- 커뮤니티 -->
@@ -55,9 +52,10 @@
 <style lang="scss" scoped>
 .meal-record-container {
   padding: 2rem;
-  max-width: 1000px;
-  margin: 0 auto;
+  //   max-width: 1000px;
+  //   margin: 0 auto;
   background-color: #fdeeee;
+  min-height: 100vh;
 
   h3 {
     font-size: 1.3rem;

@@ -40,9 +40,7 @@
   </div>
 </template>
 
-<script setup>
-// 추후 로그인 로직, 상태 관리 등 추가 가능
-</script>
+<script setup></script>
 
 <style lang="scss" scoped>
 .login-container {
@@ -82,16 +80,8 @@
 
       input {
         width: 100%;
-        // padding-right: 2.5rem; // 👈 아이콘 공간 확보
+        // padding-right: 2.5rem;
       }
-
-      //   .toggle-eye {
-      //     position: absolute;
-      //     right: 0.8rem;
-      //     top: 50%;
-      //     transform: translateY(-50%);
-      //     cursor: pointer;
-      //   }
     }
 
     .forgot-password {
