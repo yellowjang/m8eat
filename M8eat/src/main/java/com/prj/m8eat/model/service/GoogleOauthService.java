@@ -2,6 +2,7 @@ package com.prj.m8eat.model.service;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -13,11 +14,16 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.prj.m8eat.model.dto.User;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class GoogleOauthService {
+	@Autowired
+    private UserService userService;
+
 
 	@Value("${google.client-id}")
 	private String clientId;
@@ -41,7 +47,8 @@ public class GoogleOauthService {
 				+ redirectUri + "&response_type=code" + "&scope=email%20profile" + "&access_type=offline";
 	}
 
-	public String handleGoogleCallback(String code) {
+	public User handleGoogleCallback(String code) {
+
 		// 1. 토큰 요청
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -69,10 +76,17 @@ public class GoogleOauthService {
 
 		Map<String, Object> googleUser = userInfoResponse.getBody();
 		String email = (String) googleUser.get("email");
-		System.out.println(email);
-		System.out.println(accessToken);
+		String name = (String) googleUser.get("name");
+
+		User user = new User();
+		user.setId("google" + email);
+		user.setName(name);
+		User loginUser = userService.socialLogin(user);
+//		System.out.println((String)googleUser.get("picture"));
+//		System.out.println((String)googleUser.get(googleUser));
+		return loginUser;
 		// 3. JWT 발급 (또는 회원가입/로그인 처리)
-		return createJwt(email);
+
 	}
 
 	private String createJwt(String email) {

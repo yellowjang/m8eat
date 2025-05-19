@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.prj.m8eat.model.dto.User;
 import com.prj.m8eat.model.service.GoogleOauthService;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -31,9 +33,13 @@ public class GoogleLoginController {
     }
 
     @GetMapping("/callback")
-    public ResponseEntity<?> handleCallback(@RequestParam String code) {
-        String jwt = googleOauthService.handleGoogleCallback(code);
-        return ResponseEntity.ok().body(jwt);
-     
+    public ResponseEntity<?> handleCallback(@RequestParam String code, HttpSession session) {
+    	User loginUser = googleOauthService.handleGoogleCallback(code);
+		if (loginUser != null) {
+			session.setAttribute("loginUser", loginUser);
+			return ResponseEntity.ok("구글 로그인 성공: " + loginUser.getName());
+		} else {
+			return ResponseEntity.badRequest().body("구글 로그인 실패");
+		}
     }
 }
