@@ -6,11 +6,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class DietRequest {
 	private int userNo;
+	private String mealType;
 	private MultipartFile file; //업로드용.. Request 시 사용
 	private String filePath; //DB에서 불러올 실제 경로
 	private List<Food> foods;
 	
 	
+	public String getMealType() {
+		return mealType;
+	}
+	public void setMealType(String mealType) {
+		this.mealType = mealType;
+	}
 	public int getUserNo() {
 		return userNo;
 	}

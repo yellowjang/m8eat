@@ -45,21 +45,25 @@ public class DietController {
 	}
 	
 	// 유저별 식단 조회
-	@GetMapping("/{userId}")
-	public ResponseEntity<?> getDietsByUserId(@PathVariable("userId") int userId) {
-		
-		return null;
+	@GetMapping("/{userNo}")
+	public ResponseEntity<?> getDietsByUserNo(@PathVariable int userNo) {
+		List<DietResponse> dietList = dietService.getDietsByUserNo(userNo);
+		if (dietList == null || dietList.size() == 0) {
+			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+		}
+		return ResponseEntity.ok(dietList);
 	}
 	
 	// 식단 등록
 	@PostMapping
 	public ResponseEntity<String> writeDiets (@ModelAttribute DietRequest dietReq, HttpSession session) {
 		
-		User loginUser = (User) session.getAttribute("loginUser");
+//		User loginUser = (User) session.getAttribute("loginUser");
 		
 		Diet diet = new Diet();
-		diet.setUserNo(loginUser.getUserNo());
-//		diet.setUserNo(3);
+//		diet.setUserNo(loginUser.getUserNo());
+		diet.setUserNo(3);
+		diet.setMealType(dietReq.getMealType());
 		
 		MultipartFile file = dietReq.getFile();
 		

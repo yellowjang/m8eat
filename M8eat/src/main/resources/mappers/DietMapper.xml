@@ -14,10 +14,22 @@
 		 FROM diets_food;
 	</select>
 	
+	<!-- 유저별 식단 조회 -->
+	<select id="selectDietsByUserNo" parameterType="int" resultType="Diet">
+		SELECT * 
+		 FROM diets
+		 WHERE user_no=#{userNo}
+	</select>
+	<select id="selectDietsFoodByUserNo" parameterType="int" resultType="DietsFood">
+		SELECT * 
+		 FROM diets_food;
+		 WHERE user_no=#{userNo}
+	</select>
+	
 	<!-- 식단 기록 -->
 	<insert id="insertDiet" parameterType="Diet" keyProperty="dietNo" useGeneratedKeys="true">
-		INSERT INTO diets (user_no, file_path)
-		 VALUES (#{userNo}, #{filePath})
+		INSERT INTO diets (user_no, meal_type, file_path)
+		 VALUES (#{userNo}, #{mealType}, #{filePath})
 	</insert>
 	
 	<insert id="insertDietsFood" parameterType="DietsFood">
