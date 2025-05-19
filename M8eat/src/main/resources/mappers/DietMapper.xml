@@ -9,6 +9,17 @@
 		SELECT * 
 		 FROM diets;
 	</select>
+	
+	<!-- 식단 기록 -->
+	<insert id="insertDiet" parameterType="Diet" keyProperty="dietNo" useGeneratedKeys="true">
+		INSERT INTO diets (user_no, file_path)
+		 VALUES (#{userNo}, #{filePath})
+	</insert>
+	
+	<insert id="insertDietsFood" parameterType="DietsFood">
+		INSERT INTO diets_food (diet_no, food_name, calorie)
+		 VALUES (#{dietNo}, #{foodName}, #{calorie})
+	</insert>
 
 
 </mapper>
