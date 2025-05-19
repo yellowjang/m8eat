@@ -5,6 +5,14 @@ public class DietsFood {
 	private int dietNo;
 	private String foodName;
 	private int calorie;
+	
+	
+	
+	public DietsFood(int dietNo, String foodName, int calorie) {
+		this.dietNo = dietNo;
+		this.foodName = foodName;
+		this.calorie = calorie;
+	}
 	public int getNo() {
 		return no;
 	}
