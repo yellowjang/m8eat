@@ -28,7 +28,7 @@ public class DietServiceImpl implements DietService {
 
 		List<Diet> diets = dietDao.selectAllDiets();
 		for (Diet diet : diets) {
-			DietResponse res = new DietResponse(diet.getDietNo(), diet.getUserNo(), diet.getFilePath(), diet.getRegDate());;
+			DietResponse res = new DietResponse(diet.getDietNo(), diet.getUserNo(), diet.getFilePath(), diet.getRegDate(), diet.getMealType());;
 			res.setFoods(new ArrayList<>());
 			dietList.add(res);
 			dietMap.put(diet.getDietNo(), res);

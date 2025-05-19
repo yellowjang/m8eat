@@ -7,13 +7,16 @@ public class DietResponse {
 	private int userNo;
 	private String filePath;
 	private String regDate;
+	private String mealType;
 	private List<Food> foods;
 	
-	public DietResponse(int dietNo, int userNo, String filePath, String regDate) {
+	
+	public DietResponse(int dietNo, int userNo, String filePath, String regDate, String mealType) {
 		this.dietNo = dietNo;
 		this.userNo = userNo;
 		this.filePath = filePath;
 		this.regDate = regDate;
+		this.mealType = mealType;
 	}
 	public int getDietNo() {
 		return dietNo;
@@ -38,6 +41,12 @@ public class DietResponse {
 	}
 	public void setRegDate(String regDate) {
 		this.regDate = regDate;
+	}
+	public String getMealType() {
+		return mealType;
+	}
+	public void setMealType(String mealType) {
+		this.mealType = mealType;
 	}
 	public List<Food> getFoods() {
 		return foods;
