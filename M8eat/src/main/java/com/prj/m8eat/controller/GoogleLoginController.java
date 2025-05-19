@@ -34,5 +34,6 @@ public class GoogleLoginController {
     public ResponseEntity<?> handleCallback(@RequestParam String code) {
         String jwt = googleOauthService.handleGoogleCallback(code);
         return ResponseEntity.ok().body(jwt);
+     
     }
 }
