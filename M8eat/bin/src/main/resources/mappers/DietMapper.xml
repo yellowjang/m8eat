@@ -9,10 +9,6 @@
 		SELECT * 
 		 FROM diets;
 	</select>
-	<select id="selectAllDietsFood" resultType="DietsFood">
-		SELECT * 
-		 FROM diets_food;
-	</select>
 	
 	<!-- 식단 기록 -->
 	<insert id="insertDiet" parameterType="Diet" keyProperty="dietNo" useGeneratedKeys="true">

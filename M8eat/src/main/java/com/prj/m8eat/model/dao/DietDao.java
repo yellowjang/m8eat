@@ -11,6 +11,8 @@ import com.prj.m8eat.model.dto.DietsFood;
 public interface DietDao {
 
 	public List<Diet> selectAllDiets();
+	
+	public List<DietsFood> selectAllDietsFood();
 
 	public int insertDiet(Diet diet);
 
