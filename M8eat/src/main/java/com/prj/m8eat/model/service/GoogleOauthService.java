@@ -79,7 +79,7 @@ public class GoogleOauthService {
 		String name = (String) googleUser.get("name");
 
 		User user = new User();
-		user.setId("google" + email);
+		user.setId(email);
 		user.setName(name);
 		User loginUser = userService.socialLogin(user);
 //		System.out.println((String)googleUser.get("picture"));
