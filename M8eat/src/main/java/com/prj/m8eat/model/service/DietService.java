@@ -12,4 +12,6 @@ public interface DietService {
 
 	public boolean writeDiets(Diet diet, List<Food> foods);
 
+	public List<DietResponse> getDietsByUserNo(int userNo);
+
 }

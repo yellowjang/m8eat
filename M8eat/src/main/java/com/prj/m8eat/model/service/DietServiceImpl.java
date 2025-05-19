@@ -47,6 +47,29 @@ public class DietServiceImpl implements DietService {
 	}
 
 	@Override
+	public List<DietResponse> getDietsByUserNo(int userNo) {
+		List<DietResponse> dietList = new ArrayList<>();
+		Map<Integer, DietResponse> dietMap = new HashMap<>();
+
+		List<Diet> diets = dietDao.selectDietsByUserNo(userNo);
+		for (Diet diet : diets) {
+			DietResponse res = new DietResponse(diet.getDietNo(), diet.getUserNo(), diet.getFilePath(), diet.getRegDate(), diet.getMealType());;
+			res.setFoods(new ArrayList<>());
+			dietList.add(res);
+			dietMap.put(diet.getDietNo(), res);
+		}
+		
+		List<DietsFood> dietsFood = dietDao.selectDietsFoodByUserNo(userNo);
+		for (DietsFood food : dietsFood) {
+			DietResponse target = dietMap.get(food.getDietNo());
+			Food tmp = new Food(food.getFoodName(), food.getCalorie());
+			target.getFoods().add(tmp);
+		}
+		
+		return dietList;
+	}
+
+	@Override
 	public boolean writeDiets(Diet diet, List<Food> foods) {
 		System.out.println(diet);
 		if (dietDao.insertDiet(diet) == 1) {
@@ -59,5 +82,6 @@ public class DietServiceImpl implements DietService {
 		return false;
 
 	}
+
 
 }

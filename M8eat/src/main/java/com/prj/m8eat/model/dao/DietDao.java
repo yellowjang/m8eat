@@ -18,4 +18,8 @@ public interface DietDao {
 
 	public void insertDietsFood(DietsFood dietsFood);
 
+	public List<Diet> selectDietsByUserNo(int userNo);
+
+	public List<DietsFood> selectDietsFoodByUserNo(int userNo);
+
 }
