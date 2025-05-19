@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +33,7 @@ public class DietController {
 		this.dietService = dietService;
 	}
 	
-	// 식단 전체 조회 -> 수정 필요
+	// 식단 전체 조회
 	@GetMapping
 	public ResponseEntity<?> getAllDiets() {
 		List<DietResponse> dietList = dietService.getAllDiets();
@@ -43,6 +44,14 @@ public class DietController {
 		return ResponseEntity.ok(dietList);
 	}
 	
+	// 유저별 식단 조회
+	@GetMapping("/{userId}")
+	public ResponseEntity<?> getDietsByUserId(@PathVariable("userId") int userId) {
+		
+		return null;
+	}
+	
+	// 식단 등록
 	@PostMapping
 	public ResponseEntity<String> writeDiets (@ModelAttribute DietRequest dietReq, HttpSession session) {
 		
