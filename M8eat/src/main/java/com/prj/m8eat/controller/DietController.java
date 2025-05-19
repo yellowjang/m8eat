@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.prj.m8eat.model.dto.Diet;
 import com.prj.m8eat.model.dto.DietRequest;
+import com.prj.m8eat.model.dto.DietResponse;
 import com.prj.m8eat.model.dto.DietsFood;
 import com.prj.m8eat.model.dto.User;
 import com.prj.m8eat.model.service.DietService;
@@ -33,12 +35,12 @@ public class DietController {
 	// 식단 전체 조회 -> 수정 필요
 	@GetMapping
 	public ResponseEntity<?> getAllDiets() {
-		List<Diet> dietList = dietService.getAllDiets();
+		List<DietResponse> dietList = dietService.getAllDiets();
 		System.out.println(dietList);
 		if (dietList == null || dietList.size() == 0) {
 			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
 		}
-		return new ResponseEntity<List<Diet>>(dietList, HttpStatus.OK);
+		return ResponseEntity.ok(dietList);
 	}
 	
 	@PostMapping
@@ -48,14 +50,15 @@ public class DietController {
 		
 		Diet diet = new Diet();
 		diet.setUserNo(loginUser.getUserNo());
-//		diet.setUserNo(1);
+//		diet.setUserNo(3);
 		
 		MultipartFile file = dietReq.getFile();
 		
 		if (file != null && !file.isEmpty()) {
 			String originalFilename = file.getOriginalFilename();
-			String uploadDirPath = "/Users/jang-ayoung/Desktop/m8eat/data"; // 수정수정수정
-//			String uploadDirPath = "C:\\SSAFY\\m8eat"; // 수정수정수정
+//			String uploadDirPath = "/Users/jang-ayoung/Desktop/m8eat/data"; // 수정수정수정
+			String uploadDirPath = "C:\\SSAFY\\m8eat"; // 수정수정수정
+//			String uploadDirPath = "C:\\Users\\kmj\\Desktop\\SSAFY\\m8eat\\data"; // 수정수정수정
 			
 			File uploadDir = new File(uploadDirPath);
 			if (!uploadDir.exists()) {
@@ -66,6 +69,7 @@ public class DietController {
 				File saveFile = new File(uploadDir, originalFilename);
 				file.transferTo(saveFile);
 				diet.setFilePath("/upload/" + originalFilename);
+				System.out.println("controller " + diet);
 			} catch (IOException e) {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 저장 실패");
 			}

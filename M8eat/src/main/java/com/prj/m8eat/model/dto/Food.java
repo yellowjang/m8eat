@@ -4,6 +4,10 @@ public class Food {
 	private String foodName;
 	private int calorie;
 	
+	public Food(String foodName, int calorie) {
+		this.foodName = foodName;
+		this.calorie = calorie;
+	}
 	
 	public String getFoodName() {
 		return foodName;
