@@ -64,6 +64,13 @@
 			<version>3.0.4</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<dependency>
+		  <groupId>com.google.cloud</groupId>
+		  <artifactId>google-cloud-vision</artifactId>
+		  <version>3.16.0</version> <!-- 버전 최신 확인 -->
+		</dependency>
+
 	</dependencies>
 
 	<build>
