@@ -4,16 +4,7 @@ import Header from "@/components/common2/Header.vue";
 </script>
 
 <template>
-  <header>
-    <div class="wrapper">
-      <Header></Header>
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/boards">자유게시판</RouterLink>
-      </nav>
-    </div>
-  </header>
-
+  <Header />
   <RouterView />
 </template>
 
@@ -62,12 +53,6 @@ nav a:first-of-type {
 
   .logo {
     margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
   }
 
   nav {

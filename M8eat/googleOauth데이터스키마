@@ -1,0 +1,10 @@
+{
+  "id": "1234567890",               // 고유 ID
+  "email": "user@gmail.com",        // 이메일
+  "verified_email": true,           // 인증 여부
+  "name": "홍길동",                 // 전체 이름
+  "given_name": "길동",             // 이름
+  "family_name": "홍",              // 성
+  "picture": "https://...jpg",      // 프로필 이미지 URL
+  "locale": "ko"                    // 지역/언어
+}
