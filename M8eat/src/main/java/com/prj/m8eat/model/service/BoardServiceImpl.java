@@ -83,4 +83,9 @@ public class BoardServiceImpl implements BoardService {
 		return boardDao.deleteLike(boardNo, userNo);
 	}
 
+	@Override
+	public int checkLiked(int boardNo, int userNo) {
+		return boardDao.selectLiked(boardNo, userNo);
+	}
+
 }
