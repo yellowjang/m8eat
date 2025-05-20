@@ -46,7 +46,7 @@ public class DietController {
 	}
 	
 	// 유저별 식단 조회
-	@GetMapping("/{userNo}")
+	@GetMapping("/user/{userNo}")
 	public ResponseEntity<?> getDietsByUserNo(@PathVariable int userNo) {
 		List<DietResponse> dietList = dietService.getDietsByUserNo(userNo);
 		if (dietList == null || dietList.size() == 0) {
@@ -60,6 +60,17 @@ public class DietController {
 	public ResponseEntity<?> getDietsByDate(@RequestParam("start") String startDate, @RequestParam("end") String endDate) { 
 //		System.out.println(startDate + " " + endDate);
 		List<DietResponse> dietList = dietService.getDietsByDate(startDate, endDate);
+		if (dietList == null || dietList.size() == 0) {
+			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+		}
+		return ResponseEntity.ok(dietList);
+	}
+	
+	// 식단 상세 조회
+	@GetMapping("/{dietNo}")
+	public ResponseEntity<?> getDietsByDietNo(@PathVariable int dietNo) { 
+//		System.out.println(startDate + " " + endDate);
+		List<DietResponse> dietList = dietService.getDietsByDietNo(dietNo);
 		if (dietList == null || dietList.size() == 0) {
 			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
 		}

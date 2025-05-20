@@ -52,15 +52,15 @@ public class DietServiceImpl implements DietService {
 
 		List<Diet> diets = dietDao.selectDietsByUserNo(userNo);
 		for (Diet diet : diets) {
-			DietResponse res = new DietResponse(diet.getDietNo(), diet.getUserNo(), diet.getFilePath(), diet.getRegDate(), diet.getMealType());;
+			DietResponse res = new DietResponse(diet.getDietNo(), diet.getUserNo(), diet.getFilePath(), diet.getRegDate(), diet.getMealType());
 			res.setFoods(new ArrayList<>());
-			dietList.add(res);
 			
 			List<DietsFood> dietsFood = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
 			for (DietsFood food : dietsFood) {
 				Food tmp = new Food(food.getFoodName(), food.getCalorie());
 				res.getFoods().add(tmp);
 			}
+			dietList.add(res);
 		}
 		
 		return dietList;
@@ -86,6 +86,26 @@ public class DietServiceImpl implements DietService {
 			}
 		}
 
+		return dietList;
+	}
+	
+	@Override
+	public List<DietResponse> getDietsByDietNo(int dietNo) {
+		List<DietResponse> dietList = new ArrayList<>();
+		
+		List<Diet> diets = dietDao.selectDietsByDietNo(dietNo);
+		for (Diet diet : diets) {
+			DietResponse res = new DietResponse(diet.getDietNo(), diet.getUserNo(), diet.getFilePath(), diet.getRegDate(), diet.getMealType());
+			res.setFoods(new ArrayList<>());
+			
+			List<DietsFood> dietsFood = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
+			for (DietsFood food : dietsFood) {
+				res.getFoods().add(new Food(food.getFoodName(), food.getCalorie()));
+			}
+			
+			dietList.add(res);
+		}
+		
 		return dietList;
 	}
 
