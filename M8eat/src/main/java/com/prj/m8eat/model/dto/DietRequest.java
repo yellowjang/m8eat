@@ -50,8 +50,10 @@ public class DietRequest {
 		this.foods = foods;
 	}
 	
-	
-
-	
+	@Override
+	public String toString() {
+		return "DietRequest [dietNo=" + dietNo + ", userNo=" + userNo + ", mealType=" + mealType + ", file=" + file
+				+ ", filePath=" + filePath + ", foods=" + foods + "]";
+	}
 	
 }
