@@ -33,4 +33,6 @@ public interface BoardDao {
 	public boolean insertLike(int boardNo, int userNo);
 
 	public int selectLikes(int boardNo);
+
+	public boolean deleteLike(int boardNo, int userNo);
 }
