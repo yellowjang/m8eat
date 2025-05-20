@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,9 @@ public class DietController {
 	public DietController(DietService dietService) {
 		this.dietService = dietService;
 	}
+	
+	@Value("${file.upload.dir}")
+	private String baseDir;
 	
 	// 식단 전체 조회
 	@GetMapping
@@ -87,7 +91,7 @@ public class DietController {
 		
 		Diet diet = new Diet();
 //		diet.setUserNo(loginUser.getUserNo());
-		diet.setUserNo(1);
+		diet.setUserNo(3);
 		System.out.println(diet);
 		diet.setMealType(dietReq.getMealType());
 		
@@ -96,8 +100,10 @@ public class DietController {
 		if (file != null && !file.isEmpty()) {
 			String originalFilename = file.getOriginalFilename();
 //			String uploadDirPath = "/Users/jang-ayoung/Desktop/m8eat/data"; // 수정수정수정
-			String uploadDirPath = "C:\\SSAFY\\m8eat"; // 수정수정수정
+//			String uploadDirPath = "C:\\SSAFY\\m8eat"; // 수정수정수정
 //			String uploadDirPath = "C:\\Users\\kmj\\Desktop\\SSAFY\\m8eat\\data"; // 수정수정수정
+			
+			String uploadDirPath = baseDir; // 수정수정수정
 			
 			File uploadDir = new File(uploadDirPath);
 			if (!uploadDir.exists()) {
@@ -134,6 +140,7 @@ public class DietController {
 	@PutMapping("/{dietNo}")
 	public ResponseEntity<String> updateDietByDietNo(@PathVariable int dietNo, @ModelAttribute DietRequest dietReq) {
 		dietReq.setDietNo(dietNo);
+		System.out.println("updatediets controllerrrrrrrrrr " + dietReq);
 		if (dietService.updateDietByDietNo(dietReq)) {
 			return ResponseEntity.ok("정상적으로 수정되었습니다.");
 		}
