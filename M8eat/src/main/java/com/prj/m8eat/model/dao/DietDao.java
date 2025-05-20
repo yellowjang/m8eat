@@ -25,4 +25,6 @@ public interface DietDao {
 
 	public List<Diet> selectDietsByDate(Map<String, String> map);
 
+	public List<Diet> selectDietsByDietNo(int dietNo);
+
 }

@@ -16,4 +16,6 @@ public interface DietService {
 
 	public List<DietResponse> getDietsByDate(String startDate, String endDate);
 
+	public List<DietResponse> getDietsByDietNo(int dietNo);
+
 }
