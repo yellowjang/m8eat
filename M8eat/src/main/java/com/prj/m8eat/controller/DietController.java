@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,6 +49,17 @@ public class DietController {
 	@GetMapping("/{userNo}")
 	public ResponseEntity<?> getDietsByUserNo(@PathVariable int userNo) {
 		List<DietResponse> dietList = dietService.getDietsByUserNo(userNo);
+		if (dietList == null || dietList.size() == 0) {
+			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+		}
+		return ResponseEntity.ok(dietList);
+	}
+	
+	// 날짜별 식단 조회
+	@GetMapping("/date")
+	public ResponseEntity<?> getDietsByDate(@RequestParam("start") String startDate, @RequestParam("end") String endDate) { 
+//		System.out.println(startDate + " " + endDate);
+		List<DietResponse> dietList = dietService.getDietsByDate(startDate, endDate);
 		if (dietList == null || dietList.size() == 0) {
 			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
 		}

@@ -1,6 +1,7 @@
 package com.prj.m8eat.model.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -21,5 +22,7 @@ public interface DietDao {
 	public List<Diet> selectDietsByUserNo(int userNo);
 
 	public List<DietsFood> selectDietsFoodByDietNo(int userNo);
+
+	public List<Diet> selectDietsByDate(Map<String, String> map);
 
 }

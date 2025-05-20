@@ -26,6 +26,13 @@
 		 WHERE diet_no=#{dietNo}
 	</select>
 	
+	<!-- 날짜별 식단 조회 -->
+	<select id="selectDietsByDate" parameterType="Map" resultType="Diet">
+		SELECT * 
+		 FROM diets
+ 		 WHERE reg_date BETWEEN #{startDate} AND #{endDate};
+	</select>
+	
 	<!-- 식단 기록 -->
 	<insert id="insertDiet" parameterType="Diet" keyProperty="dietNo" useGeneratedKeys="true">
 		INSERT INTO diets (user_no, meal_type, file_path)
