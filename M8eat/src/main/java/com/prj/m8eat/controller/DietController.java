@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -125,6 +126,16 @@ public class DietController {
 	public ResponseEntity<String> deleteDietByDietNo(@PathVariable int dietNo) {
 		if (dietService.deleteDietByDietNo(dietNo)) {
 			return ResponseEntity.ok("삭제되었습니다.");
+		}
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("요청을 처리하지 못했습니다.");
+	}
+	
+	// 식단 수정
+	@PutMapping("/{dietNo}")
+	public ResponseEntity<String> updateDietByDietNo(@PathVariable int dietNo, @ModelAttribute DietRequest dietReq) {
+		dietReq.setDietNo(dietNo);
+		if (dietService.updateDietByDietNo(dietReq)) {
+			return ResponseEntity.ok("정상적으로 수정되었습니다.");
 		}
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("요청을 처리하지 못했습니다.");
 	}

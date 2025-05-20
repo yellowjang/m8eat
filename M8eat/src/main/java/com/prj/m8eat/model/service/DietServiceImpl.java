@@ -1,14 +1,20 @@
 package com.prj.m8eat.model.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.prj.m8eat.model.dao.DietDao;
 import com.prj.m8eat.model.dto.Diet;
+import com.prj.m8eat.model.dto.DietRequest;
 import com.prj.m8eat.model.dto.DietResponse;
 import com.prj.m8eat.model.dto.DietsFood;
 import com.prj.m8eat.model.dto.Food;
@@ -20,6 +26,9 @@ public class DietServiceImpl implements DietService {
 	public DietServiceImpl(DietDao dietDao) {
 		this.dietDao = dietDao;
 	}
+	
+	@Value("${file.upload.dir}")
+	private String baseDir;
 
 	@Override
 	public List<DietResponse> getAllDiets() {
@@ -93,8 +102,8 @@ public class DietServiceImpl implements DietService {
 	public List<DietResponse> getDietsByDietNo(int dietNo) {
 		List<DietResponse> dietList = new ArrayList<>();
 		
-		List<Diet> diets = dietDao.selectDietsByDietNo(dietNo);
-		for (Diet diet : diets) {
+		Diet diet = dietDao.selectDietsByDietNo(dietNo);
+//		for (Diet diet : diets) {
 			DietResponse res = new DietResponse(diet.getDietNo(), diet.getUserNo(), diet.getFilePath(), diet.getRegDate(), diet.getMealType());
 			res.setFoods(new ArrayList<>());
 			
@@ -104,7 +113,7 @@ public class DietServiceImpl implements DietService {
 			}
 			
 			dietList.add(res);
-		}
+//		}
 		
 		return dietList;
 	}
@@ -130,6 +139,59 @@ public class DietServiceImpl implements DietService {
 		}
 		return false;
 	}
+
+	@Override
+	public boolean updateDietByDietNo(DietRequest dietReq) {
+		
+		System.out.println("ssssssssssssss");
+		
+		Diet oldDiet = dietDao.selectDietsByDietNo(dietReq.getDietNo());
+//		System.out.println("serviceeee " + oldData.getFilePath());
+		if (oldDiet == null) return false;
+		
+		MultipartFile newFile = dietReq.getFile();
+		
+		// 파일이 새로 업로드 된 경우
+		if (newFile != null && newFile.isEmpty()) {
+			deleteFileIfExist(oldDiet.getFilePath());
+			
+			String fileName = UUID.randomUUID() + "_" + newFile.getOriginalFilename(); 
+			File saveFile = new File(baseDir, fileName);
+			
+			try {
+				newFile.transferTo(saveFile);
+				String newFilePath = "/upload/" + fileName;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		
+		System.out.println("updateeeeeeeeeeeeeee " + dietReq.getDietNo());
+		Diet updateDiet = new Diet(dietReq.getDietNo(), dietReq.getUserNo(),
+									dietReq.getMealType(), dietReq.getFilePath());
+		int result = dietDao.updateDiet(updateDiet);
+		
+		dietDao.deleteDietFood(dietReq.getDietNo());
+		for (Food f : dietReq.getFoods()) {
+			DietsFood dietsFood = new DietsFood(dietReq.getDietNo(), f.getFoodName(), f.getCalorie());
+			System.out.println("updateeeeeeeeeeeeeee " + dietsFood.getDietNo());
+			dietDao.insertDietsFood(dietsFood);
+		}
+		
+		return result > 0;
+	}
+
+	private void deleteFileIfExist(String filePath) {
+		if (filePath == null || filePath.isEmpty()) return;
+		
+		String fileName = filePath.replace("/upload", "");
+		File file = new File(baseDir, fileName);
+		
+		if (file.exists()) file.delete();
+	}
+
+
 
 
 }
