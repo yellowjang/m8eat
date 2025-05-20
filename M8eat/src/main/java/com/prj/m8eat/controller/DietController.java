@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -85,7 +86,8 @@ public class DietController {
 		
 		Diet diet = new Diet();
 //		diet.setUserNo(loginUser.getUserNo());
-		diet.setUserNo(2);
+		diet.setUserNo(1);
+		System.out.println(diet);
 		diet.setMealType(dietReq.getMealType());
 		
 		MultipartFile file = dietReq.getFile();
@@ -118,5 +120,13 @@ public class DietController {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("식단 등록에 실패했습니다");
 	}
 	
+	// 식단 삭제
+	@DeleteMapping("/{dietNo}")
+	public ResponseEntity<String> deleteDietByDietNo(@PathVariable int dietNo) {
+		if (dietService.deleteDietByDietNo(dietNo)) {
+			return ResponseEntity.ok("삭제되었습니다.");
+		}
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("요청을 처리하지 못했습니다.");
+	}
 	
 }

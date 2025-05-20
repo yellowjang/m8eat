@@ -50,6 +50,12 @@
 		INSERT INTO diets_food (diet_no, food_name, calorie)
 		 VALUES (#{dietNo}, #{foodName}, #{calorie})
 	</insert>
+	
+	<!-- 식단 삭제 -->
+	<delete id="deleteDiet" parameterType="int">
+		DELETE FROM diets
+ 		 WHERE diet_no=#{dietNo}
+	</delete>
 
 
 </mapper>
