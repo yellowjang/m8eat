@@ -77,4 +77,22 @@
 		DELETE FROM boards_comment
 		WHERE board_no = #{boardNo} AND comment_no =#{commentNo}
 	</delete>
+	
+	<!-- 좋아요를 누르지 않았을  때 좋아요 등록 -->
+	<insert id="insertLike" parameterType="map">
+		  INSERT INTO boards_like (board_no, user_no)
+		  SELECT #{boardNo}, #{userNo}
+		  FROM dual
+		  WHERE NOT EXISTS (
+		    SELECT 1 FROM boards_like
+		    WHERE board_no = #{boardNo} AND user_no = #{userNo}
+		  )
+	</insert>
+	
+	<!-- 해당하는 게시글의 좋아요 수를-->
+	<select id="selectLikes" parameterType="int" resultType="int">
+		SELECT COUNT(*) FROM boards_like
+		WHERE board_no = #{boardNo}
+	</select>
+
  </mapper>
