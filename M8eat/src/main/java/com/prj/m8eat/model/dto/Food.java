@@ -1,30 +1,17 @@
 package com.prj.m8eat.model.dto;
 
-public class DietsFood {
-	private int no;
-	private int dietNo;
+public class Food {
 	private String foodName;
 	private int calorie;
 	
-	
-	
-	public DietsFood(int dietNo, String foodName, int calorie) {
-		this.dietNo = dietNo;
+	public Food() {
+	}
+
+	public Food(String foodName, int calorie) {
 		this.foodName = foodName;
 		this.calorie = calorie;
 	}
-	public int getNo() {
-		return no;
-	}
-	public void setNo(int no) {
-		this.no = no;
-	}
-	public int getDietNo() {
-		return dietNo;
-	}
-	public void setDietNo(int dietNo) {
-		this.dietNo = dietNo;
-	}
+	
 	public String getFoodName() {
 		return foodName;
 	}
@@ -37,5 +24,6 @@ public class DietsFood {
 	public void setCalorie(int calorie) {
 		this.calorie = calorie;
 	}
+	
 	
 }

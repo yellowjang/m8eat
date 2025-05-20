@@ -9,6 +9,47 @@
 		SELECT * 
 		 FROM diets;
 	</select>
+	<select id="selectAllDietsFood" resultType="DietsFood">
+		SELECT * 
+		 FROM diets_food;
+	</select>
+	
+	<!-- 유저별 식단 조회 -->
+	<select id="selectDietsByUserNo" parameterType="int" resultType="Diet">
+		SELECT * 
+		 FROM diets
+		 WHERE user_no=#{userNo}
+	</select>
+	<select id="selectDietsFoodByDietNo" parameterType="int" resultType="DietsFood">
+		SELECT * 
+		 FROM diets_food
+		 WHERE diet_no=#{dietNo}
+	</select>
+	
+	<!-- 날짜별 식단 조회 -->
+	<select id="selectDietsByDate" parameterType="Map" resultType="Diet">
+		SELECT * 
+		 FROM diets
+ 		 WHERE reg_date BETWEEN #{startDate} AND #{endDate};
+	</select>
+	
+	<!-- 식단 상세 조회 -->
+	<select id="selectDietsByDietNo" parameterType="int" resultType="Diet">
+		SELECT * 
+		 FROM diets
+		 WHERE diet_no=#{dietNo}
+	</select>
+	
+	<!-- 식단 기록 -->
+	<insert id="insertDiet" parameterType="Diet" keyProperty="dietNo" useGeneratedKeys="true">
+		INSERT INTO diets (user_no, meal_type, file_path)
+		 VALUES (#{userNo}, #{mealType}, #{filePath})
+	</insert>
+	
+	<insert id="insertDietsFood" parameterType="DietsFood">
+		INSERT INTO diets_food (diet_no, food_name, calorie)
+		 VALUES (#{dietNo}, #{foodName}, #{calorie})
+	</insert>
 
 
 </mapper>
