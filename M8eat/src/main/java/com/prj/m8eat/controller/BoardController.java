@@ -204,5 +204,23 @@ public class BoardController {
 	public int countLikes(@PathVariable int boardNo){
 		return boardService.countLikes(boardNo);
 	}
+	
+	@DeleteMapping("/{boardNo}/likes")
+	public ResponseEntity<?> removeLikes(@PathVariable("boardNo") int boardNo,HttpSession session) {
+		 Object userObj = session.getAttribute("loginUser");
+		    
+		    if (userObj == null) {
+		        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
+		    }
+		    int userNo = ((User) userObj).getUserNo();
+		    boolean isUnliked = boardService.removeLikes(boardNo, userNo); // 서비스 단에 userNo 전달
+
+		    if (isUnliked) {
+		        return ResponseEntity.ok("좋아요가 제거되었습니다.");
+		    } else {
+		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("좋아요 취소에 실패했습니다");
+		    }
+
+	}
 
 }

@@ -94,5 +94,10 @@
 		SELECT COUNT(*) FROM boards_like
 		WHERE board_no = #{boardNo}
 	</select>
+	<!--게시글 좋아요 삭제 -->
+	<delete id="deleteLike">
+		DELETE FROM boards_like
+		WHERE board_no = #{boardNo} AND user_no = #{userNo}
+	</delete>
 
  </mapper>
