@@ -21,7 +21,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.prj.m8eat.model.dto.Board;
 import com.prj.m8eat.model.dto.BoardsComment;
+import com.prj.m8eat.model.dto.User;
 import com.prj.m8eat.model.service.BoardService;
+
+import jakarta.servlet.http.HttpSession;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -33,7 +36,7 @@ public class BoardController {
 		this.boardService = boardService;
 	}
 
-	//전체 게시글 조회 
+	// 전체 게시글 조회
 	@GetMapping
 	public ResponseEntity<?> boardList() {
 		List<Board> boardList = boardService.getBoardList();
@@ -43,7 +46,7 @@ public class BoardController {
 		return new ResponseEntity<List<Board>>(boardList, HttpStatus.OK);
 	}
 
-	//게시글 상세 조회 
+	// 게시글 상세 조회
 	@GetMapping("/{boardNo}")
 	public ResponseEntity<Board> boardDetail(@PathVariable int boardNo) {
 		Board board = boardService.getBoardDetail(boardNo);
@@ -53,9 +56,8 @@ public class BoardController {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
 	}
-	
 
-	//게시글 등록 
+	// 게시글 등록
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<String> boardWrite(@ModelAttribute Board board) {
 		MultipartFile file = board.getFile();
@@ -86,7 +88,7 @@ public class BoardController {
 		}
 	}
 
-	//게시글 삭제  
+	// 게시글 삭제
 	@DeleteMapping("/{boardNo}")
 	public ResponseEntity<String> deleteBoard(@PathVariable int boardNo) {
 		boolean isDeleted = boardService.removeBoard(boardNo);
@@ -96,7 +98,7 @@ public class BoardController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("없는 게시글 번호입니다");
 	}
 
-	// 게시글 수정 
+	// 게시글 수정
 	@PutMapping(value = "/{boardNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<String> updateBoard(@PathVariable int boardNo, @ModelAttribute Board board) {
 		board.setBoardNo(boardNo);
@@ -131,8 +133,8 @@ public class BoardController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("게시글 수정에 실패하였습니다");
 		}
 	}
-	
-	//게시글 댓글 작성
+
+	// 게시글 댓글 작성
 	@PostMapping("/{boardNo}/comments")
 	public ResponseEntity<String> commentWrite(@ModelAttribute BoardsComment comment) {
 		int result = boardService.writeComment(comment);
@@ -142,8 +144,8 @@ public class BoardController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("댓글 작성에 실패했습니다");
 		}
 	}
-	
-	//댓글 전체 조회 
+
+	// 댓글 전체 조회
 	@GetMapping("/{boardNo}/comments")
 	public ResponseEntity<?> commentsList(@PathVariable int boardNo) {
 		List<BoardsComment> commentList = boardService.getCommentList(boardNo);
@@ -152,10 +154,11 @@ public class BoardController {
 		}
 		return new ResponseEntity<List<BoardsComment>>(commentList, HttpStatus.OK);
 	}
-	
-	// 댓글 수정 
+
+	// 댓글 수정
 	@PutMapping("/{boardNo}/comments/{commentNo}")
-	public ResponseEntity<?> updateComment(@PathVariable("boardNo") int boardNo,@PathVariable("commentNo") int commentNo, @RequestBody BoardsComment comment) {
+	public ResponseEntity<?> updateComment(@PathVariable("boardNo") int boardNo,
+			@PathVariable("commentNo") int commentNo, @RequestBody BoardsComment comment) {
 		comment.setCommentNo(commentNo);
 		int isSuccess = boardService.updateComment(comment, boardNo);
 		if (isSuccess >= 0) {
@@ -164,18 +167,41 @@ public class BoardController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("게시글 수정에 실패하였습니다");
 		}
 	}
-	
-	//게시글 삭제  
+
+	// 게시글 삭제
 	@DeleteMapping("/{boardNo}/comments/{commentNo}")
-	public ResponseEntity<String> deleteBoard(@PathVariable("boardNo") int boardNo,@PathVariable("commentNo") int commentNo) {
-		boolean isDeleted = boardService.removeComment(boardNo,commentNo);
+	public ResponseEntity<String> deleteBoard(@PathVariable("boardNo") int boardNo,
+			@PathVariable("commentNo") int commentNo) {
+		boolean isDeleted = boardService.removeComment(boardNo, commentNo);
 		if (isDeleted) {
 			return ResponseEntity.status(HttpStatus.OK).body("댓글이 성공적으로 삭제되었습니다!");
 		} else
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("댓글 삭제에 실패하였습니다");
 	}
 
+	
+	@PostMapping("/{boardNo}/likes")
+	public ResponseEntity<?> addLikes(@PathVariable("boardNo") int boardNo,HttpSession session) {
+		 Object userObj = session.getAttribute("loginUser");
+		    
+		    if (userObj == null) {
+		        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
+		    }
+
+		    int userNo = ((User) userObj).getUserNo();
+
+		    boolean isLiked = boardService.addLikes(boardNo, userNo); // 서비스 단에 userNo 전달
+
+		    if (isLiked) {
+		        return ResponseEntity.ok("좋아요가 등록되었습니다");
+		    } else {
+		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 좋아요를 눌렀습니다");
+		    }
+
+	}
+	// 게시글 좋아요 수 가져오기 boardNo 가 일치하는것들의 count 를 셈
+	public int countLikes(@PathVariable int boardNo){
+		return boardService.countLikes(boardNo);
 	}
 
-
-
+}

@@ -29,4 +29,8 @@ public interface BoardDao {
 	public int updateComment(@Param("comment") BoardsComment comment, @Param("boardNo") int boardNo);
 
 	public boolean deleteComment(@Param("boardNo")int boardNo, @Param("commentNo")int commentNo);
+
+	public boolean insertLike(int boardNo, int userNo);
+
+	public int selectLikes(int boardNo);
 }
