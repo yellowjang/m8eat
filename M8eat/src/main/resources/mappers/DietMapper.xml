@@ -20,10 +20,10 @@
 		 FROM diets
 		 WHERE user_no=#{userNo}
 	</select>
-	<select id="selectDietsFoodByUserNo" parameterType="int" resultType="DietsFood">
+	<select id="selectDietsFoodByDietNo" parameterType="int" resultType="DietsFood">
 		SELECT * 
-		 FROM diets_food;
-		 WHERE user_no=#{userNo}
+		 FROM diets_food
+		 WHERE diet_no=#{dietNo}
 	</select>
 	
 	<!-- 식단 기록 -->

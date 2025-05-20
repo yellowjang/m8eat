@@ -62,7 +62,7 @@ public class DietController {
 		
 		Diet diet = new Diet();
 //		diet.setUserNo(loginUser.getUserNo());
-		diet.setUserNo(3);
+		diet.setUserNo(2);
 		diet.setMealType(dietReq.getMealType());
 		
 		MultipartFile file = dietReq.getFile();
