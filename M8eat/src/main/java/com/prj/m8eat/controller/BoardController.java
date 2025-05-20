@@ -200,6 +200,7 @@ public class BoardController {
 
 	}
 	// 게시글 좋아요 수 가져오기 boardNo 가 일치하는것들의 count 를 셈
+	@GetMapping("/{boardNo}/likes")
 	public int countLikes(@PathVariable int boardNo){
 		return boardService.countLikes(boardNo);
 	}
