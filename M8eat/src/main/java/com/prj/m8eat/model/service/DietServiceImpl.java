@@ -57,14 +57,15 @@ public class DietServiceImpl implements DietService {
 			res.setFoods(new ArrayList<>());
 			dietList.add(res);
 			dietMap.put(diet.getDietNo(), res);
+			
+			List<DietsFood> dietsFood = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
+			for (DietsFood food : dietsFood) {
+				DietResponse target = dietMap.get(food.getDietNo());
+				Food tmp = new Food(food.getFoodName(), food.getCalorie());
+				target.getFoods().add(tmp);
+			}
 		}
 		
-		List<DietsFood> dietsFood = dietDao.selectDietsFoodByUserNo(userNo);
-		for (DietsFood food : dietsFood) {
-			DietResponse target = dietMap.get(food.getDietNo());
-			Food tmp = new Food(food.getFoodName(), food.getCalorie());
-			target.getFoods().add(tmp);
-		}
 		
 		return dietList;
 	}

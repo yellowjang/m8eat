@@ -20,6 +20,6 @@ public interface DietDao {
 
 	public List<Diet> selectDietsByUserNo(int userNo);
 
-	public List<DietsFood> selectDietsFoodByUserNo(int userNo);
+	public List<DietsFood> selectDietsFoodByDietNo(int userNo);
 
 }
