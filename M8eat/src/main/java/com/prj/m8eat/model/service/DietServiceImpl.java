@@ -123,5 +123,13 @@ public class DietServiceImpl implements DietService {
 
 	}
 
+	@Override
+	public boolean deleteDietByDietNo(int dietNo) {
+		if (dietDao.deleteDiet(dietNo) > 0) {
+			return true;
+		}
+		return false;
+	}
+
 
 }

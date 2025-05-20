@@ -27,4 +27,6 @@ public interface DietDao {
 
 	public List<Diet> selectDietsByDietNo(int dietNo);
 
+	public int deleteDiet(int dietNo);
+
 }

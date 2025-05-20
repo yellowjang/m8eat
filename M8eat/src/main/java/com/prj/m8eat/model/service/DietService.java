@@ -18,4 +18,6 @@ public interface DietService {
 
 	public List<DietResponse> getDietsByDietNo(int dietNo);
 
+	public boolean deleteDietByDietNo(int dietNo);
+
 }
