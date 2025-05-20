@@ -35,4 +35,6 @@ public interface BoardDao {
 	public int selectLikes(int boardNo);
 
 	public boolean deleteLike(int boardNo, int userNo);
+
+	public int selectLiked(int boardNo, int userNo);
 }

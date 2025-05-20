@@ -179,47 +179,59 @@ public class BoardController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("댓글 삭제에 실패하였습니다");
 	}
 
-	
 	@PostMapping("/{boardNo}/likes")
-	public ResponseEntity<?> addLikes(@PathVariable("boardNo") int boardNo,HttpSession session) {
-		 Object userObj = session.getAttribute("loginUser");
-		    
-		    if (userObj == null) {
-		        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
-		    }
+	public ResponseEntity<?> addLikes(@PathVariable("boardNo") int boardNo, HttpSession session) {
+		Object userObj = session.getAttribute("loginUser");
 
-		    int userNo = ((User) userObj).getUserNo();
+		if (userObj == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
+		}
 
-		    boolean isLiked = boardService.addLikes(boardNo, userNo); // 서비스 단에 userNo 전달
+		int userNo = ((User) userObj).getUserNo();
 
-		    if (isLiked) {
-		        return ResponseEntity.ok("좋아요가 등록되었습니다");
-		    } else {
-		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 좋아요를 눌렀습니다");
-		    }
+		boolean isLiked = boardService.addLikes(boardNo, userNo); // 서비스 단에 userNo 전달
+
+		if (isLiked) {
+			return ResponseEntity.ok("좋아요가 등록되었습니다");
+		} else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 좋아요를 눌렀습니다");
+		}
 
 	}
+
 	// 게시글 좋아요 수 가져오기 boardNo 가 일치하는것들의 count 를 셈
 	@GetMapping("/{boardNo}/likes")
-	public int countLikes(@PathVariable int boardNo){
+	public int countLikes(@PathVariable int boardNo) {
 		return boardService.countLikes(boardNo);
 	}
-	
-	@DeleteMapping("/{boardNo}/likes")
-	public ResponseEntity<?> removeLikes(@PathVariable("boardNo") int boardNo,HttpSession session) {
-		 Object userObj = session.getAttribute("loginUser");
-		    
-		    if (userObj == null) {
-		        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
-		    }
-		    int userNo = ((User) userObj).getUserNo();
-		    boolean isUnliked = boardService.removeLikes(boardNo, userNo); // 서비스 단에 userNo 전달
 
-		    if (isUnliked) {
-		        return ResponseEntity.ok("좋아요가 제거되었습니다.");
-		    } else {
-		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("좋아요 취소에 실패했습니다");
-		    }
+	// 해당 사용자가 해당 게시글에 좋아요를 눌렀는지 확인하기
+	@GetMapping("/{boardNo}/likes/check")
+	public boolean countLikes(@PathVariable int boardNo, HttpSession session) {
+		Object userObj = session.getAttribute("loginUser");
+		int userNo = ((User) userObj).getUserNo();
+
+		if (boardService.checkLiked(boardNo, userNo) == 1) {
+			return true;
+		} else
+			return false;
+	}
+
+	@DeleteMapping("/{boardNo}/likes")
+	public ResponseEntity<?> removeLikes(@PathVariable("boardNo") int boardNo, HttpSession session) {
+		Object userObj = session.getAttribute("loginUser");
+
+		if (userObj == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
+		}
+		int userNo = ((User) userObj).getUserNo();
+		boolean isUnliked = boardService.removeLikes(boardNo, userNo); // 서비스 단에 userNo 전달
+
+		if (isUnliked) {
+			return ResponseEntity.ok("좋아요가 제거되었습니다.");
+		} else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("좋아요 취소에 실패했습니다");
+		}
 
 	}
 

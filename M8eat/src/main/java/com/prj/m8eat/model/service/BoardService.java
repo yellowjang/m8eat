@@ -35,5 +35,7 @@ public interface BoardService {
 
 	public boolean removeLikes(int boardNo, int userNo);
 
+	public int checkLiked(int boardNo, int userNo);
+
 	
 }
