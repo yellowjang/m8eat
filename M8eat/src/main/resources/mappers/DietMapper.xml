@@ -56,6 +56,17 @@
 		DELETE FROM diets
  		 WHERE diet_no=#{dietNo}
 	</delete>
+	
+	<!-- 식단 수정 -->
+	<delete id="deleteDietFood" parameterType="int">
+		DELETE FROM diets_food
+ 		 WHERE diet_no=#{dietNo}
+	</delete>
+	<update id="updateDiet" >
+		UPDATE diets
+		 SET meal_type=#{mealType}, file_path=#{filePath}
+		 WHERE diet_no = #{dietNo};
+	</update>
 
 
 </mapper>
