@@ -1,6 +1,9 @@
 package com.prj.m8eat.model.service;
 
 import java.util.List;
+import java.util.Map;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.prj.m8eat.model.dto.Diet;
 import com.prj.m8eat.model.dto.DietRequest;
@@ -22,5 +25,7 @@ public interface DietService {
 	public boolean deleteDietByDietNo(int dietNo);
 
 	public boolean updateDietByDietNo(DietRequest dietReq);
+
+	public List<Map<String, Object>> analyzeImageAndMatchLabels(MultipartFile file) throws Exception;
 
 }
