@@ -9,6 +9,7 @@
 
   .logo img {
     height: 40px;
+    margin-right: 40px;
   }
   .header-left {
     display: flex;
@@ -18,6 +19,7 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    margin-left: auto;
 
     .greeting {
       font-weight: 500;
@@ -26,14 +28,14 @@
 
     .nav-btn {
       padding: 0.4rem 1rem;
-      border: 1px solid #3498db;
+      border: 1px solid #d26767;
       border-radius: 5px;
-      color: #3498db;
+      color: #d26767;
       text-decoration: none;
       transition: background 0.2s;
 
       &:hover {
-        background-color: #3498db;
+        background-color: #d26767;
         color: white;
       }
     }

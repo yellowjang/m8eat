@@ -1,40 +1,40 @@
 <template>
   <div class="login-container">
-    <h3>로그인</h3>
+    <div class="login-box">
+      <h3>로그인</h3>
 
-    <form class="login-form">
-      <label for="email">이메일</label>
-      <input id="email" type="email" placeholder="이메일을 입력해주세요." />
+      <form class="login-form">
+        <label for="email">이메일</label>
+        <input id="email" type="email" placeholder="이메일을 입력해주세요." />
 
-      <label for="password">비밀번호</label>
-      <!-- <div class="password-wrapper"> -->
-      <input id="password" type="password" placeholder="비밀번호를 입력해주세요." />
-      <!-- <span class="toggle-eye">👁️</span> -->
-      <!-- </div> -->
+        <label for="password">비밀번호</label>
+        <!-- <div class="password-wrapper"> -->
+        <input id="password" type="password" placeholder="비밀번호를 입력해주세요." />
+        <!-- <span class="toggle-eye">👁️</span> -->
+        <!-- </div> -->
 
-      <div class="forgot-password">
-        <a href="#">비밀번호를 잊으셨나요?</a>
+        <div class="forgot-password">
+          <a href="#">비밀번호를 잊으셨나요?</a>
+        </div>
+
+        <button type="submit" class="login-button">로그인</button>
+      </form>
+      <div class="signup">
+        아직 계정이 없으신가요?
+        <a href="#">가입하기</a>
       </div>
 
-      <button type="submit" class="login-button">로그인</button>
-    </form>
-
-    <div class="signup">
-      아직 계정이 없으신가요?
-      <a href="#">가입하기</a>
-    </div>
-
-    <div class="divider">
-      <span></span>
-      <p>OR</p>
-      <span></span>
-    </div>
-
-    <div class="social-login">
-      <p>간편 로그인하기</p>
-      <div class="social-buttons">
-        <button class="google">G</button>
-        <button class="kakao">K</button>
+      <div class="divider">
+        <span></span>
+        <p>OR</p>
+        <span></span>
+      </div>
+      <div class="social-login">
+        <p>간편 로그인하기</p>
+        <div class="social-buttons">
+          <a href=""><img src="@/assets/icon/google.png" /></a>
+          <a href=""><img src="@/assets/icon/kakao.png" /></a>
+        </div>
       </div>
     </div>
   </div>
@@ -46,11 +46,24 @@
 .login-container {
   //   max-width: 400px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
   background-color: #fdeeee;
-  border-radius: 8px;
   font-family: "Noto Sans KR", sans-serif;
+  padding-top: 10rem;
+
+  @media (min-width: 1024px) {
+    padding: 8rem 20rem;
+  }
+
+  // 태블릿
+  @media (min-width: 768px) and (max-width: 1023px) {
+    padding: 6rem 10rem;
+  }
+
+  // 모바일
+  @media (max-width: 767px) {
+    padding: 4rem 1.5rem;
+  }
 
   h3 {
     font-size: 1.8rem;
@@ -58,11 +71,19 @@
     font-weight: bold;
   }
 
+  .login-box {
+    margin: auto;
+    max-width: 700px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   .login-form {
     display: flex;
     flex-direction: column;
     text-align: left;
-
+    width: 80%;
     label {
       font-size: 0.9rem;
       margin: 0.8rem 0 0.2rem;
@@ -70,9 +91,14 @@
 
     input {
       padding: 0.8rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      border: 0.5px solid #ccc;
+      border-radius: 10px;
       margin-bottom: 0.5rem;
+      outline: none;
+
+      &:focus {
+        border-color: #de9c9c;
+      }
     }
 
     .password-wrapper {
@@ -123,10 +149,12 @@
 
   .divider {
     display: flex;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
     margin: 2rem 0;
     color: #aaa;
+    width: 80%;
 
     span {
       flex: 1;

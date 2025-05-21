@@ -87,7 +87,7 @@
 
   button {
     padding: 0.5rem 1.2rem;
-    background-color: #3498db;
+    background-color: #db8383;
     color: white;
     border: none;
     border-radius: 5px;
@@ -96,7 +96,7 @@
     transition: background-color 0.2s ease;
 
     &:hover {
-      background-color: #2980b9;
+      background-color: #d26767;
     }
   }
 }
@@ -126,7 +126,7 @@
     }
 
     a {
-      color: #3498db;
+      color: #d26767;
       text-decoration: none;
 
       &:hover {
