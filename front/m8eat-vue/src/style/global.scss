@@ -1,0 +1,31 @@
+/* reset 일부 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic",
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  line-height: 1.5;
+  background-color: #fdeeee;
+  color: #3d3d3d;
+}
+
+button {
+  padding: 0.4rem 1rem;
+  border: 1px solid #d26767;
+  border-radius: 5px;
+  color: #d26767;
+  text-decoration: none;
+  transition: background 0.2s;
+
+  &:hover {
+    background-color: #d26767;
+    color: white;
+  }
+}
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/variable/pretendardvariable.css");
