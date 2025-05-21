@@ -1,8 +1,7 @@
-create database if not exists m8eat;
-
+drop database m8eat;
+create database IF NOT EXISTS m8eat;
 use m8eat;
 
-drop database m8eat;
 
 -- 사용자 정보
 CREATE TABLE if not exists users (
@@ -50,11 +49,20 @@ CREATE TABLE if not exists diets (
     diet_no INT PRIMARY KEY AUTO_INCREMENT,
     user_no INT not null,
     reg_date TIMESTAMP default now(),
-    file VARCHAR(255),
+    meal_type VARCHAR(10) not null,
+    file_path VARCHAR(255),
     FOREIGN KEY (user_no) REFERENCES users(user_no)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
+
+select * from users;
+select * from diets;
+select * from diets_food;
+
+drop table diets_food;
+drop table diets;
+
 
 -- 식단 음식 구성
 CREATE TABLE if not exists diets_food (
@@ -66,6 +74,32 @@ CREATE TABLE if not exists diets_food (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
+
+
+-- 음식 데이터
+CREATE TABLE food (
+    food_id INT PRIMARY KEY,
+    calories INT,
+    name_ko VARCHAR(100) NOT NULL,
+    moisture DOUBLE,
+    protein DOUBLE,
+    fat DOUBLE,
+    carbohydrate DOUBLE,
+    sugar DOUBLE,
+    fiber DOUBLE,
+    calcium DOUBLE,
+    sodium DOUBLE,
+    cholesterol DOUBLE
+);
+
+drop table food;
+select * from food;
+select * from food where name_ko='채소밥' ;
+select * from food;
+ 
+
+
+
 
 -- 채팅방
 CREATE TABLE if not exists chat_room (
@@ -117,9 +151,9 @@ CREATE TABLE if not exists board (
         ON UPDATE CASCADE
 );
 
-		SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
-		reg_date as regDate, file_path as filePath
-		FROM board;
+        SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
+        reg_date as regDate, file_path as filePath
+        FROM board;
 
 
 INSERT INTO board (user_no, title, content, file_path)

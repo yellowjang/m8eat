@@ -70,6 +70,20 @@
 		  <artifactId>google-cloud-vision</artifactId>
 		  <version>3.16.0</version> <!-- 버전 최신 확인 -->
 		</dependency>
+		
+		<dependency>
+		  <groupId>org.apache.commons</groupId>
+		  <artifactId>commons-text</artifactId>
+		  <version>1.10.0</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.google.cloud</groupId>
+		    <artifactId>google-cloud-translate</artifactId>
+		    <version>2.30.0</version> <!-- 버전은 최신 기준 -->
+		</dependency>
+
+
 
 	</dependencies>
 
