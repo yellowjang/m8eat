@@ -1,7 +1,7 @@
 <template>
   <header class="app-header">
     <RouterLink to="/" class="logo">
-      <img src="@/assets/img/logo.png" alt="로고" />
+      <img src="@/assets/img/log.svg" alt="로고" />
     </RouterLink>
     <div class="header-left">
       <RouterLink to="/">Home</RouterLink>

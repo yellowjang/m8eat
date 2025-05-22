@@ -6,8 +6,20 @@ public class Diet {
 	private int dietNo;
 	private int userNo;
 	private String regDate;
+	private String mealType;
 	private MultipartFile file; //업로드용.. Request 시 사용
 	private String filePath; //DB에서 불러올 실제 경로
+	
+	
+	
+	public Diet() {
+	}
+
+	public Diet(int userNo, MultipartFile file, String filePath) {
+		this.userNo = userNo;
+		this.file = file;
+		this.filePath = filePath;
+	}
 	
 	public int getDietNo() {
 		return dietNo;
@@ -26,6 +38,13 @@ public class Diet {
 	}
 	public void setRegDate(String regDate) {
 		this.regDate = regDate;
+	}
+	public String getMealType() {
+		return mealType;
+	}
+	
+	public void setMealType(String mealType) {
+		this.mealType = mealType;
 	}
 	public MultipartFile getFile() {
 		return file;
