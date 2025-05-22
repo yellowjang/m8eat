@@ -1,26 +1,30 @@
 <template>
-  <div class="container">
-    <h2>🥗 식단 이미지 분석</h2>
-
+  <div>
+    <h2>🍱 Vision + GPT 분석 테스트</h2>
     <input type="file" @change="onFileChange" />
-    <button @click="analyzeImage" :disabled="!file || loading">분석 요청</button>
+    <button @click="analyzeImage">분석 요청</button>
 
-    <div v-if="loading">⏳ 분석 중...</div>
-    <div v-if="error" class="error">❌ 분석 실패: {{ errorMessage }}</div>
+    <div v-if="loading">⏳ 분석 중입니다...</div>
 
     <div v-if="results.length > 0">
-      <h3>📝 분석 결과:</h3>
-      <div v-for="(item, idx) in results" :key="idx" class="result-item">
-        <p><strong>영문 라벨:</strong> {{ item.label }}</p>
-        <p><strong>번역 결과:</strong> {{ item.translated }}</p>
-        <p><strong>매칭된 음식명:</strong> {{ item.matched }}</p>
-        <div v-if="item.nutrition">
-          <p><strong>칼로리:</strong> {{ item.nutrition.calorie }} kcal</p>
-          <p><strong>단백질:</strong> {{ item.nutrition.protein }}g</p>
-          <p><strong>지방:</strong> {{ item.nutrition.fat }}g</p>
-        </div>
-        <hr />
-      </div>
+      <h3>📦 분석 결과</h3>
+      <p v-if="results.length === 0">❗결과가 없습니다.</p>
+
+      <ul v-else>
+        <li v-for="(item, idx) in results" :key="idx">
+          🍽️ 라벨: {{ item.label }}
+          <br>🇰🇷 번역: {{ item.translated }}
+          <br>🔍 매칭: {{ item.matched }}
+          <div v-if="item.nutrition">
+            🔥 칼로리: {{ item.nutrition.calories }}kcal
+          </div>
+          <div v-else>
+            ⚠️ 영양 정보 없음
+          </div>
+        </li>
+      </ul>
+
+
     </div>
   </div>
 </template>
@@ -29,34 +33,26 @@
 import { ref } from 'vue'
 import axios from 'axios'
 
-const file = ref(null)
-const results = ref([])
+const selectedFile = ref(null)
 const loading = ref(false)
-const error = ref(false)
-const errorMessage = ref('')
+const results = ref([])
 
-function onFileChange(e) {
-  file.value = e.target.files[0]
-  results.value = []
-  error.value = false
+const onFileChange = (e) => {
+  selectedFile.value = e.target.files[0]
 }
 
-async function analyzeImage() {
-  if (!file.value) return
+const analyzeImage = async () => {
+  if (!selectedFile.value) return alert("파일을 선택하세요")
   loading.value = true
-  error.value = false
-  errorMessage.value = ''
-
   const formData = new FormData()
-  formData.append('file', file.value)
+  formData.append("file", selectedFile.value)
 
   try {
-    const res = await axios.post('http://localhost:8080/diets/api/image/label', formData)
+    const res = await axios.post("http://localhost:8080/diets/ai/vision-gpt", formData)
     results.value = res.data
   } catch (err) {
-    console.error('분석 실패:', err)
-    error.value = true
-    errorMessage.value = err.response?.data || '서버 오류'
+    console.error(err)
+    alert("분석 실패: " + err.message)
   } finally {
     loading.value = false
   }
@@ -64,18 +60,10 @@ async function analyzeImage() {
 </script>
 
 <style scoped>
-.container {
-  max-width: 600px;
-  margin: 2rem auto;
+h2 {
+  margin-bottom: 1rem;
 }
-.error {
-  color: red;
-  margin-top: 1rem;
-}
-.result-item {
-  background: #f9f9f9;
-  padding: 1rem;
-  border-radius: 8px;
+ul {
   margin-bottom: 1rem;
 }
 </style>

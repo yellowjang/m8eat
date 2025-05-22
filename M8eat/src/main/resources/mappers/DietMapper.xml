@@ -70,16 +70,14 @@
 	
 	<!-- google api -->
 	    <!-- 전체 음식 이름 목록 (유사도 비교용) -->
-    <select id="getAllDietNames" resultType="String">
-        SELECT name_ko FROM food
-    </select>
+	<select id="getAllDietNames" resultType="string">
+	  SELECT name_ko FROM food
+	</select>
+	
+	<select id="getDietByName" parameterType="string" resultType="FoodInfo">
+	  SELECT * FROM food WHERE name_ko = #{name} LIMIT 1
+	</select>
 
-    <!-- 이름으로 해당 음식 전체 정보 조회 -->
-    <select id="getDietByName" parameterType="String" resultType="FoodInfo">
-        SELECT * FROM food
-        WHERE name_ko = #{name}
-        LIMIT 1
-    </select>
 
 
 </mapper>

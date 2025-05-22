@@ -26,6 +26,7 @@ public interface DietService {
 
 	public boolean updateDietByDietNo(DietRequest dietReq);
 
-	public List<Map<String, Object>> analyzeImageAndMatchLabels(MultipartFile file) throws Exception;
+	public List<Map<String, Object>> analyzeImageWithVisionAndGpt(MultipartFile file) throws Exception;
+
 
 }

@@ -83,6 +83,40 @@
 		    <version>2.30.0</version> <!-- 버전은 최신 기준 -->
 		</dependency>
 
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>com.squareup.okhttp3</groupId>
+		    <artifactId>okhttp</artifactId>
+		    <version>4.10.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-databind</artifactId>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.theokanning.openai-gpt3-java</groupId>
+		    <artifactId>client</artifactId>
+		    <version>0.18.2</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.theokanning.openai-gpt3-java</groupId>
+		    <artifactId>service</artifactId>
+		    <version>0.12.0</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.google.code.gson</groupId>
+		    <artifactId>gson</artifactId>
+		    <version>2.10.1</version>
+		</dependency>
+
+
+
+
 
 
 	</dependencies>

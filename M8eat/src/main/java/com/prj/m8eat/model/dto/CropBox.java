@@ -1,6 +1,4 @@
-package com.prj.m8eat.model.dto; // 패키지는 실제 경로에 맞게 조정하세요
-
-import java.util.Map;
+package com.prj.m8eat.model.dto;
 
 public class CropBox {
     private int x;
@@ -9,34 +7,46 @@ public class CropBox {
     private int height;
 
     public CropBox(int x, int y, int width, int height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        this.x = x; this.y = y; this.width = width; this.height = height;
     }
 
-    public int getX() {
-        return x;
-    }
+	public int getX() {
+		return x;
+	}
 
-    public int getY() {
-        return y;
-    }
+	public void setX(int x) {
+		this.x = x;
+	}
 
-    public int getWidth() {
-        return width;
-    }
+	public int getY() {
+		return y;
+	}
 
-    public int getHeight() {
-        return height;
-    }
+	public void setY(int y) {
+		this.y = y;
+	}
 
-    public Map<String, Integer> toMap() {
-        return Map.of(
-                "x", x,
-                "y", y,
-                "width", width,
-                "height", height
-        );
-    }
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	@Override
+	public String toString() {
+		return "CropBox [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + "]";
+	}
+
+    
+    
 }
