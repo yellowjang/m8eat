@@ -6,15 +6,11 @@ import BoardDetail from "@/components/board/BoardDetail.vue";
 import BoardRegist from "@/components/board/BoardRegist.vue";
 import Login from "@/views/LoginView.vue";
 import MainView from "@/views/MainView.vue";
-<<<<<<< HEAD
 import LoginView from "@/views/LoginView.vue";
 import SignupView from "@/views/SignupView.vue";
 import DietView from "@/views/DietView.vue";
 import DietView2 from "@/views/DietView2.vue";
-=======
-import MainView2 from "@/views/MainView2.vue";
 import ApiTest from "@/components/board/ApiTest.vue";
->>>>>>> back
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
