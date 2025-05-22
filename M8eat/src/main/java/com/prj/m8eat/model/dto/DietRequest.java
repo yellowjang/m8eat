@@ -3,11 +3,22 @@ package com.prj.m8eat.model.dto;
 import org.springframework.web.multipart.MultipartFile;
 
 public class DietRequest {
+	private int dietNo;
 	private int userNo;
     private String mealType;
     private MultipartFile file;
     private String filePath;
     private String foods; // JSON 문자열 (프론트에서 stringify 해서 넘김)
+
+	
+	
+	public int getDietNo() {
+		return dietNo;
+	}
+	public void setDietNo(int dietNo) {
+		this.dietNo = dietNo;
+	}
+
 	public int getUserNo() {
 		return userNo;
 	}
@@ -49,4 +60,11 @@ public class DietRequest {
 	public DietRequest() {
 	}
 
+	
+	@Override
+	public String toString() {
+		return "DietRequest [dietNo=" + dietNo + ", userNo=" + userNo + ", mealType=" + mealType + ", file=" + file
+				+ ", filePath=" + filePath + ", foods=" + foods + "]";
+	}
+	
 }
