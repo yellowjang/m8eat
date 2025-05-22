@@ -3,6 +3,7 @@ package com.prj.m8eat.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prj.m8eat.model.dto.LoginResponse;
+import com.prj.m8eat.model.dto.SignupRequestDTO;
 import com.prj.m8eat.model.dto.User;
 import com.prj.m8eat.model.dto.UserHealthInfo;
 import com.prj.m8eat.model.service.UserService;
@@ -20,6 +22,7 @@ import com.prj.m8eat.model.service.UserService;
 import jakarta.servlet.http.HttpSession;
 
 @RestController
+@CrossOrigin("*")
 public class UserController {
 	
 	private final UserService userService;
@@ -28,7 +31,12 @@ public class UserController {
 	}
 	
 	@PostMapping("/auth/signup")
-	public ResponseEntity<Void> signup(@ModelAttribute User user, @ModelAttribute UserHealthInfo healthInfo) {
+//	public ResponseEntity<Void> signup(@RequestBody User user, @RequestBody UserHealthInfo healthInfo) {
+	public ResponseEntity<Void> signup(@RequestBody SignupRequestDTO reqDto) {
+		System.out.println("Controller signuppppppppppppppppppppppp");
+		User user = reqDto.getUser();
+		UserHealthInfo healthInfo = reqDto.getHealthInfo();
+		System.out.println(user);
 		if (userService.signup(user, healthInfo) == 1) {
 			return new ResponseEntity<Void>(HttpStatus.CREATED);
 		} else {

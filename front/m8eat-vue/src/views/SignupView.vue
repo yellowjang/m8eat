@@ -2,18 +2,18 @@
   <div class="signup-container">
     <h3>회원가입</h3>
     <div class="signup-box">
-      <form class="signup-form">
+      <form class="signup-form" @submit.prevent="signup">
         <label for="name">이름</label>
-        <input id="name" type="text" placeholder="이름을 입력해주세요." />
+        <input id="name" type="text" placeholder="이름을 입력해주세요." v-model.trim="name" />
 
         <label for="username">아이디</label>
-        <input id="username" type="text" placeholder="아이디를 입력해주세요." />
+        <input id="username" type="text" placeholder="아이디를 입력해주세요." v-model.trim="id" />
 
         <label for="password">비밀번호</label>
-        <input id="password" type="password" placeholder="비밀번호를 입력해주세요." />
+        <input id="password" type="password" placeholder="비밀번호를 입력해주세요." v-model.trim="password" />
 
         <label for="passwordConfirm">비밀번호 확인</label>
-        <input id="passwordConfirm" type="password" placeholder="비밀번호를 한 번 더 입력해주세요." />
+        <input id="passwordConfirm" type="password" placeholder="비밀번호를 한 번 더 입력해주세요." v-model.trim="passwordConfirm" />
 
         <button type="submit" class="signup-button">회원가입</button>
       </form>
@@ -40,7 +40,38 @@
 </template>
 
 <script setup>
-// 아직 로직은 없음
+import { ref } from "vue";
+import { useUserStore } from "@/stores/user";
+
+const store = useUserStore();
+
+const name = ref("");
+const id = ref("");
+const password = ref("");
+const passwordConfirm = ref("");
+
+const signup = () => {
+  if (!name.value || !id.value || !password.value || !passwordConfirm.value) {
+    alert("모든 항목을 입력해주세요");
+    return;
+  }
+
+  if (password.value !== passwordConfirm.value) {
+    alert("비밀번호가 일치하지 않습니다.");
+    return;
+  }
+
+  console.log("signup viewww");
+  console.log(name.value);
+  console.log(id.value);
+  console.log(password.value);
+
+  store.signup({
+    name: name.value,
+    id: id.value,
+    password: password.value,
+  });
+};
 </script>
 
 <style lang="scss" scoped>
