@@ -1,0 +1,159 @@
+create database if not exists m8eat;
+
+use m8eat;
+
+drop database m8eat;
+
+-- 사용자 정보
+CREATE TABLE if not exists users (
+    user_no INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) not null,
+    id VARCHAR(100) UNIQUE not null,
+    password VARCHAR(255) ,
+    role VARCHAR(20) not null DEFAULT 'user'
+);
+INSERT INTO users (name, id, password, role)
+VALUES
+('홍길동', 'hong123', 'password1!', 'user'),
+('김철수', 'kimcs', 'passw0rd!', 'user'),
+('이영희', 'lee01', 'myp@ssword', 'admin'),
+('박민수', 'parkms', 'qwer1234', 'user'),
+('최지은', 'choi_je', 'abcd!1234', 'user');
+
+select * from users;
+
+-- 사용자 건강 정보
+CREATE TABLE if not exists users_health_info (
+    info_no INT PRIMARY KEY AUTO_INCREMENT,
+    user_no INT not null,
+    height double,
+    weight double,
+    illness TEXT,
+    allergy TEXT,
+    purpose TEXT,
+    FOREIGN KEY (user_no) REFERENCES users(user_no)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- 코치 선호 태그
+CREATE TABLE if not exists coach_prefer (
+    user_no INT PRIMARY KEY,
+    tags TEXT,
+    FOREIGN KEY (user_no) REFERENCES users(user_no)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- 식단
+CREATE TABLE if not exists diets (
+    diet_no INT PRIMARY KEY AUTO_INCREMENT,
+    user_no INT not null,
+    reg_date TIMESTAMP default now(),
+    file VARCHAR(255),
+    FOREIGN KEY (user_no) REFERENCES users(user_no)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- 식단 음식 구성
+CREATE TABLE if not exists diets_food (
+    no INT PRIMARY KEY AUTO_INCREMENT,
+    diet_no INT not null,
+    food_name VARCHAR(255) not null,
+    calorie INT not null,
+    FOREIGN KEY (diet_no) REFERENCES diets(diet_no)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- 채팅방
+CREATE TABLE if not exists chat_room (
+    room_no INT PRIMARY KEY AUTO_INCREMENT,
+    room_type TEXT not null,
+    created_at TIMESTAMP default now()
+);
+
+-- 채팅방 참여자
+CREATE TABLE if not exists chat_room_user (
+    room_no INT not null,
+    user_no INT not null,
+    PRIMARY KEY (room_no, user_no),
+    FOREIGN KEY (room_no) REFERENCES chat_room(room_no)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (user_no) REFERENCES users(user_no)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- 채팅 메시지
+CREATE TABLE if not exists chat_msg (
+    msg_no INT PRIMARY KEY AUTO_INCREMENT,
+    room_no INT not null,
+    sender_no INT not null,
+    content VARCHAR(1000) not null,
+    msg_type TEXT not null,
+    created_at TIMESTAMP default now(),
+    FOREIGN KEY (room_no) REFERENCES chat_room(room_no)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (sender_no) REFERENCES users(user_no)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- 게시판
+CREATE TABLE if not exists board (
+    board_no INT PRIMARY KEY AUTO_INCREMENT,
+    user_no INT not null,
+    title VARCHAR(255) not null,
+    content VARCHAR(2000) not null,
+    view_cnt INT default 0,
+    reg_date TIMESTAMP default now(),
+    file_path VARCHAR(255),
+    FOREIGN KEY (user_no) REFERENCES users(user_no)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+		SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
+		reg_date as regDate, file_path as filePath
+		FROM board;
+
+
+INSERT INTO board (user_no, title, content, file_path)
+VALUES
+(1, '첫 번째 게시글', '이것은 첫 번째 게시글의 내용입니다.', '/uploads/image1.png'),
+(2, '두 번째 게시글', '이것은 두 번째 게시글의 내용입니다.', '/uploads/doc1.pdf'),
+(1, '세 번째 게시글', '파일 없이 텍스트만 있는 게시글입니다.', NULL),
+(2, '네 번째 게시글', '사진과 함께하는 게시글입니다.', '/uploads/photo.jpg');
+
+
+-- 게시글 좋아요
+CREATE TABLE if not exists boards_like (
+    like_no INT PRIMARY KEY AUTO_INCREMENT,
+    board_no INT not null,
+    user_no INT not null,
+    FOREIGN KEY (board_no) REFERENCES boards(board_no)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+drop table boards_like;
+-- 게시글 댓글
+CREATE TABLE if not exists boards_comment (
+    comment_no INT PRIMARY KEY AUTO_INCREMENT,
+    board_no INT not null,
+    user_no INT not null,
+    content VARCHAR(1000) not null,
+    created_at TIMESTAMP default now(),
+    updated_at TIMESTAMP,
+    FOREIGN KEY (board_no) REFERENCES boards(board_no)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (user_no) REFERENCES users(user_no)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+drop table boards_comment;
