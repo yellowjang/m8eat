@@ -1,6 +1,6 @@
 <template>
   <section class="meal-today">
-    <h2>오늘의 식단</h2>
+    <h2 class="title">오늘의 식단</h2>
     <!-- showForm이 false일 때만 기존 박스 보여줌 -->
     <template v-if="!showForm">
       <div class="meal-boxes">
@@ -17,7 +17,15 @@
         </div>
       </div>
       <p class="summary">총 섭취 칼로리: {{ overallCalories }} kcal</p>
-
+      <div>
+        <p>식단 분석</p>
+        <div>
+          <!-- 영양성분 분석 그래프 들어감. -->
+          <!-- 막대 그래프에는 하루 권장 섭취량이 전체 섭취량이 되고, 현재 섭취한 영양성분은
+              비율로 현재까지의 섭취율을 표기한다. 이건 탄수화물, 단백질, 지방, 당류로 구분하여
+              4개의 원형 그래프로 나타내려고 함.-->
+        </div>
+      </div>
       <div class="add-meal-box">
         <button class="add-meal" @click="showForm = true">+ 식단 등록하기</button>
       </div>
@@ -74,6 +82,11 @@ const addMeal = (newMeal) => {
 };
 </script>
 <style lang="scss" scoped>
+.title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
 .meal-record {
   display: flex;
   gap: 2rem;
