@@ -19,7 +19,7 @@
               <img :src="previewUrl" alt="미리보기" />
               <!-- 엑스 버튼 이미지 사용 -->
               <button type="button" class="remove-image-button" @click="removeImage">
-                <img src="@/assets/icon/X.svg" alt="제거" />
+                <img class="remove" :src="deleteIcon" alt="제거" />
               </button>
             </div>
           </div>
@@ -82,7 +82,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-
+import deleteIcon from "@/assets/icon/deleteIcon.png";
 const emit = defineEmits(["close"]);
 
 const mealTime = ref("");
@@ -146,6 +146,7 @@ const handleSubmit = () => {
     margin-top: 0;
   }
 }
+
 .input-title {
   font-size: 16px;
   font-weight: 600;
@@ -178,6 +179,7 @@ const handleSubmit = () => {
   padding: 0.5rem;
   border-radius: 6px;
   margin-bottom: 0.5rem;
+
 }
 .food-item button {
   background: none;
@@ -206,6 +208,7 @@ const handleSubmit = () => {
   gap: 30px;
 }
 .image-upload-preview {
+  margin-top: 10px;
   width: 250px;
   height: 250px;
   position: relative;
@@ -240,18 +243,19 @@ const handleSubmit = () => {
   height: 100%;
   object-fit: cover;
 }
-
+.remove-image-button img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 .remove-image-button {
+  z-index: 1;
   position: absolute;
-  top: -10px;
-  right: -10px;
+  top: 8px;
+  right: 8px;
   background: transparent;
   border: none;
   cursor: pointer;
-  width: 24px;
-  height: 24px;
-}
-.remove-image-button img {
   width: 24px;
   height: 24px;
 }
