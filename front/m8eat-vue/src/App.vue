@@ -1,20 +1,14 @@
 <script setup>
 import { RouterLink, RouterView } from "vue-router";
 import Header from "@/components/common2/Header.vue";
+import "@/style/global.scss";
 </script>
 
 <template>
-  <header>
-    <div class="wrapper">
-      <Header></Header>
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/boards">자유게시판</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+  <Header></Header>
+  <div class="view">
+    <RouterView />
+  </div>
 </template>
 
 <style scoped>
@@ -23,6 +17,9 @@ header {
   max-height: 100vh;
 }
 
+.view {
+  padding: 5rem;
+}
 .logo {
   display: block;
   margin: 0 auto 2rem;
@@ -57,17 +54,10 @@ nav a:first-of-type {
   header {
     display: flex;
     place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
   }
 
   .logo {
     margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
   }
 
   nav {

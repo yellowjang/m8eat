@@ -3,10 +3,14 @@
     <RouterLink to="/" class="logo">
       <img src="@/assets/img/logo.png" alt="로고" />
     </RouterLink>
-
+    <div class="header-left">
+      <RouterLink to="/">Home</RouterLink>
+      <RouterLink to="/boards">자유게시판</RouterLink>
+    </div>
     <div class="header-right">
       <template v-if="isLoggedIn">
         <span class="greeting">{{ userName }}님, 건강한 하루 되세요!</span>
+
         <div class="profile-dropdown" @click="toggleDropdown">
           <img class="profile-img" :src="profileImageUrl" alt="프로필" />
           <ul v-if="dropdownOpen" class="dropdown-menu">
