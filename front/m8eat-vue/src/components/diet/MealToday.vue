@@ -12,7 +12,7 @@
             </li>
           </ul>
           <div>
-            <p class="calorie">총 섭취 칼로리 : {{ totalCalories(meal.foods) }} kcal</p>
+            <p class="calorie">{{ totalCalories(meal.foods) }} kcal</p>
           </div>
         </div>
       </div>
@@ -117,6 +117,7 @@ const addMeal = (newMeal) => {
   .food-name {
     font-size: 12px;
     font-weight: 400;
+    list-style: none;
   }
   .calorie {
     font-size: 12px;
