@@ -50,6 +50,34 @@
 		INSERT INTO diets_food (diet_no, food_name, calorie)
 		 VALUES (#{dietNo}, #{foodName}, #{calorie})
 	</insert>
+	
+	<!-- 식단 삭제 -->
+	<delete id="deleteDiet" parameterType="int">
+		DELETE FROM diets
+ 		 WHERE diet_no=#{dietNo}
+	</delete>
+	
+	<!-- 식단 수정 -->
+	<delete id="deleteDietFood" parameterType="int">
+		DELETE FROM diets_food
+ 		 WHERE diet_no=#{dietNo}
+	</delete>
+	<update id="updateDiet" >
+		UPDATE diets
+		 SET meal_type=#{mealType}, file_path=#{filePath}
+		 WHERE diet_no = #{dietNo};
+	</update>
+	
+	<!-- google api -->
+	    <!-- 전체 음식 이름 목록 (유사도 비교용) -->
+	<select id="getAllDietNames" resultType="string">
+	  SELECT name_ko FROM food
+	</select>
+	
+	<select id="getDietByName" parameterType="string" resultType="FoodInfo">
+	  SELECT * FROM food WHERE name_ko = #{name} LIMIT 1
+	</select>
+
 
 
 </mapper>
