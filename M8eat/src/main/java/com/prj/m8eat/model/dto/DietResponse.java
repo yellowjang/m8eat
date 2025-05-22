@@ -8,7 +8,7 @@ public class DietResponse {
 	private String filePath;
 	private String regDate;
 	private String mealType;
-	private List<Food> foods;
+	private List<DietsFood> foods;
 	
 	
 	public DietResponse(int dietNo, int userNo, String filePath, String regDate, String mealType) {
@@ -48,10 +48,10 @@ public class DietResponse {
 	public void setMealType(String mealType) {
 		this.mealType = mealType;
 	}
-	public List<Food> getFoods() {
+	public List<DietsFood> getFoods() {
 		return foods;
 	}
-	public void setFoods(List<Food> foods) {
+	public void setFoods(List<DietsFood> foods) {
 		this.foods = foods;
 	}
 	

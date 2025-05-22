@@ -36,8 +36,7 @@ const submitForm = async () => {
     alert("등록 중 오류가 발생했습니다.");
   }
 };
+import "@/style/boardForm.scss";
 </script>
 
-<style lang="scss" scoped>
-@import "@/style/boardForm.scss";
-</style>
+<style lang="scss" scoped></style>

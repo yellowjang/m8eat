@@ -1,34 +1,27 @@
 <template>
   <section class="meal-form">
     <p class="sub-title">식단 등록</p>
-
     <form @submit.prevent="handleSubmit">
-      <!-- 이미지 업로드 -->
       <!-- 이미지 업로드 -->
       <div class="image-upload-box">
         <div class="image-upload">
           <label class="input-title">이미지 업로드</label>
-
           <div class="image-upload-preview">
             <label v-if="!previewUrl" class="upload-placeholder">
               이미지 업로드
               <input type="file" @change="handleFileChange" accept="image/*" />
             </label>
-
             <div v-else class="image-preview">
               <img :src="previewUrl" alt="미리보기" />
-              <!-- 엑스 버튼 이미지 사용 -->
               <button type="button" class="remove-image-button" @click="removeImage">
                 <img class="remove" :src="deleteIcon" alt="제거" />
               </button>
             </div>
           </div>
         </div>
-
         <!-- 분석 결과 -->
         <div class="analysis-result-box">
           <p class="input-title">분석 결과</p>
-          <p>분석한 결과가 여기에 나올 거예요.</p>
           <p>분석한 결과가 여기에 나올 거예요.</p>
         </div>
       </div>
@@ -48,7 +41,6 @@
           저녁
         </label>
       </div>
-
       <!-- 음식 입력 -->
       <div class="food-table">
         <p class="input-title">음식 입력</p>
@@ -58,19 +50,16 @@
           <input type="number" placeholder="kcal" v-model.number="foodCalories" />
           <button class="add-button" type="button" @click="addFood">추가</button>
         </div>
-
         <!-- 음식 리스트 -->
         <ul class="food-list">
           <li v-for="(food, index) in foods" :key="index" class="food-item">
-            {{ food.name }} / {{ food.amount }}g / {{ food.kcal }} kcal
+            {{ food.name }} / {{ food.amount }}g / {{ food.calorie }} kcal
             <button type="button" @click="removeFood(index)">x</button>
           </li>
         </ul>
       </div>
-
       <!-- 총 칼로리 -->
       <div class="total-calories">총 칼로리: {{ totalCalories }} kcal</div>
-
       <!-- 제출 버튼 -->
       <div class="button-row">
         <button type="submit">식단 추가하기</button>
@@ -83,7 +72,10 @@
 <script setup>
 import { ref, computed } from "vue";
 import deleteIcon from "@/assets/icon/deleteIcon.png";
+import { useDietStore } from "@/stores/diet";
+
 const emit = defineEmits(["close"]);
+const dietStore = useDietStore();
 
 const mealTime = ref("");
 const foodName = ref("");
@@ -112,26 +104,35 @@ const addFood = () => {
   foods.value.push({
     name: foodName.value,
     amount: foodAmount.value,
-    kcal: foodCalories.value,
+    calorie: foodCalories.value,
   });
   foodName.value = "";
   foodAmount.value = null;
   foodCalories.value = null;
 };
-
+console.log("foods", JSON.stringify(foods.value));
 const removeFood = (index) => {
   foods.value.splice(index, 1);
 };
 
-const totalCalories = computed(() => foods.value.reduce((sum, food) => sum + food.kcal, 0));
+const totalCalories = computed(() => foods.value.reduce((sum, food) => sum + food.calorie, 0));
 
-const handleSubmit = () => {
-  console.log({
-    mealTime: mealTime.value,
-    foods: foods.value,
-    totalCalories: totalCalories.value,
-    file: file.value,
-  });
+const handleSubmit = async () => {
+  const formData = new FormData();
+  formData.append("mealType", mealTime.value);
+  if (file.value) {
+    formData.append("file", file.value);
+  }
+  formData.append("foods", JSON.stringify(foods.value));
+
+  try {
+    await dietStore.createDiet(formData);
+    alert("식단이 성공적으로 등록되었습니다.");
+    // 초기화 또는 다른 처리
+  } catch (error) {
+    console.error("식단 등록 실패:", error);
+    alert("식단 등록에 실패했습니다.");
+  }
 };
 </script>
 
@@ -179,7 +180,6 @@ const handleSubmit = () => {
   padding: 0.5rem;
   border-radius: 6px;
   margin-bottom: 0.5rem;
-
 }
 .food-item button {
   background: none;
