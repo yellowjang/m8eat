@@ -7,6 +7,7 @@ import BoardRegist from "@/components/board/BoardRegist.vue";
 import Login from "@/components/user/Login.vue";
 import MainView from "@/views/MainView.vue";
 import MainView2 from "@/views/MainView2.vue";
+import ApiTest from "@/components/board/ApiTest.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -53,6 +54,11 @@ const router = createRouter({
           component: BoardRegist,
         },
       ],
+    },
+    {
+      path: "/apiTest",
+      name: "apiTest",
+      component: ApiTest,
     },
   ],
 });
