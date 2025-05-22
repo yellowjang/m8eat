@@ -117,6 +117,20 @@ CREATE TABLE if not exists board (
         ON UPDATE CASCADE
 );
 
+INSERT INTO board (user_no, title, content, view_cnt, file_path)
+VALUES
+(1, '첫 번째 게시글', '안녕하세요, 첫 글입니다!', 15, '/uploads/file1.png'),
+(2, '두 번째 게시글', '테스트용 게시글입니다.', 8, '/uploads/file2.png'),
+(3, '세 번째 게시글', '게시판 기능 구현 중입니다.', 20, NULL),
+(1, '네 번째 게시글', '파일 첨부 없는 게시글입니다.', 5, NULL),
+(2, '다섯 번째 게시글', '이미지 업로드 테스트', 0, '/uploads/image1.jpg'),
+(3, '여섯 번째 게시글', '좋아요 기능도 구현할 예정입니다.', 12, NULL),
+(1, '일곱 번째 게시글', '조회수 증가 테스트', 30, '/uploads/test7.pdf'),
+(2, '여덟 번째 게시글', '세션 기반 로그인 완료', 4, NULL),
+(3, '아홉 번째 게시글', 'MyBatis로 DB 연동 성공', 17, '/uploads/test9.docx'),
+(1, '열 번째 게시글', 'Spring과 연동 중입니다.', 25, '/uploads/test10.zip');
+
+
 		SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
 		reg_date as regDate, file_path as filePath
 		FROM board;
@@ -135,7 +149,7 @@ CREATE TABLE if not exists boards_like (
     like_no INT PRIMARY KEY AUTO_INCREMENT,
     board_no INT not null,
     user_no INT not null,
-    FOREIGN KEY (board_no) REFERENCES boards(board_no)
+    FOREIGN KEY (board_no) REFERENCES board(board_no)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );

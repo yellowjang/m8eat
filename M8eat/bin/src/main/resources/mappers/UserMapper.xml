@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.prj.m8eat.model.dao.UserDao">
+	
+	<!-- 회원가입 -->
+	<insert id="insertUser" parameterType="User" keyProperty="userNo" useGeneratedKeys="true">
+		INSERT INTO users (name, id, password, role)
+ 		 values (#{name}, #{id}, #{password}, #{role});
+	</insert>
+	
+	<insert id="insertUserHealthInfo" parameterType="UserHealthInfo">
+		INSERT INTO users_health_info (user_no, height, weight, illness, allergy, purpose)
+ 		 values (#{userNo}, #{height}, #{weight}, #{illness}, #{allergy}, #{purpose});
+	</insert>
+	
+	<!-- 로그인, 내 정보 조회 -->
+	<select id="selectUser" parameterType="String" resultType="User">
+		SELECT * FROM users
+ 		 WHERE id = #{id};
+	</select>
+	
+	<!-- 회원탈퇴 -->
+	<delete id="deleteUser" parameterType="int">
+		DELETE from users
+		 WHERE user_no = #{userNo};
+	</delete>
+	
+	<!-- 내 정보 수정 -->
+	<update id="updateUserInfo" parameterType="User">
+		UPDATE users
+		 SET name=#{name}, id=#{id}, password=#{password}, role=#{role}
+		 WHERE user_no=#{userNo};
+	</update>
+	
+	<!-- 건강 정보 수정 -->
+	<update id="updateUserHealthInfo" parameterType="UserHealthInfo">
+		UPDATE users_health_info
+		 SET height=#{height}, weight=#{weight}, illness=#{illness}, allergy=#{allergy}, purpose=#{purpose}
+		 WHERE user_no=#{userNo};
+	</update>
+	
+ </mapper>
