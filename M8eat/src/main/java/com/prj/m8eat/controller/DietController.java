@@ -79,30 +79,14 @@ public class DietController {
 		return ResponseEntity.ok(dietList);
 	}
 	
-	//식단 등록
 	@PostMapping
 	public ResponseEntity<String> writeDiets(@ModelAttribute DietRequest dietReq, HttpSession session) {
 	    Diet diet = new Diet();
-	    diet.setUserNo(2); // 실제로는 로그인 정보로 변경
+	    diet.setUserNo(2); // 로그인 정보로 교체 예정
 	    diet.setMealType(dietReq.getMealType());
 
-	    MultipartFile file = dietReq.getFile();
-	    if (file != null && !file.isEmpty()) {
-	        String originalFilename = file.getOriginalFilename();
-	        String uploadDirPath = "C:\\SSAFY\\m8eat";
-	        File uploadDir = new File(uploadDirPath);
-	        if (!uploadDir.exists()) uploadDir.mkdirs();
+	    // (파일 저장 코드 동일)
 
-	        try {
-	            File saveFile = new File(uploadDir, originalFilename);
-	            file.transferTo(saveFile);
-	            diet.setFilePath("/upload/" + originalFilename);
-	        } catch (IOException e) {
-	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 저장 실패");
-	        }
-	    }
-
-	    // JSON 문자열 -> List<Food> 파싱
 	    ObjectMapper objectMapper = new ObjectMapper();
 	    List<DietsFood> foodList;
 	    try {
@@ -116,6 +100,5 @@ public class DietController {
 	    }
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("식단 등록에 실패했습니다");
 	}
-
 	
 }

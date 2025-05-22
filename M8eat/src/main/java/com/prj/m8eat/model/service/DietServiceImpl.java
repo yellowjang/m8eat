@@ -123,24 +123,8 @@ public class DietServiceImpl implements DietService {
         if (dietDao.insertDiet(diet) != 1) return false;
 
         for (DietsFood input : inputFoods) {
-            Food foodMaster = dietDao.selectFoodById(input.getFoodId());
-            if (foodMaster == null) continue;
-
-            double ratio = input.getAmount() / 100.0;
-
-            DietsFood record = new DietsFood();
-            record.setDietNo(diet.getDietNo());
-            record.setFoodId(foodMaster.getFoodId());
-            record.setFoodName(foodMaster.getNameKo());
-            record.setAmount(input.getAmount());
-            record.setCalorie((int) Math.round(foodMaster.getCalories() * ratio));
-            record.setProtein(foodMaster.getProtein() * ratio);
-            record.setFat(foodMaster.getFat() * ratio);
-            record.setCarbohydrate(foodMaster.getCarbohydrate() * ratio);
-            record.setSugar(foodMaster.getSugar() * ratio);
-            record.setCholesterol(foodMaster.getCholesterol() * ratio);
-
-            dietDao.insertDietsFood(record);
+            input.setDietNo(diet.getDietNo()); // diet_no 연결
+            dietDao.insertDietsFood(input);    // 그대로 insert
         }
 
         return true;

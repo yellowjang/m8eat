@@ -40,27 +40,16 @@
 		 WHERE diet_no=#{dietNo}
 	</select>
 	
-    <!-- ⭐ 음식 마스터 정보 조회 -->
-    <select id="selectFoodById" parameterType="int" resultType="Food">
-        SELECT *
-        FROM food
-        WHERE food_id = #{foodId}
-    </select>
+	<!-- 식단 기록 -->
+	<insert id="insertDiet" parameterType="Diet" keyProperty="dietNo" useGeneratedKeys="true">
+		INSERT INTO diets (user_no, meal_type, file_path)
+		 VALUES (#{userNo}, #{mealType}, #{filePath})
+	</insert>
+	
+	<insert id="insertDietsFood" parameterType="DietsFood">
+		INSERT INTO diets_food (diet_no, food_name, calorie)
+		 VALUES (#{dietNo}, #{foodName}, #{calorie})
+	</insert>
 
-    <!-- 식단 기록 -->
-    <insert id="insertDiet" parameterType="Diet" keyProperty="dietNo" useGeneratedKeys="true">
-        INSERT INTO diets (user_no, meal_type, file_path)
-        VALUES (#{userNo}, #{mealType}, #{filePath})
-    </insert>
-
-    <insert id="insertDietsFood" parameterType="DietsFood">
-        INSERT INTO diets_food (
-            diet_no, food_id, food_name, amount, calorie,
-            protein, fat, carbohydrate, sugar, cholesterol
-        ) VALUES (
-            #{dietNo}, #{foodId}, #{foodName}, #{amount}, #{calorie},
-            #{protein}, #{fat}, #{carbohydrate}, #{sugar}, #{cholesterol}
-        )
-    </insert>
 
 </mapper>
