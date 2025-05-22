@@ -37,6 +37,8 @@ public interface DietDao {
 
 	public List<String> getAllDietNames();
 
-	public FoodInfo getDietByName(String bestMatch);
+	public FoodInfo getDietByName(String name);
+	
+
 
 }

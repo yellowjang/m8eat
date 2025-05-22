@@ -1,90 +1,36 @@
 package com.prj.m8eat.util;
 
-import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.vision.v1.*;
-import com.google.cloud.vision.v1.Image;
 import com.google.protobuf.ByteString;
-import com.prj.m8eat.model.dto.CropBox;
+import com.google.api.gax.core.FixedCredentialsProvider;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 
+import com.prj.m8eat.model.dto.CropBox;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
 public class GoogleVisionUtil {
 
-    // 📌 객체 인식 (Object Detection)
-    public static List<LocalizedObjectAnnotation> detectObjects(ImageAnnotatorClient client, ByteString imageBytes) throws IOException {
-        Image image = Image.newBuilder().setContent(imageBytes).build();
-        Feature feature = Feature.newBuilder().setType(Feature.Type.OBJECT_LOCALIZATION).build();
-        AnnotateImageRequest request = AnnotateImageRequest.newBuilder()
-                .addFeatures(feature)
-                .setImage(image)
-                .build();
+    @Value("${gcp.credentials.path}")
+    private String credentialsPath;
 
-        BatchAnnotateImagesResponse response = client.batchAnnotateImages(List.of(request));
-        return response.getResponses(0).getLocalizedObjectAnnotationsList();
+    @PostConstruct
+    public void init() {
+        System.out.println("✅ GOOGLE_APPLICATION_CREDENTIALS set: " + credentialsPath);
     }
 
-    // 📌 라벨 인식 (Label Detection)
-    public static List<EntityAnnotation> detectLabels(ImageAnnotatorClient client, ByteString imageBytes) throws IOException {
-        Image image = Image.newBuilder().setContent(imageBytes).build();
-        Feature labelFeature = Feature.newBuilder().setType(Feature.Type.LABEL_DETECTION).build();
-        AnnotateImageRequest request = AnnotateImageRequest.newBuilder()
-                .addFeatures(labelFeature)
-                .setImage(image)
-                .build();
-
-        BatchAnnotateImagesResponse response = client.batchAnnotateImages(List.of(request));
-        return response.getResponses(0).getLabelAnnotationsList();
-    }
-
-    // 📌 객체 박스 추출
-    public static CropBox extractBox(LocalizedObjectAnnotation obj, int imgWidth, int imgHeight) {
-        List<NormalizedVertex> verts = obj.getBoundingPoly().getNormalizedVerticesList();
-
-        float xMin = verts.stream().map(NormalizedVertex::getX).min(Float::compare).orElse(0f);
-        float yMin = verts.stream().map(NormalizedVertex::getY).min(Float::compare).orElse(0f);
-        float xMax = verts.stream().map(NormalizedVertex::getX).max(Float::compare).orElse(1f);
-        float yMax = verts.stream().map(NormalizedVertex::getY).max(Float::compare).orElse(1f);
-
-        int x = (int) (xMin * imgWidth);
-        int y = (int) (yMin * imgHeight);
-        int w = (int) ((xMax - xMin) * imgWidth);
-        int h = (int) ((yMax - yMin) * imgHeight);
-
-        if (w <= 0 || h <= 0 || x < 0 || y < 0 || x + w > imgWidth || y + h > imgHeight) {
-            return null;
-        }
-
-        return new CropBox(x, y, w, h);
-    }
-
-    // 📌 이미지 잘라서 ByteString으로 변환
-    public static ByteString toByteString(BufferedImage image) throws IOException {
-        BufferedImage rgbImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = rgbImage.createGraphics();
-        g.drawImage(image, 0, 0, null);
-        g.dispose();
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(rgbImage, "jpg", baos);
-        return ByteString.copyFrom(baos.toByteArray());
-    }
-    
-    // Vision API 클라이언트 생성
-    public static ImageAnnotatorClient createClient() throws Exception {
-        InputStream keyStream = GoogleVisionUtil.class.getResourceAsStream("/braided-gravity-460410-r6-1e7c33f2eb8a.json"); // 키 경로
-        if (keyStream == null) {
-            throw new RuntimeException("📁 Vision API 키 파일을 찾을 수 없습니다.");
-        }
-
-        GoogleCredentials credentials = GoogleCredentials.fromStream(keyStream)
-                .createScoped("https://www.googleapis.com/auth/cloud-platform");
+    // 1. 클라이언트 생성
+    public ImageAnnotatorClient createClient() throws IOException {
+        GoogleCredentials credentials = GoogleCredentials
+                .fromStream(new FileInputStream(credentialsPath))
+                .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
 
         ImageAnnotatorSettings settings = ImageAnnotatorSettings.newBuilder()
                 .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
@@ -92,4 +38,75 @@ public class GoogleVisionUtil {
 
         return ImageAnnotatorClient.create(settings);
     }
+
+    // 2. 객체 감지
+    public List<LocalizedObjectAnnotation> detectObjects(ImageAnnotatorClient client, ByteString imageBytes) throws IOException {
+        Image img = Image.newBuilder().setContent(imageBytes).build();
+        Feature feature = Feature.newBuilder().setType(Feature.Type.OBJECT_LOCALIZATION).build();
+        AnnotateImageRequest request = AnnotateImageRequest.newBuilder()
+                .addFeatures(feature)
+                .setImage(img)
+                .build();
+
+        BatchAnnotateImagesResponse response = client.batchAnnotateImages(List.of(request));
+        return response.getResponses(0).getLocalizedObjectAnnotationsList();
+    }
+
+    // 3. 라벨 감지
+    public List<EntityAnnotation> detectLabels(ImageAnnotatorClient client, ByteString imageBytes) throws IOException {
+        Image img = Image.newBuilder().setContent(imageBytes).build();
+        Feature feature = Feature.newBuilder().setType(Feature.Type.LABEL_DETECTION).build();
+        AnnotateImageRequest request = AnnotateImageRequest.newBuilder()
+                .addFeatures(feature)
+                .setImage(img)
+                .build();
+
+        BatchAnnotateImagesResponse response = client.batchAnnotateImages(List.of(request));
+        return response.getResponses(0).getLabelAnnotationsList();
+    }
+
+    // 4. 박스 추출
+    public static CropBox extractBox(LocalizedObjectAnnotation obj, int width, int height) {
+        if (obj.getBoundingPoly().getNormalizedVerticesCount() < 2) return null;
+
+        float x1 = obj.getBoundingPoly().getNormalizedVertices(0).getX();
+        float y1 = obj.getBoundingPoly().getNormalizedVertices(0).getY();
+        float x2 = obj.getBoundingPoly().getNormalizedVertices(2).getX();
+        float y2 = obj.getBoundingPoly().getNormalizedVertices(2).getY();
+
+        int x = (int) (x1 * width);
+        int y = (int) (y1 * height);
+        int w = (int) ((x2 - x1) * width);
+        int h = (int) ((y2 - y1) * height);
+
+        return new CropBox(x, y, w, h);
+    }
+
+    // 5. BufferedImage → ByteString 변환
+//    public static ByteString toByteString(BufferedImage image) throws IOException {
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        ImageIO.write(image, "jpg", baos);
+//        return ByteString.copyFrom(baos.toByteArray());
+//    }
+    public static ByteString toByteString(BufferedImage image) throws IOException {
+        if (image == null) return ByteString.EMPTY;
+
+        // 💡 TYPE_INT_RGB로 변환
+        BufferedImage converted = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+        converted.getGraphics().drawImage(image, 0, 0, null);
+        
+//        ImageIO.write(converted, "jpg", new File("C:/SSAFY/m8eat/test_crop_" + System.currentTimeMillis() + ".jpg"));
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        boolean success = ImageIO.write(converted, "jpg", baos);
+
+        if (!success || baos.size() == 0) {
+            System.out.println("❌ ImageIO.write 실패 또는 결과 비어있음");
+            return ByteString.EMPTY;
+        }
+
+        return ByteString.copyFrom(baos.toByteArray());
+    }
+
+
 }
