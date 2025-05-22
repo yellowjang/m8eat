@@ -24,10 +24,8 @@ function base64UrlDecode(str) {
 export const useUserStore = defineStore("user", () => {
   const signup = (user) => {
     console.log("userStore signuppppppppppp");
-    // console.log("userStore", name, id, password);
     const requestBody = {
       user: {
-        name: user.name,
         id: user.id,
         password: user.password,
         role: "user",
@@ -44,12 +42,32 @@ export const useUserStore = defineStore("user", () => {
       .post(`${REST_API_URL}/auth/signup`, requestBody)
       .then((response) => {
         console.log(response.data);
-        router.push({ name: "mainpage" });
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
-  return { signup };
+  const login = (loginUser) => {
+    console.log(loginUser);
+    const requestBody = {
+      user: {
+        id: loginUser.id,
+        password: loginUser.password,
+      },
+    };
+    axios
+      .post(`${REST_API_URL}/auth/login`, {
+        id: loginUser.id,
+        password: loginUser.password,
+      })
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  return { signup, login };
 });

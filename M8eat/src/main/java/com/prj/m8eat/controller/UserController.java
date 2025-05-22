@@ -45,7 +45,8 @@ public class UserController {
 	}
 	
 	@PostMapping("/auth/login")
-	public ResponseEntity<String> login(@ModelAttribute User user, HttpSession session) {
+	public ResponseEntity<String> login(@RequestBody User user, HttpSession session) {
+		System.out.println("controller login " + user);
 		LoginResponse result = userService.login(user);
 		if (result.isLogin()) {
 			User loginUser = result.getUser();
