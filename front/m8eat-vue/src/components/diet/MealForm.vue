@@ -53,7 +53,7 @@
         <!-- 음식 리스트 -->
         <ul class="food-list">
           <li v-for="(food, index) in foods" :key="index" class="food-item">
-            {{ food.name }} / {{ food.amount }}g / {{ food.calorie }} kcal
+            {{ food.foodName }} / {{ food.amount }}g / {{ food.calorie }} kcal
             <button type="button" @click="removeFood(index)">x</button>
           </li>
         </ul>
@@ -102,7 +102,7 @@ const removeImage = () => {
 const addFood = () => {
   if (!foodName.value || !foodAmount.value || !foodCalories.value) return;
   foods.value.push({
-    name: foodName.value,
+    foodName: foodName.value,
     amount: foodAmount.value,
     calorie: foodCalories.value,
   });
