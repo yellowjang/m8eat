@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "axios";
-
+import { ref } from "vue";
 const REST_API_URL = `http://localhost:8080/diets`;
 
 export const useDietStore = defineStore("diets", () => {
@@ -14,32 +14,12 @@ export const useDietStore = defineStore("diets", () => {
   });
 
   /** 식단 등록 (이미지 포함 멀티파트 전송) */
-  const createDiet = async (form) => {
+  const createDiet = async (formData) => {
     try {
-      const formData = new FormData();
-
-      // 이미지 파일 추가
-      if (form.imageFile) {
-        formData.append("image", form.imageFile);
-      }
-
-      // JSON 데이터 추가 (필요 시 stringify 사용)
-      formData.append("mealTime", form.mealTime);
-
-      form.foods.forEach((food, index) => {
-        formData.append(`foods[${index}].name`, food.name);
-        formData.append(`foods[${index}].amount`, food.amount);
-        formData.append(`foods[${index}].kcal`, food.kcal);
-      });
-
-      await axios.post(`${REST_API_URL}`, formData, {
-        headers: {
-          "access-token": sessionStorage.getItem("access-token"),
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await axios.post(`${REST_API_URL}`, formData, tokenHeader());
     } catch (err) {
       console.error("식단 등록 실패", err);
+      throw err;
     }
   };
 
@@ -54,7 +34,6 @@ export const useDietStore = defineStore("diets", () => {
   };
 
   /** 유저별 식단 조회 */
-  /** 코치가 유저별로 식단을 조회해야 할 것임 */
   const getDietByUser = async (userNo) => {
     try {
       const res = await axios.get(`${REST_API_URL}/user/${userNo}`, tokenHeader());
@@ -87,7 +66,6 @@ export const useDietStore = defineStore("diets", () => {
   const deleteDiet = async (dietNo) => {
     try {
       await axios.delete(`${REST_API_URL}/${dietNo}`, tokenHeader());
-      // 삭제 후 리스트 갱신 등 추가 가능
     } catch (err) {
       console.error("식단 삭제 실패", err);
     }
@@ -96,7 +74,7 @@ export const useDietStore = defineStore("diets", () => {
   return {
     dietList,
     diet,
-    getDietList,
+    createDiet,
     getDietByDate,
     getDietByUser,
     getDietDetail,
