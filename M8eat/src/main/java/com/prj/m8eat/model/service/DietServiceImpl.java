@@ -15,113 +15,134 @@ import com.prj.m8eat.model.dto.Food;
 
 @Service
 public class DietServiceImpl implements DietService {
-	
-	private final DietDao dietDao;
-	public DietServiceImpl(DietDao dietDao) {
-		this.dietDao = dietDao;
-	}
 
-	@Override
-	public List<DietResponse> getAllDiets() {
-		List<DietResponse> dietList = new ArrayList<>();
-		Map<Integer, DietResponse> dietMap = new HashMap<>();
+    private final DietDao dietDao;
 
-		List<Diet> diets = dietDao.selectAllDiets();
-		for (Diet diet : diets) {
-			DietResponse res = new DietResponse(diet.getDietNo(), diet.getUserNo(), diet.getFilePath(), diet.getRegDate(), diet.getMealType());;
-			res.setFoods(new ArrayList<>());
-			dietList.add(res);
-			dietMap.put(diet.getDietNo(), res);
-		}
-		
-		List<DietsFood> dietsFood = dietDao.selectAllDietsFood();
-		for (DietsFood food : dietsFood) {
-			DietResponse target = dietMap.get(food.getDietNo());
-			Food tmp = new Food(food.getFoodName(), food.getCalorie());
-			target.getFoods().add(tmp);
-		}
-		
-		System.out.println("service " + dietList);
-		
-		return dietList;
-	}
+    public DietServiceImpl(DietDao dietDao) {
+        this.dietDao = dietDao;
+    }
 
-	@Override
-	public List<DietResponse> getDietsByUserNo(int userNo) {
-		List<DietResponse> dietList = new ArrayList<>();
+    @Override
+    public List<DietResponse> getAllDiets() {
+        List<DietResponse> dietList = new ArrayList<>();
+        Map<Integer, DietResponse> dietMap = new HashMap<>();
 
-		List<Diet> diets = dietDao.selectDietsByUserNo(userNo);
-		for (Diet diet : diets) {
-			DietResponse res = new DietResponse(diet.getDietNo(), diet.getUserNo(), diet.getFilePath(), diet.getRegDate(), diet.getMealType());
-			res.setFoods(new ArrayList<>());
-			
-			List<DietsFood> dietsFood = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
-			for (DietsFood food : dietsFood) {
-				Food tmp = new Food(food.getFoodName(), food.getCalorie());
-				res.getFoods().add(tmp);
-			}
-			dietList.add(res);
-		}
-		
-		return dietList;
-	}
-	
-	@Override
-	public List<DietResponse> getDietsByDate(String startDate, String endDate) {
-		List<DietResponse> dietList = new ArrayList<>();
-		Map<String, String> map = new HashMap<>();
-		map.put("startDate", startDate);
-		map.put("endDate", endDate + " 23:59:59");
-		
-		List<Diet> diets = dietDao.selectDietsByDate(map);
-		for (Diet diet : diets) {
-			DietResponse res = new DietResponse(diet.getDietNo(), diet.getUserNo(), diet.getFilePath(), diet.getRegDate(), diet.getMealType());;
-			res.setFoods(new ArrayList<>());
-			dietList.add(res);
-			
-			List<DietsFood> dietsFood = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
-			for (DietsFood food : dietsFood) {
-				Food tmp = new Food(food.getFoodName(), food.getCalorie());
-				res.getFoods().add(tmp);
-			}
-		}
+        List<Diet> diets = dietDao.selectAllDiets();
+        for (Diet diet : diets) {
+            DietResponse res = new DietResponse(
+                diet.getDietNo(),
+                diet.getUserNo(),
+                diet.getFilePath(),
+                diet.getRegDate(),
+                diet.getMealType()
+            );
+            res.setFoods(new ArrayList<>());
+            dietList.add(res);
+            dietMap.put(diet.getDietNo(), res);
+        }
 
-		return dietList;
-	}
-	
-	@Override
-	public List<DietResponse> getDietsByDietNo(int dietNo) {
-		List<DietResponse> dietList = new ArrayList<>();
-		
-		List<Diet> diets = dietDao.selectDietsByDietNo(dietNo);
-		for (Diet diet : diets) {
-			DietResponse res = new DietResponse(diet.getDietNo(), diet.getUserNo(), diet.getFilePath(), diet.getRegDate(), diet.getMealType());
-			res.setFoods(new ArrayList<>());
-			
-			List<DietsFood> dietsFood = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
-			for (DietsFood food : dietsFood) {
-				res.getFoods().add(new Food(food.getFoodName(), food.getCalorie()));
-			}
-			
-			dietList.add(res);
-		}
-		
-		return dietList;
-	}
+        List<DietsFood> dietsFood = dietDao.selectAllDietsFood();
+        for (DietsFood food : dietsFood) {
+            DietResponse target = dietMap.get(food.getDietNo());
+            if (target != null) {
+                target.getFoods().add(food);
+            }
+        }
 
-	@Override
-	public boolean writeDiets(Diet diet, List<Food> foods) {
-		System.out.println(diet);
-		if (dietDao.insertDiet(diet) == 1) {
-			for (Food food : foods) {
-				DietsFood dietsFood = new DietsFood(diet.getDietNo(), food.getFoodName(), food.getCalorie());
-				dietDao.insertDietsFood(dietsFood);
-			}
-			return true;
-		}
-		return false;
+        return dietList;
+    }
 
-	}
+    @Override
+    public List<DietResponse> getDietsByUserNo(int userNo) {
+        List<DietResponse> dietList = new ArrayList<>();
 
+        List<Diet> diets = dietDao.selectDietsByUserNo(userNo);
+        for (Diet diet : diets) {
+            DietResponse res = new DietResponse(
+                diet.getDietNo(),
+                diet.getUserNo(),
+                diet.getFilePath(),
+                diet.getRegDate(),
+                diet.getMealType()
+            );
+            List<DietsFood> dietsFood = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
+            res.setFoods(dietsFood);
+            dietList.add(res);
+        }
 
+        return dietList;
+    }
+
+    @Override
+    public List<DietResponse> getDietsByDate(String startDate, String endDate) {
+        List<DietResponse> dietList = new ArrayList<>();
+        Map<String, String> map = new HashMap<>();
+        map.put("startDate", startDate);
+        map.put("endDate", endDate + " 23:59:59");
+
+        List<Diet> diets = dietDao.selectDietsByDate(map);
+        for (Diet diet : diets) {
+            DietResponse res = new DietResponse(
+                diet.getDietNo(),
+                diet.getUserNo(),
+                diet.getFilePath(),
+                diet.getRegDate(),
+                diet.getMealType()
+            );
+            List<DietsFood> dietsFood = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
+            res.setFoods(dietsFood);
+            dietList.add(res);
+        }
+
+        return dietList;
+    }
+
+    @Override
+    public List<DietResponse> getDietsByDietNo(int dietNo) {
+        List<DietResponse> dietList = new ArrayList<>();
+
+        List<Diet> diets = dietDao.selectDietsByDietNo(dietNo);
+        for (Diet diet : diets) {
+            DietResponse res = new DietResponse(
+                diet.getDietNo(),
+                diet.getUserNo(),
+                diet.getFilePath(),
+                diet.getRegDate(),
+                diet.getMealType()
+            );
+            List<DietsFood> dietsFood = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
+            res.setFoods(dietsFood);
+            dietList.add(res);
+        }
+
+        return dietList;
+    }
+
+    @Override
+    public boolean writeDiets(Diet diet, List<DietsFood> inputFoods) {
+        if (dietDao.insertDiet(diet) != 1) return false;
+
+        for (DietsFood input : inputFoods) {
+            Food foodMaster = dietDao.selectFoodById(input.getFoodId());
+            if (foodMaster == null) continue;
+
+            double ratio = input.getAmount() / 100.0;
+
+            DietsFood record = new DietsFood();
+            record.setDietNo(diet.getDietNo());
+            record.setFoodId(foodMaster.getFoodId());
+            record.setFoodName(foodMaster.getNameKo());
+            record.setAmount(input.getAmount());
+            record.setCalorie((int) Math.round(foodMaster.getCalories() * ratio));
+            record.setProtein(foodMaster.getProtein() * ratio);
+            record.setFat(foodMaster.getFat() * ratio);
+            record.setCarbohydrate(foodMaster.getCarbohydrate() * ratio);
+            record.setSugar(foodMaster.getSugar() * ratio);
+            record.setCholesterol(foodMaster.getCholesterol() * ratio);
+
+            dietDao.insertDietsFood(record);
+        }
+
+        return true;
+    }
 }

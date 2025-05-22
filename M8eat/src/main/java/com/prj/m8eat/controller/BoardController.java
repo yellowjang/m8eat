@@ -1,5 +1,6 @@
 package com.prj.m8eat.controller;
 
+import java.beans.PropertyEditorSupport;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -7,9 +8,11 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,8 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prj.m8eat.model.dto.Board;
 import com.prj.m8eat.model.dto.BoardsComment;
+import com.prj.m8eat.model.dto.Food;
 import com.prj.m8eat.model.dto.User;
 import com.prj.m8eat.model.service.BoardService;
 
@@ -57,8 +63,26 @@ public class BoardController {
 
 	}
 
+	private final ObjectMapper objectMapper = new ObjectMapper();
+
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+		binder.registerCustomEditor(List.class, "foods", new PropertyEditorSupport() {
+			@Override
+			public void setAsText(String text) {
+				try {
+					List<Food> foods = objectMapper.readValue(text, new TypeReference<List<Food>>() {
+					});
+					setValue(foods);
+				} catch (IOException e) {
+					throw new IllegalArgumentException("Invalid JSON format for foods", e);
+				}
+			}
+		});
+	}
+
 	// 게시글 등록
-	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping
 	public ResponseEntity<String> boardWrite(@ModelAttribute Board board) {
 		MultipartFile file = board.getFile();
 
