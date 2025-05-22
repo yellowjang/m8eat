@@ -3,13 +3,13 @@
     <div class="login-box">
       <h3>로그인</h3>
 
-      <form class="login-form">
-        <label for="email">이메일</label>
-        <input id="email" type="email" placeholder="이메일을 입력해주세요." />
+      <form class="login-form" @submit.prevent="login">
+        <label for="userId">아이디</label>
+        <input id="userId" type="text" placeholder="아이디를 입력해주세요." v-model.trim="id" />
 
         <label for="password">비밀번호</label>
         <!-- <div class="password-wrapper"> -->
-        <input id="password" type="password" placeholder="비밀번호를 입력해주세요." />
+        <input id="password" type="password" placeholder="비밀번호를 입력해주세요." v-model.trim="password" />
         <!-- <span class="toggle-eye">👁️</span> -->
         <!-- </div> -->
 
@@ -40,7 +40,19 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { ref } from "vue";
+import { useUserStore } from "@/stores/user";
+
+const store = useUserStore();
+
+const id = ref("");
+const password = ref("");
+
+const login = () => {
+  store.login({ id: id.value, password: password.value });
+};
+</script>
 
 <style lang="scss" scoped>
 .login-container {

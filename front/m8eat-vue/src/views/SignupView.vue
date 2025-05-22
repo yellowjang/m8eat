@@ -6,8 +6,8 @@
         <label for="name">이름</label>
         <input id="name" type="text" placeholder="이름을 입력해주세요." v-model.trim="name" />
 
-        <label for="username">아이디</label>
-        <input id="username" type="text" placeholder="아이디를 입력해주세요." v-model.trim="id" />
+        <label for="userId">아이디</label>
+        <input id="userId" type="text" placeholder="아이디를 입력해주세요." v-model.trim="id" />
 
         <label for="password">비밀번호</label>
         <input id="password" type="password" placeholder="비밀번호를 입력해주세요." v-model.trim="password" />
