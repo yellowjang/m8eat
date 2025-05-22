@@ -15,6 +15,16 @@
     display: flex;
     gap: 30px;
   }
+  .header-left a {
+    text-decoration: none;
+    color: #787878;
+    font-weight: 5s00;
+  }
+  .header-left a:hover {
+    text-decoration: none;
+    font-weight: 600;
+    color: #d26767;
+  }
   .header-right {
     display: flex;
     align-items: center;
