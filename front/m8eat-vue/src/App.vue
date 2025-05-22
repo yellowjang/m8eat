@@ -6,7 +6,9 @@ import "@/style/global.scss";
 
 <template>
   <Header></Header>
-  <RouterView />
+  <div class="view">
+    <RouterView />
+  </div>
 </template>
 
 <style scoped>
@@ -15,6 +17,9 @@ header {
   max-height: 100vh;
 }
 
+.view {
+  padding: 5rem;
+}
 .logo {
   display: block;
   margin: 0 auto 2rem;
@@ -49,7 +54,6 @@ nav a:first-of-type {
   header {
     display: flex;
     place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
   }
 
   .logo {
