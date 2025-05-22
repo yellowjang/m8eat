@@ -6,7 +6,9 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.prj.m8eat.model.dto.Diet;
+import com.prj.m8eat.model.dto.DietRequest;
 import com.prj.m8eat.model.dto.DietsFood;
+import com.prj.m8eat.model.dto.FoodInfo;
 
 @Mapper
 public interface DietDao {
@@ -25,6 +27,18 @@ public interface DietDao {
 
 	public List<Diet> selectDietsByDate(Map<String, String> map);
 
-	public List<Diet> selectDietsByDietNo(int dietNo);
+	public Diet selectDietsByDietNo(int dietNo);
+
+	public int deleteDiet(int dietNo);
+
+	public int updateDiet(Diet updateDiet);
+	
+	public void deleteDietFood(int dietNo);
+
+	public List<String> getAllDietNames();
+
+	public FoodInfo getDietByName(String name);
+	
+
 
 }

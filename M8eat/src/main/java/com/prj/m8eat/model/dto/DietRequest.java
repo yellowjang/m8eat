@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 public class DietRequest {
+	private int dietNo;
 	private int userNo;
 	private String mealType;
 	private MultipartFile file; //업로드용.. Request 시 사용
@@ -12,6 +13,12 @@ public class DietRequest {
 	private List<Food> foods;
 	
 	
+	public int getDietNo() {
+		return dietNo;
+	}
+	public void setDietNo(int dietNo) {
+		this.dietNo = dietNo;
+	}
 	public String getMealType() {
 		return mealType;
 	}
@@ -43,8 +50,10 @@ public class DietRequest {
 		this.foods = foods;
 	}
 	
-	
-
-	
+	@Override
+	public String toString() {
+		return "DietRequest [dietNo=" + dietNo + ", userNo=" + userNo + ", mealType=" + mealType + ", file=" + file
+				+ ", filePath=" + filePath + ", foods=" + foods + "]";
+	}
 	
 }

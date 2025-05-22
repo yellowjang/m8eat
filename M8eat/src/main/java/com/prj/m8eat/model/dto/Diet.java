@@ -21,6 +21,14 @@ public class Diet {
 		this.filePath = filePath;
 	}
 	
+
+	public Diet(int dietNo, int userNo, String mealType, String filePath) {
+		this.dietNo = dietNo;
+		this.userNo = userNo;
+		this.mealType = mealType;
+		this.filePath = filePath;
+	}
+
 	public int getDietNo() {
 		return dietNo;
 	}
