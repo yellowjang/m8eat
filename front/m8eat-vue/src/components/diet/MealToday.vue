@@ -1,24 +1,26 @@
 <template>
   <section class="meal-today">
     <h2 class="title">오늘의 식단</h2>
+    <div class="add-meal-box">
+      <button class="add-meal" @click="$emit('add-meal')">+ 식단 등록하기</button>
+    </div>
     <div class="meal-boxes">
       <div class="meal-box" v-for="type in ['아침', '점심', '저녁']" :key="type">
         <p class="meal-title">{{ type }}</p>
 
         <div v-if="mealsByType(type).length > 0">
+          <button class="edit-meal" @click="$emit('edit-meal', mealsByType(type)[0])">수정</button>
           <div class="meal-item" v-for="meal in mealsByType(type)" :key="meal.dietNo">
+            <router-link class="view-detail" :to="`/diet/${meal.dietNo}`">상세보기</router-link>
             <ul class="food-list">
               <li v-for="(food, idx) in meal.foods" :key="idx" class="food-name">
                 {{ food.foodName }}
               </li>
             </ul>
             <p class="calorie">{{ totalCalories(meal.foods) }} kcal</p>
-            <button class="edit-meal" @click="$emit('edit-meal', meal)">수정</button>
-            <router-link :to="`/diet/${meal.dietNo}`">상세보기</router-link>
           </div>
         </div>
 
-        <!-- 아무 식단도 없을 때 -->
         <div v-else class="empty-meal">등록된 식단이 없습니다.</div>
       </div>
     </div>
@@ -27,9 +29,6 @@
     <div class="meal-analysis">
       <p class="title nutri">영양 성분 분석</p>
       <NutrientGraph :data="totalNutrients" :max="recommendedIntake" />
-    </div>
-    <div class="add-meal-box">
-      <button class="add-meal" @click="$emit('add-meal')">+ 식단 등록하기</button>
     </div>
   </section>
 </template>
@@ -85,6 +84,19 @@ const recommendedIntake = {
 </script>
 
 <style lang="scss" scoped>
+.view-detail {
+  color: #de9c9c;
+  border: none;
+  font-size: 12px;
+  font-weight: bold;
+  text-decoration: none; /* 밑줄 제거 */
+}
+
+.view-detail:hover {
+  background-color: #d57c7c;
+  color: #ffffff;
+}
+
 .divide-line {
   border-bottom: solid 0.3px #f1caca;
   margin: 10px 0px;
@@ -137,6 +149,7 @@ const recommendedIntake = {
 }
 .add-meal {
   text-align: right;
+  background-color: transparent;
   margin-left: auto;
   margin-top: 0.5rem;
   font-size: 14px;

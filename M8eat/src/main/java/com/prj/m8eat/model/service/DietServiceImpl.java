@@ -302,7 +302,7 @@ public class DietServiceImpl implements DietService {
 	        diet.getRegDate(),
 	        diet.getMealType()
 	    );
-
+	    res.setMealDate(diet.getMealDate()); // 🔹 여기 추가
 	    List<DietsFood> dietsFoodList = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
 	    for (DietsFood df : dietsFoodList) {
 	        // food_id로 food 마스터 정보 조회 후 계산된 영양소를 설정
