@@ -7,11 +7,11 @@ import { useUserStore } from "@/stores/user";
 
 const store = useUserStore();
 
-onMounted(() => {
-  store.checkLogin().catch(() => {
-    // 로그인 안 된 상태면 무시
-  });
-});
+// onMounted(() => {
+//   store.checkLogin().catch(() => {
+//     // 로그인 안 된 상태면 무시
+//   });
+// });
 </script>
 
 <template>
