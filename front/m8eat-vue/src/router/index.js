@@ -12,6 +12,8 @@ import DietView from "@/views/DietView.vue";
 import DietView2 from "@/views/DietView2.vue";
 import ApiTest from "@/components/board/ApiTest.vue";
 
+import { useUserStore } from "@/stores/user";
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -31,6 +33,7 @@ const router = createRouter({
       path: "/mypage",
       name: "mypage",
       component: MyPageView,
+      meta: {requiresAuth: true}
     },
     {
       path: "/login",
@@ -47,6 +50,7 @@ const router = createRouter({
       name: "boards",
       component: BoardView,
       redirect: { path: "/" },
+      meta: {requiresAuth: true},
       children: [
         {
           path: "/boards",
@@ -72,5 +76,17 @@ const router = createRouter({
     },
   ],
 });
+
+router.beforeEach((to, from, next) => {
+  const store = useUserStore();
+  const isLoggedIn = store.loginUser !== null;
+
+  if (to.meta.requiresAuth && !isLoggedIn) {
+    alert("로그인이 필요합니다.")
+    next({name: 'login'})
+  } else {
+    next();
+  }
+})
 
 export default router;

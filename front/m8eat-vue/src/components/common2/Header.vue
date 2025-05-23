@@ -37,7 +37,7 @@ const store = useUserStore();
 
 // 로그인 여부 및 사용자 정보
 const isLoggedIn = computed(() => store.loginUser !== null); // 실제론 store 또는 auth composable 사용
-const userName = computed(() => store.loginUser?.name || "");
+const userName = computed(() => store.loginUser?.name ?? '');
 
 const profileImageUrl = ref("https://via.placeholder.com/40");
 
@@ -52,19 +52,28 @@ const goToMyPage = () => {
   router.push("/mypage");
 };
 
+
+
+
 const logout = async () => {
   try {
     await store.logout();
     alert("로그아웃 되었습니다.");
     router.push({name: 'login'})
   } catch {
-    alert("로그아웃에 실패했습니다.")
+    alert("로그아웃에 실패")
   }
 
   // isLoggedIn.value = false;
   // dropdownOpen.value = false;
 };
 
+// // ✅ 처음 마운트될 때 로그인 상태 확인
+// onMounted(() => {
+//   store.checkLogin().catch(() => {
+//     // 실패해도 무시 가능 (로그인 안 된 경우)
+//   });
+// });
 
 import "@/style/header.scss";
 </script>

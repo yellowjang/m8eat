@@ -1,7 +1,8 @@
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
 import router from "@/router";
+import api from "@/api";
 
 const REST_API_URL = `http://localhost:8080`;
 
@@ -43,7 +44,7 @@ export const useUserStore = defineStore("user", () => {
         purpose: "",
       },
     };
-    axios
+    api
       .post(`${REST_API_URL}/auth/signup`, requestBody)
       .then((response) => {
         console.log(response.data);
@@ -56,13 +57,13 @@ export const useUserStore = defineStore("user", () => {
 
   const login = async (userInfo) => {
     try {
-      await axios.post(`${REST_API_URL}/auth/login`, {
+      await api.post(`${REST_API_URL}/auth/login`, {
           id: userInfo.id,
           password: userInfo.password,
       });
 
       // ✅ 로그인 성공 → 유저 정보 받아오기
-      const res = await axios.get(`${REST_API_URL}/auth/check`);
+      const res = await api.get(`${REST_API_URL}/auth/check`);
       
       console.log(res.data)
       loginUser.value = res.data;
@@ -76,15 +77,22 @@ export const useUserStore = defineStore("user", () => {
   };
 
   const checkLogin = async () => {
-    const res = await axios.get(`${REST_API_URL}/auth/check`);
+    const res = await api.get(`${REST_API_URL}/auth/check`);
     loginUser.value = res.data; // ✅ 다시 로그인 상태로 복구
   };
 
   const logout = async () => {
     try {
-      await axios.post(`${REST_API_URL}/auth/logout`, null)
+      await api.post(`${REST_API_URL}/auth/logout`, null)
   
       loginUser.value = null;
+      // ✅ DOM 반영까지 기다림
+      await nextTick(); 
+
+      // ✅ login 페이지로 강제 이동
+      // router.replace({ name: 'login' }); 
+      // await nextTick(); 
+      // router.push({name: 'login'})
     } catch (err) {
         console.error("로그아웃 실패", err);
         throw err; // 필요 시 헤더에서 처리할 수 있게
