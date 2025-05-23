@@ -31,26 +31,27 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { getBoardList } from "@/api/board";
 import { useUserStore } from "@/stores/user";
-const store = useUserStore();
+import { useBoardStore } from "@/stores/board"
+
+const userStore = useUserStore();
+const boardStore = useBoardStore();
 
 const router = useRouter();
 const boards = ref([]);
 
-// watch(() => store.loginUser, (val) => {
-//   if (val === null) {
-//     router.push({ name: 'login' });
-//   }
-// });
-
 
 const requestBoardList = async () => {
-  boards.value = await getBoardList();
-  console.log(boards.value)
-  console.log("보드리스트 불러옴!");
+  try {
+    boards.value = await boardStore.getBoardList();
+    console.log("보드리스트 불러옴!");
+    console.log(boards.value)
+  } catch {
+    alert("게시판 데이터를 불러오지 못했습니다.")
+  }
 };
 
 const moveToBoardForm = () => {
@@ -59,7 +60,7 @@ const moveToBoardForm = () => {
 // requestBoardList();
 
 onMounted(() => {
-  if (store.loginUser) {
+  if (userStore.loginUser) {
     requestBoardList();
   }
 });

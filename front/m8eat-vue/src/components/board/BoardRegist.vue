@@ -4,12 +4,12 @@
     <form @submit.prevent="submitForm">
       <div class="form-group">
         <label for="title">제목</label>
-        <input v-model="form.title" type="text" id="title" required />
+        <input v-model.trim="title" type="text" id="title" required />
       </div>
 
       <div class="form-group">
         <label for="content">내용</label>
-        <textarea v-model="form.content" id="content" required></textarea>
+        <textarea v-model.trim="content" id="content" required></textarea>
       </div>
 
       <button type="submit" class="submit-btn">등록</button>
@@ -21,10 +21,13 @@
 import { reactive } from "vue";
 import { addBoard } from "@/api/board";
 
-const form = reactive({
-  title: "",
-  content: "",
-});
+// const form = reactive({
+//   title: "",
+//   content: "",
+// });
+
+const title = ref('')
+const content = ref('')
 
 const submitForm = async () => {
   try {

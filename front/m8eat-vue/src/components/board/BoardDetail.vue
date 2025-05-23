@@ -19,7 +19,7 @@
       <div class="detail-actions">
         <!-- TODO : 목록, 수정, 삭제 버튼 클릭 시 이벤트 처리 필요 -->
         <button class="btn" @click="requestBoardList">목록</button>
-        <button class="btn btn-danger" @click="requestBoardDelete">삭제</button>
+        <button class="btn btn-danger" @click="requestBoardDelete" v-if="board.userNo === userStore.loginUser?.userNo">삭제</button>
         <button class="btn btn-secondary">수정</button>
       </div>
     </div>
@@ -30,23 +30,40 @@
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { getBoardDetail, removeBoard } from "@/api/board";
+import { useBoardStore } from "@/stores/board"
+import { useUserStore } from "@/stores/user"
+
 const route = useRoute();
 const router = useRouter();
+
+const boardStore = useBoardStore();
+const userStore = useUserStore();
 
 const board = ref({});
 
 const requestBoardDetail = async () => {
-  const boardNo = route.params.boardNo;
-  board.value = await getBoardDetail(boardNo);
+  try {
+    const boardNo = route.params.boardNo;
+    board.value = await boardStore.getBoardDetail(boardNo);
+  } catch {
+    alert("요청을 처리하지 못했습니다.")
+    router.push({name: "boardList"})
+  }
 };
 
 const requestBoardList = () => {
   router.push({ name: "boardList" });
 };
+
 const requestBoardDelete = async () => {
-  const boardNo = route.params.boardNo;
-  await removeBoard(boardNo);
-  router.push({ name: "boardList" });
+  try {
+    const boardNo = route.params.boardNo;
+    await boardStore.removeBoard(boardNo);
+    alert("삭제되었습니다.")
+    router.push({ name: "boardList" });
+  } catch {
+    alert("요청을 처리하지 못했습니다.")
+  }
 };
 
 requestBoardDetail();
