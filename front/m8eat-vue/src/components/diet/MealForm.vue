@@ -28,6 +28,7 @@
       <!-- 상세 시간 -->
       <div class="food-info">
         <p class="input-title">상세 시간</p>
+        <VueDatePicker v-model="mealDate" :format="'yyyy-MM-dd'" />
         <label>
           <input type="radio" name="meal" value="아침" v-model="mealTime" />
           아침
@@ -51,7 +52,7 @@
             <option v-for="food in filteredFoods" :key="food.foodId" :value="food.nameKo" />
           </datalist>
           <input type="number" placeholder="g" v-model.number="foodAmount" @input="calculateCalories" />
-          <input type="number" placeholder="kcal" v-model.number="foodCalories" readonly />
+          <input type="number" placeholder="kcal" v-model.number="foodCalories" :readonly="!!selectedFood" />
           <button class="add-button" type="button" @click="addFood">추가</button>
         </div>
 
@@ -75,6 +76,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import VueDatePicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 import deleteIcon from "@/assets/icon/deleteIcon.png";
 import { useDietStore } from "@/stores/diet";
 import { useFoodStore } from "@/stores/food";
@@ -83,6 +86,7 @@ const emit = defineEmits(["close"]);
 const dietStore = useDietStore();
 const foodStore = useFoodStore();
 
+const mealDate = ref(new Date());
 const mealTime = ref("");
 const foodInput = ref("");
 const foodAmount = ref(null);
@@ -117,29 +121,35 @@ const filterFoodList = () => {
 };
 
 const confirmSelectedFood = () => {
-  selectedFood.value = foodStore.foods.find((f) => f.nameKo.trim() === foodInput.value.trim());
+  selectedFood.value = foodStore.foods.find((f) => f.nameKo.trim() === foodInput.value.trim()) || null;
   calculateCalories();
 };
 
 const calculateCalories = () => {
-  if (!selectedFood.value || !foodAmount.value) return;
-  const ratio = foodAmount.value / 100;
-  foodCalories.value = Math.round(selectedFood.value.calories * ratio);
+  if (!foodAmount.value) return;
+  if (selectedFood.value) {
+    const ratio = foodAmount.value / 100;
+    foodCalories.value = Math.round(selectedFood.value.calories * ratio);
+  }
 };
 
 const addFood = () => {
-  if (!selectedFood.value || !foodAmount.value || !foodCalories.value) return;
-  foods.value.push({
-    foodId: selectedFood.value.foodId,
-    foodName: selectedFood.value.nameKo,
+  if (!foodInput.value || !foodAmount.value || !foodCalories.value) return;
+
+  const food = {
+    foodId: selectedFood.value?.foodId ?? 0,
+    foodName: foodInput.value,
     amount: foodAmount.value,
     calorie: foodCalories.value,
-    protein: selectedFood.value.protein * (foodAmount.value / 100),
-    fat: selectedFood.value.fat * (foodAmount.value / 100),
-    carbohydrate: selectedFood.value.carbohydrate * (foodAmount.value / 100),
-    sugar: selectedFood.value.sugar * (foodAmount.value / 100),
-    cholesterol: selectedFood.value.cholesterol * (foodAmount.value / 100),
-  });
+    protein: selectedFood.value ? selectedFood.value.protein * (foodAmount.value / 100) : 0,
+    fat: selectedFood.value ? selectedFood.value.fat * (foodAmount.value / 100) : 0,
+    carbohydrate: selectedFood.value ? selectedFood.value.carbohydrate * (foodAmount.value / 100) : 0,
+    sugar: selectedFood.value ? selectedFood.value.sugar * (foodAmount.value / 100) : 0,
+    cholesterol: selectedFood.value ? selectedFood.value.cholesterol * (foodAmount.value / 100) : 0,
+  };
+
+  foods.value.push(food);
+
   foodInput.value = "";
   foodAmount.value = null;
   foodCalories.value = null;
@@ -155,6 +165,7 @@ const totalCalories = computed(() => foods.value.reduce((sum, food) => sum + foo
 const handleSubmit = async () => {
   const formData = new FormData();
   formData.append("mealType", mealTime.value);
+  formData.append("mealDate", mealDate.value.toISOString().slice(0, 10));
   if (file.value) {
     formData.append("file", file.value);
   }

@@ -1,16 +1,15 @@
 package com.prj.m8eat.controller;
 
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.*;
-
-import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,20 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.core.io.ClassPathResource;
-
-import com.google.cloud.vision.v1.AnnotateImageRequest;
-import com.google.cloud.vision.v1.BatchAnnotateImagesResponse;
-import com.google.cloud.vision.v1.EntityAnnotation;
-import com.google.cloud.vision.v1.Feature;
-import com.google.cloud.vision.v1.Image;
-import com.google.cloud.vision.v1.ImageAnnotatorClient;
-import com.google.protobuf.ByteString;
-
-import com.google.api.gax.core.FixedCredentialsProvider;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.vision.v1.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,7 +28,6 @@ import com.prj.m8eat.model.dto.Diet;
 import com.prj.m8eat.model.dto.DietRequest;
 import com.prj.m8eat.model.dto.DietResponse;
 import com.prj.m8eat.model.dto.DietsFood;
-import com.prj.m8eat.model.dto.Food;
 import com.prj.m8eat.model.service.DietService;
 
 import jakarta.servlet.http.HttpSession;
@@ -110,7 +94,12 @@ public class DietController {
 	    Diet diet = new Diet();
 	    diet.setUserNo(2); // 로그인 정보로 교체 예정
 	    diet.setMealType(dietReq.getMealType());
-
+	    try {
+	        OffsetDateTime odt = OffsetDateTime.parse(dietReq.getMealDate());
+	        diet.setMealDate(odt.toLocalDate()); // 날짜만 저장
+	    } catch (DateTimeParseException e) {
+	        return ResponseEntity.badRequest().body("날짜 형식 오류: " + e.getMessage());
+	    }
 	    // (파일 저장 코드 동일)
 	    MultipartFile file = dietReq.getFile();
 

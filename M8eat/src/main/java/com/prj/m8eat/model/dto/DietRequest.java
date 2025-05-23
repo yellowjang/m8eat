@@ -9,9 +9,10 @@ public class DietRequest {
     private MultipartFile file;
     private String filePath;
     private String foods; // JSON 문자열 (프론트에서 stringify 해서 넘김)
+    private String mealDate;
+	
+	
 
-	
-	
 	public int getDietNo() {
 		return dietNo;
 	}
@@ -65,6 +66,12 @@ public class DietRequest {
 	public String toString() {
 		return "DietRequest [dietNo=" + dietNo + ", userNo=" + userNo + ", mealType=" + mealType + ", file=" + file
 				+ ", filePath=" + filePath + ", foods=" + foods + "]";
+	}
+	public String getMealDate() {
+	    return mealDate;
+	}
+	public void setMealDate(String mealDate) {
+	    this.mealDate = mealDate;
 	}
 	
 }

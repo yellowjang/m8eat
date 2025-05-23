@@ -1,5 +1,7 @@
 package com.prj.m8eat.model.dto;
 
+import java.time.LocalDate;
+
 import org.springframework.web.multipart.MultipartFile;
 
 public class Diet {
@@ -9,9 +11,17 @@ public class Diet {
 	private String mealType;
 	private MultipartFile file; //업로드용.. Request 시 사용
 	private String filePath; //DB에서 불러올 실제 경로
+	private LocalDate mealDate;
 	
 	
-	
+	public LocalDate getMealDate() {
+		return mealDate;
+	}
+
+	public void setMealDate(LocalDate mealDate) {
+		this.mealDate = mealDate;
+	}
+
 	public Diet() {
 	}
 
@@ -72,7 +82,7 @@ public class Diet {
 		return "Diet [dietNo=" + dietNo + ", userNo=" + userNo + ", regDate=" + regDate + ", file=" + file
 				+ ", filePath=" + filePath + "]";
 	}
-	
+
 	
 	
 }
