@@ -77,7 +77,9 @@ export const useUserStore = defineStore("user", () => {
 
   const checkLogin = async () => {
     const res = await api.get(`${REST_API_URL}/auth/check`);
+    console.log("res.dataaaaaaaaaaaaa ", res.data)
     loginUser.value = res.data; // ✅ 다시 로그인 상태로 복구
+    console.log("loginUser.valueeeeeeeeee ", loginUser.value)
   };
 
   const logout = async () => {

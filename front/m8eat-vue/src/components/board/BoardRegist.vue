@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { reactive } from "vue";
+import { ref, reactive } from "vue";
 import { addBoard } from "@/api/board";
 
 // const form = reactive({
