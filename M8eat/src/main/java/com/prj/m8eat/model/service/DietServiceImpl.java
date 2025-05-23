@@ -293,7 +293,7 @@ public class DietServiceImpl implements DietService {
 	@Override
 	public List<DietResponse> getDietsByDietNo(int dietNo) {
 	    List<DietResponse> dietList = new ArrayList<>();
-
+	    System.out.println("서비스에 다이어트 넘버 들어옴"+dietNo);
 	    Diet diet = dietDao.selectDietsByDietNo(dietNo);
 	    DietResponse res = new DietResponse(
 	        diet.getDietNo(),
@@ -305,15 +305,16 @@ public class DietServiceImpl implements DietService {
 
 	    List<DietsFood> dietsFoodList = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
 	    for (DietsFood df : dietsFoodList) {
-	        Food food = foodDao.selectFoodById(df.getFoodId());
-	        if (food != null) {
-	            df.setFoodName(food.getNameKo());
-	            df.setCalorie((int) Math.round(food.getCalories() * (df.getAmount() / 100.0)));
-	            df.setProtein(food.getProtein() * (df.getAmount() / 100.0));
-	            df.setFat(food.getFat() * (df.getAmount() / 100.0));
-	            df.setCarbohydrate(food.getCarbohydrate() * (df.getAmount() / 100.0));
-	            df.setSugar(food.getSugar() * (df.getAmount() / 100.0));
-	            df.setCholesterol(food.getCholesterol() * (df.getAmount() / 100.0));
+	        // food_id로 food 마스터 정보 조회 후 계산된 영양소를 설정
+	        Food masterFood = foodDao.selectFoodById(df.getFoodId());
+	        if (masterFood != null) {
+	            df.setFoodName(masterFood.getNameKo());
+	            df.setCalorie((int) Math.round(masterFood.getCalories() * (df.getAmount() / 100.0)));
+	            df.setProtein(masterFood.getProtein() * (df.getAmount() / 100.0));
+	            df.setFat(masterFood.getFat() * (df.getAmount() / 100.0));
+	            df.setCarbohydrate(masterFood.getCarbohydrate() * (df.getAmount() / 100.0));
+	            df.setSugar(masterFood.getSugar() * (df.getAmount() / 100.0));
+	            df.setCholesterol(masterFood.getCholesterol() * (df.getAmount() / 100.0));
 	        }
 	    }
 
@@ -350,6 +351,27 @@ public class DietServiceImpl implements DietService {
 
         return dietNo;
     }
+
+
+
+//    @Override
+//    public DietResponse getDietDetail(int dietNo) {
+//        Diet diet = dietDao.selectDietsByDietNo(dietNo);
+//        if (diet == null) return null;
+//
+//        List<DietsFood> foodList = dietDao.selectDietsFoodByDietNo(dietNo);
+//
+//        DietResponse response = new DietResponse(
+//            diet.getDietNo(),
+//            diet.getUserNo(),
+//            diet.getFilePath(),
+//            diet.getRegDate(),
+//            diet.getMealType()
+//        );
+//        response.setFoods(foodList);
+//
+//        return response;
+//    }
 
 
 }

@@ -6,4 +6,8 @@
     <select id="selectAllFoods" resultType="Food">
         SELECT * FROM food;
     </select>
+    
+    <select id="selectFoodById" parameterType="int" resultType="com.prj.m8eat.model.dto.Food">
+    SELECT * FROM food WHERE food_id = #{foodId}
+	</select>
 </mapper>

@@ -32,5 +32,7 @@ public interface DietService {
 	//여러 음식을 넣을 때, 같은 dietNo 로 들어가도록 해야함.
 	public int createDietWithFoods(Diet diet, List<DietsFood> foodList);
 
+//	public DietResponse getDietDetail(int dietNo);
+
 
 }
