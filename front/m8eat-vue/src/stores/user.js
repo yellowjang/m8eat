@@ -22,10 +22,14 @@ function base64UrlDecode(str) {
 }
 
 export const useUserStore = defineStore("user", () => {
+
+  const loginUser = ref(null)
+
   const signup = (user) => {
     console.log("userStore signuppppppppppp");
     const requestBody = {
       user: {
+        name: user.name,
         id: user.id,
         password: user.password,
         role: "user",
@@ -42,31 +46,36 @@ export const useUserStore = defineStore("user", () => {
       .post(`${REST_API_URL}/auth/signup`, requestBody)
       .then((response) => {
         console.log(response.data);
+        router.push({name: 'login'})
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
-  const login = (loginUser) => {
-    console.log(loginUser);
-    const requestBody = {
-      user: {
-        id: loginUser.id,
-        password: loginUser.password,
-      },
-    };
-    axios
-      .post(`${REST_API_URL}/auth/login`, {
-        id: loginUser.id,
-        password: loginUser.password,
-      })
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((err) => {
-        console.log(err);
+  const login = async (loginUser) => {
+    try {
+      const response = await axios.post(`${REST_API_URL}/auth/login`, {
+          id: loginUser.id,
+          password: loginUser.password,
       });
+      
+      const token = response.data["access-token"].split(".")
+      
+      const payload = JSON.parse(base64UrlDecode(token[1]))
+      console.log("payload", payload)
+  
+      sessionStorage.setItem("access-token", response.data["access-token"])
+      loginUser.value = payload
+      console.log(loginUser.value)
+  
+      return { success: true, message: '로그인 성공' }
+      
+    } catch (err) {
+      console.log(err);
+      // alert(err.response.data.message)
+      return {success: false, message: err.response.data.message}
+    }
   };
 
   return { signup, login };
