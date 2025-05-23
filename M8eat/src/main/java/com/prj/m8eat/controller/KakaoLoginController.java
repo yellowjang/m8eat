@@ -22,7 +22,7 @@ import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/oauth/kakao")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+//@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class KakaoLoginController {
 
 	private final KakaoOauthService kakaoOauthService;

@@ -1,6 +1,5 @@
 import { ref, nextTick } from "vue";
 import { defineStore } from "pinia";
-import axios from "axios";
 import router from "@/router";
 import api from "@/api";
 
@@ -89,10 +88,6 @@ export const useUserStore = defineStore("user", () => {
       // ✅ DOM 반영까지 기다림
       await nextTick(); 
 
-      // ✅ login 페이지로 강제 이동
-      // router.replace({ name: 'login' }); 
-      // await nextTick(); 
-      // router.push({name: 'login'})
     } catch (err) {
         console.error("로그아웃 실패", err);
         throw err; // 필요 시 헤더에서 처리할 수 있게

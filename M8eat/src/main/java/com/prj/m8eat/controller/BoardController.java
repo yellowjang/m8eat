@@ -32,7 +32,7 @@ import com.prj.m8eat.model.service.BoardService;
 
 import jakarta.servlet.http.HttpSession;
 
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/boards")
 public class BoardController {
