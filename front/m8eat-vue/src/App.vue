@@ -7,6 +7,17 @@ import { useUserStore } from "@/stores/user";
 
 const store = useUserStore();
 
+onMounted(async () => {
+  if (!store.loginUser) {
+    try {
+      await store.checkLogin(); // ✅ OAuth 후에도 자동 동기화
+      console.log("✅ 로그인 상태 복구됨");
+    } catch {
+      console.log("❌ 로그인 아님");
+    }
+  }
+});
+
 // onMounted(() => {
 //   store.checkLogin().catch(() => {
 //     // 로그인 안 된 상태면 무시
