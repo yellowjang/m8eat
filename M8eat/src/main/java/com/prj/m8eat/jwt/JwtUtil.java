@@ -39,10 +39,29 @@ public class JwtUtil {
 				.signWith(secretKey).compact();
 	}
 	
+    // ✅ 2. 유효성 검증
+    public boolean validate(String token) {
+        try {
+            Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // ✅ 3. Claims (payload) 추출
+    public Claims getClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
 	
-	//유효성 검증 (실제로 내용물을 확인하기 위함은 아님 / 에러나면 유효기간 지난것)
-	//이거 실행했을때 에러나면 유효기간 지난거....
-	public Jws<Claims> vaildate(String token ){
-		return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
-	}
+	
+//	//유효성 검증 (실제로 내용물을 확인하기 위함은 아님 / 에러나면 유효기간 지난것)
+//	//이거 실행했을때 에러나면 유효기간 지난거....
+//	public Jws<Claims> vaildate(String token){
+//		return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
+//	}
 }

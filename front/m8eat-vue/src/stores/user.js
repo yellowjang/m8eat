@@ -54,13 +54,19 @@ export const useUserStore = defineStore("user", () => {
       });
   };
 
-  const login = async (loginUser) => {
+  const login = async (userInfo) => {
     try {
-      const response = await axios.post(`${REST_API_URL}/auth/login`, {
-          id: loginUser.id,
-          password: loginUser.password,
+      await axios.post(`${REST_API_URL}/auth/login`, {
+          id: userInfo.id,
+          password: userInfo.password,
       });
-  
+
+      // ✅ 로그인 성공 → 유저 정보 받아오기
+      const res = await axios.get(`${REST_API_URL}/auth/check`);
+      
+      console.log(res.data)
+      loginUser.value = res.data;
+
       return { success: true, message: '로그인 성공' }
       
     } catch (err) {
@@ -69,7 +75,23 @@ export const useUserStore = defineStore("user", () => {
     }
   };
 
+  const checkLogin = async () => {
+    const res = await axios.get(`${REST_API_URL}/auth/check`);
+    loginUser.value = res.data; // ✅ 다시 로그인 상태로 복구
+  };
+
+  const logout = async () => {
+    try {
+      await axios.post(`${REST_API_URL}/auth/logout`, null)
+  
+      loginUser.value = null;
+    } catch (err) {
+        console.error("로그아웃 실패", err);
+        throw err; // 필요 시 헤더에서 처리할 수 있게
+    }
+  }
 
 
-  return { signup, login, loginUser };
+
+  return { signup, login, loginUser, checkLogin, logout };
 });

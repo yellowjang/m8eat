@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import com.prj.m8eat.model.dto.User;
 import com.prj.m8eat.model.dto.UserHealthInfo;
 import com.prj.m8eat.model.service.UserService;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
@@ -82,11 +84,37 @@ public class UserController {
 		}
 	}
 	
+	@GetMapping("/auth/check")
+	public ResponseEntity<User> checkLogin(@CookieValue("access-token") String token) {
+	    if (util.validate(token)) {
+	        Claims claims = util.getClaims(token);
+	        User user = new User();
+	        user.setUserNo((Integer) claims.get("userNo"));
+	        user.setName((String) claims.get("name"));
+	        user.setId((String) claims.get("id"));
+	        user.setRole((String) claims.get("role"));
+	        return ResponseEntity.ok(user);
+	    } else {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+	    }
+	}
 
-
+	
 	@PostMapping("/auth/logout")
-	public ResponseEntity<Void> logout(HttpSession session) {
-		session.invalidate();
+	public ResponseEntity<Void> logout(HttpServletResponse response) {
+	    // ✅ access-token 쿠키를 빈 값 + 만료로 설정
+	    ResponseCookie expiredCookie = ResponseCookie.from("access-token", "")
+	        .httpOnly(true)
+	        .secure(false)
+	        .sameSite("Lax")
+	        .path("/")
+	        .maxAge(0) // ⛔ 즉시 만료
+	        .build();
+	    
+	    // ✅ 쿠키 헤더 설정
+	    response.setHeader("Set-Cookie", expiredCookie.toString());
+	    
+//		session.invalidate();
 		return ResponseEntity.ok().build();
 	}
 	

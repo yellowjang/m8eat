@@ -2,6 +2,16 @@
 import { RouterLink, RouterView } from "vue-router";
 import Header from "@/components/common2/Header.vue";
 import "@/style/global.scss";
+import { onMounted } from "vue";
+import { useUserStore } from "@/stores/user";
+
+const store = useUserStore();
+
+onMounted(() => {
+  store.checkLogin().catch(() => {
+    // 로그인 안 된 상태면 무시
+  });
+});
 </script>
 
 <template>
