@@ -11,7 +11,7 @@ import SignupView from "@/views/SignupView.vue";
 import DietView from "@/views/DietView.vue";
 import DietView2 from "@/views/DietView2.vue";
 import ApiTest from "@/components/board/ApiTest.vue";
-
+import DietDetail from "@/components/diet/DietDetail.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -27,6 +27,7 @@ const router = createRouter({
       name: "diet",
       component: DietView2,
     },
+
     {
       path: "/mypage",
       name: "mypage",
@@ -41,6 +42,16 @@ const router = createRouter({
       path: "/signup",
       name: "signup",
       component: SignupView,
+    },
+    {
+      path: "/diet",
+      name: "diets",
+      component: DietView2,
+    },
+    {
+      path: "/diet/:dietNo",
+      name: "dietDetail",
+      component: DietDetail,
     },
     {
       path: "/boards",
@@ -65,6 +76,7 @@ const router = createRouter({
         },
       ],
     },
+
     {
       path: "/apiTest",
       name: "apiTest",
