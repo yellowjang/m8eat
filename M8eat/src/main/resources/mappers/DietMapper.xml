@@ -41,9 +41,9 @@
 	</select>
 	
 	<!-- 식단 기록 -->
-	<insert id="insertDiet" parameterType="Diet" keyProperty="dietNo" useGeneratedKeys="true">
-		INSERT INTO diets (user_no, meal_type, file_path)
-		 VALUES (#{userNo}, #{mealType}, #{filePath})
+	<insert id="insertDiet" parameterType="Diet" useGeneratedKeys="true" keyProperty="dietNo">
+	  INSERT INTO diets (user_no, meal_date, meal_type, file_path)
+	  VALUES (#{userNo}, #{mealDate}, #{mealType}, #{filePath})
 	</insert>
 	
 	<!-- 식단 음식 추가 -->
