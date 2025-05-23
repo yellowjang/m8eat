@@ -29,12 +29,16 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed, onMounted  } from "vue";
 import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/user";
+
+const store = useUserStore();
 
 // 로그인 여부 및 사용자 정보
-const isLoggedIn = ref(false); // 실제론 store 또는 auth composable 사용
-const userName = ref("홍길동");
+const isLoggedIn = computed(() => store.loginUser !== null); // 실제론 store 또는 auth composable 사용
+const userName = computed(() => store.loginUser?.name || "");
+
 const profileImageUrl = ref("https://via.placeholder.com/40");
 
 const dropdownOpen = ref(false);
@@ -48,11 +52,19 @@ const goToMyPage = () => {
   router.push("/mypage");
 };
 
-const logout = () => {
-  // TODO: 로그아웃 로직 구현
-  alert("로그아웃 되었습니다.");
-  isLoggedIn.value = false;
-  dropdownOpen.value = false;
+const logout = async () => {
+  try {
+    await store.logout();
+    alert("로그아웃 되었습니다.");
+    router.push({name: 'login'})
+  } catch {
+    alert("로그아웃에 실패했습니다.")
+  }
+
+  // isLoggedIn.value = false;
+  // dropdownOpen.value = false;
 };
+
+
 import "@/style/header.scss";
 </script>

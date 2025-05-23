@@ -55,6 +55,7 @@ const login = async () => {
   const res = await store.login({ id: id.value, password: password.value });
 
   if (res.success) {
+    
     alert(res.message)
     router.push({name: 'mainpage'})
   } else {
