@@ -1,42 +1,38 @@
 package com.prj.m8eat.model.service;
 
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import javax.imageio.ImageIO;
 
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.prj.m8eat.model.dao.DietDao;
-import com.prj.m8eat.model.dto.Diet;
-import com.prj.m8eat.model.dto.DietRequest;
-import com.prj.m8eat.model.dto.DietResponse;
-import com.prj.m8eat.model.dto.DietsFood;
-import com.prj.m8eat.model.dto.Food;
-import com.prj.m8eat.model.dto.FoodInfo;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 //이미지 처리 및 Vision API
 import com.google.cloud.vision.v1.EntityAnnotation;
 import com.google.cloud.vision.v1.ImageAnnotatorClient;
 import com.google.cloud.vision.v1.LocalizedObjectAnnotation;
 import com.google.protobuf.ByteString;
-
-import java.io.ByteArrayOutputStream;
-
-//JSON 처리
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.prj.m8eat.model.dao.DietDao;
+import com.prj.m8eat.model.dto.CropBox;
+import com.prj.m8eat.model.dto.Diet;
+import com.prj.m8eat.model.dto.DietRequest;
+import com.prj.m8eat.model.dto.DietResponse;
+import com.prj.m8eat.model.dto.DietsFood;
+import com.prj.m8eat.model.dto.FoodInfo;
 //내부 유틸 클래스들 (직접 만든 클래스 기준)
 import com.prj.m8eat.util.GoogleVisionUtil;
 import com.prj.m8eat.util.OpenAIUtil;
-import com.prj.m8eat.model.dto.CropBox;
 
 @Service
 public class DietServiceImpl implements DietService {
@@ -107,47 +103,56 @@ public class DietServiceImpl implements DietService {
 	}
 
 
-	@Override
-	public boolean updateDietByDietNo(DietRequest dietReq) {
-		
-		System.out.println("ssssssssssssss");
-		
-		Diet oldDiet = dietDao.selectDietsByDietNo(dietReq.getDietNo());
-//		System.out.println("serviceeee " + oldData.getFilePath());
-		if (oldDiet == null) return false;
-		
-		MultipartFile newFile = dietReq.getFile();
-		
-		// 파일이 새로 업로드 된 경우
-		if (newFile != null && newFile.isEmpty()) {
-			deleteFileIfExist(oldDiet.getFilePath());
-			
-			String fileName = UUID.randomUUID() + "_" + newFile.getOriginalFilename(); 
-			File saveFile = new File(baseDir, fileName);
-			
-			try {
-				newFile.transferTo(saveFile);
-				String newFilePath = "/upload/" + fileName;
-			} catch (IOException e) {
-				e.printStackTrace();
-				return false;
-			}
-		}
-		
-		System.out.println("updateeeeeeeeeeeeeee " + dietReq.getDietNo());
-		Diet updateDiet = new Diet(dietReq.getDietNo(), dietReq.getUserNo(),
-									dietReq.getMealType(), dietReq.getFilePath());
-		int result = dietDao.updateDiet(updateDiet);
-		
-		dietDao.deleteDietFood(dietReq.getDietNo());
-//		for (Food f : dietReq.getFoods()) {
-//			DietsFood dietsFood = new DietsFood(dietReq.getDietNo(), f.getFoodName(), f.getCalorie());
-//			System.out.println("updateeeeeeeeeeeeeee " + dietsFood.getDietNo());
-//			dietDao.insertDietsFood(dietsFood);
-//		}
-		
-		return result > 0;
-	}
+    @Override
+    public boolean updateDietByDietNo(DietRequest dietReq) {
+        Diet oldDiet = dietDao.selectDietsByDietNo(dietReq.getDietNo());
+        if (oldDiet == null) return false;
+
+        MultipartFile newFile = dietReq.getFile();
+        String newFilePath = oldDiet.getFilePath();
+
+        if (newFile != null && !newFile.isEmpty()) {
+            deleteFileIfExist(oldDiet.getFilePath());
+            String fileName = UUID.randomUUID() + "_" + newFile.getOriginalFilename();
+            File saveFile = new File(baseDir, fileName);
+            try {
+                newFile.transferTo(saveFile);
+                newFilePath = "/upload/" + fileName;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<DietsFood> foodsList;
+        try {
+            foodsList = mapper.readValue(
+                    dietReq.getFoods(),
+                    new TypeReference<List<DietsFood>>() {}
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        Diet updateDiet = new Diet(
+                dietReq.getDietNo(),
+                dietReq.getUserNo(),
+                dietReq.getMealType(),
+                newFilePath
+        );
+        int result = dietDao.updateDiet(updateDiet);
+
+        dietDao.deleteDietFood(dietReq.getDietNo());
+        for (DietsFood food : foodsList) {
+            food.setDietNo(dietReq.getDietNo());
+            dietDao.insertDietsFood(food);
+        }
+
+        return result > 0;
+    }
+
 
 	private void deleteFileIfExist(String filePath) {
 		if (filePath == null || filePath.isEmpty()) return;

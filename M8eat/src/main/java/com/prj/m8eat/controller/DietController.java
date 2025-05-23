@@ -199,12 +199,11 @@ public class DietController {
 	// 식단 수정
 	@PutMapping("/{dietNo}")
 	public ResponseEntity<String> updateDietByDietNo(@PathVariable int dietNo, @ModelAttribute DietRequest dietReq) {
-		dietReq.setDietNo(dietNo);
-		System.out.println("updatediets controllerrrrrrrrrr " + dietReq);
-		if (dietService.updateDietByDietNo(dietReq)) {
-			return ResponseEntity.ok("정상적으로 수정되었습니다.");
-		}
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("요청을 처리하지 못했습니다.");
+	    dietReq.setDietNo(dietNo);
+	    if (dietService.updateDietByDietNo(dietReq)) {
+	        return ResponseEntity.ok("정상적으로 수정되었습니다.");
+	    }
+	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("요청을 처리하지 못했습니다.");
 	}
 
 
