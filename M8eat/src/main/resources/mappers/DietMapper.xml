@@ -46,9 +46,28 @@
 		 VALUES (#{userNo}, #{mealType}, #{filePath})
 	</insert>
 	
+	<!-- 식단 음식 추가 -->
 	<insert id="insertDietsFood" parameterType="DietsFood">
-		INSERT INTO diets_food (diet_no, food_name, calorie)
-		 VALUES (#{dietNo}, #{foodName}, #{calorie})
+	  INSERT INTO diets_food (
+	    diet_no,food_id, food_name, amount,calorie,
+	    protein,
+	    fat,
+	    carbohydrate,
+	    sugar,
+	    cholesterol
+	  )
+	  VALUES (
+	    #{dietNo},
+	    #{foodId},
+	    #{foodName},
+	    #{amount},
+	    #{calorie},
+	    #{protein},
+	    #{fat},
+	    #{carbohydrate},
+	    #{sugar},
+	    #{cholesterol}
+	  )
 	</insert>
 	
 	<!-- 식단 삭제 -->

@@ -19,12 +19,12 @@
             </div>
           </div>
         </div>
-        <!-- 분석 결과 -->
         <div class="analysis-result-box">
           <p class="input-title">분석 결과</p>
           <p>분석한 결과가 여기에 나올 거예요.</p>
         </div>
       </div>
+
       <!-- 상세 시간 -->
       <div class="food-info">
         <p class="input-title">상세 시간</p>
@@ -41,15 +41,20 @@
           저녁
         </label>
       </div>
+
       <!-- 음식 입력 -->
       <div class="food-table">
         <p class="input-title">음식 입력</p>
         <div class="food-row">
-          <input type="text" placeholder="음식명" v-model="foodName" />
-          <input type="number" placeholder="g" v-model.number="foodAmount" />
-          <input type="number" placeholder="kcal" v-model.number="foodCalories" />
+          <input type="text" placeholder="음식명" v-model="foodInput" @input="filterFoodList" @blur="confirmSelectedFood" list="food-suggestions" />
+          <datalist id="food-suggestions">
+            <option v-for="food in filteredFoods" :key="food.foodId" :value="food.nameKo" />
+          </datalist>
+          <input type="number" placeholder="g" v-model.number="foodAmount" @input="calculateCalories" />
+          <input type="number" placeholder="kcal" v-model.number="foodCalories" readonly />
           <button class="add-button" type="button" @click="addFood">추가</button>
         </div>
+
         <!-- 음식 리스트 -->
         <ul class="food-list">
           <li v-for="(food, index) in foods" :key="index" class="food-item">
@@ -58,9 +63,8 @@
           </li>
         </ul>
       </div>
-      <!-- 총 칼로리 -->
+
       <div class="total-calories">총 칼로리: {{ totalCalories }} kcal</div>
-      <!-- 제출 버튼 -->
       <div class="button-row">
         <button type="submit">식단 추가하기</button>
       </div>
@@ -70,21 +74,29 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import deleteIcon from "@/assets/icon/deleteIcon.png";
 import { useDietStore } from "@/stores/diet";
+import { useFoodStore } from "@/stores/food";
 
 const emit = defineEmits(["close"]);
 const dietStore = useDietStore();
+const foodStore = useFoodStore();
 
 const mealTime = ref("");
-const foodName = ref("");
+const foodInput = ref("");
 const foodAmount = ref(null);
 const foodCalories = ref(null);
 const foods = ref([]);
-
 const file = ref(null);
 const previewUrl = ref(null);
+
+const selectedFood = ref(null);
+const filteredFoods = ref([]);
+
+onMounted(() => {
+  foodStore.fetchFoods();
+});
 
 const handleFileChange = (e) => {
   const selectedFile = e.target.files[0];
@@ -99,18 +111,41 @@ const removeImage = () => {
   previewUrl.value = null;
 };
 
+const filterFoodList = () => {
+  const query = foodInput.value.trim().toLowerCase();
+  filteredFoods.value = foodStore.foods.filter((food) => food.nameKo.toLowerCase().includes(query));
+};
+
+const confirmSelectedFood = () => {
+  selectedFood.value = foodStore.foods.find((f) => f.nameKo.trim() === foodInput.value.trim());
+  calculateCalories();
+};
+
+const calculateCalories = () => {
+  if (!selectedFood.value || !foodAmount.value) return;
+  const ratio = foodAmount.value / 100;
+  foodCalories.value = Math.round(selectedFood.value.calories * ratio);
+};
+
 const addFood = () => {
-  if (!foodName.value || !foodAmount.value || !foodCalories.value) return;
+  if (!selectedFood.value || !foodAmount.value || !foodCalories.value) return;
   foods.value.push({
-    foodName: foodName.value,
+    foodId: selectedFood.value.foodId,
+    foodName: selectedFood.value.nameKo,
     amount: foodAmount.value,
     calorie: foodCalories.value,
+    protein: selectedFood.value.protein * (foodAmount.value / 100),
+    fat: selectedFood.value.fat * (foodAmount.value / 100),
+    carbohydrate: selectedFood.value.carbohydrate * (foodAmount.value / 100),
+    sugar: selectedFood.value.sugar * (foodAmount.value / 100),
+    cholesterol: selectedFood.value.cholesterol * (foodAmount.value / 100),
   });
-  foodName.value = "";
+  foodInput.value = "";
   foodAmount.value = null;
   foodCalories.value = null;
+  selectedFood.value = null;
 };
-console.log("foods", JSON.stringify(foods.value));
+
 const removeFood = (index) => {
   foods.value.splice(index, 1);
 };
@@ -124,11 +159,9 @@ const handleSubmit = async () => {
     formData.append("file", file.value);
   }
   formData.append("foods", JSON.stringify(foods.value));
-
   try {
     await dietStore.createDiet(formData);
     alert("식단이 성공적으로 등록되었습니다.");
-    // 초기화 또는 다른 처리
   } catch (error) {
     console.error("식단 등록 실패:", error);
     alert("식단 등록에 실패했습니다.");
