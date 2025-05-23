@@ -57,8 +57,8 @@ public class GoogleLoginController {
             // HttpOnly 쿠키로 토큰 설정
             ResponseCookie cookie = ResponseCookie.from("access-token", token)
                 .httpOnly(true)                // JS 접근 불가
-                .secure(false)                // HTTPS 환경이면 true로 설정
-                .sameSite("Lax")              // 크로스 도메인 요청 시 Lax or None
+                .secure(true)                // HTTPS 환경이면 true로 설정
+                .sameSite("None")              // 크로스 도메인 요청 시 Lax or None
                 .path("/")                    // 모든 경로에서 유효
                 .maxAge(60 * 60)              // 1시간
                 .build();
