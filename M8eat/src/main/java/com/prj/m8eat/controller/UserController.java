@@ -1,5 +1,8 @@
 package com.prj.m8eat.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.prj.m8eat.jwt.JwtUtil;
 import com.prj.m8eat.model.dto.LoginResponse;
 import com.prj.m8eat.model.dto.SignupRequestDTO;
 import com.prj.m8eat.model.dto.User;
@@ -26,8 +30,10 @@ import jakarta.servlet.http.HttpSession;
 public class UserController {
 	
 	private final UserService userService;
-	public UserController(UserService userService) {
+	private final JwtUtil util;
+	public UserController(UserService userService, JwtUtil util) {
 		this.userService = userService;
+		this.util = util;
 	}
 	
 	@PostMapping("/auth/signup")
@@ -45,19 +51,27 @@ public class UserController {
 	}
 	
 	@PostMapping("/auth/login")
-	public ResponseEntity<String> login(@RequestBody User user, HttpSession session) {
+	public ResponseEntity<Map<String, Object>> login(@RequestBody User user) {
 		System.out.println("controller login " + user);
 		LoginResponse result = userService.login(user);
-		if (result.isLogin()) {
-			User loginUser = result.getUser();
-			loginUser.setPassword(null);
-			session.setAttribute("loginUser", loginUser);
-			return ResponseEntity.ok(result.getMessage());
-		} else {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result.getMessage());
+		
+		Map<String, Object> resMap = new HashMap<>();
+		HttpStatus status = null;
+		
+		// 로그인 성공
+		if (result.isLogin()) { 
+			status = HttpStatus.ACCEPTED;
+			resMap.put("message", "login 성공");
+			resMap.put("access-token", util.createToken(result.getUser()));
+		} else {  // 로그인 실패
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			resMap.put("message", result.getMessage());
 		}
+		
+		return new ResponseEntity<Map<String,Object>>(resMap, status);
 	}
 	
+
 
 	@PostMapping("/auth/logout")
 	public ResponseEntity<Void> logout(HttpSession session) {

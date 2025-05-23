@@ -43,14 +43,24 @@
 <script setup>
 import { ref } from "vue";
 import { useUserStore } from "@/stores/user";
+import router from "@/router";
 
 const store = useUserStore();
 
 const id = ref("");
 const password = ref("");
 
-const login = () => {
-  store.login({ id: id.value, password: password.value });
+const login = async () => {
+  const res = await store.login({ id: id.value, password: password.value });
+
+  if (res.success) {
+    alert(res.message)
+    router.push({name: 'mainpage'})
+  } else {
+    alert(res.message)
+    id.value = ""
+    password.value = ""
+  }
 };
 </script>
 
