@@ -1,64 +1,64 @@
 <template>
   <section class="meal-today">
     <h2 class="title">오늘의 식단</h2>
-    <template v-if="!showForm">
-      <div class="meal-boxes">
-        <div v-for="meal in meals" :key="meal.type" class="meal-box">
-          <p class="meal-title">{{ meal.label }}</p>
-          <ul class="food-list">
-            <li v-for="(food, idx) in meal.foods" :key="idx" class="food-name">
-              {{ food.foodName }}
-            </li>
-          </ul>
-          <div>
-            <p class="calorie">{{ totalCalories(meal.foods) }} kcal</p>
-          </div>
-          <button class="edit-meal" @click="$emit('edit-meal', meal)">수정</button>
-        </div>
-      </div>
-      <p class="summary">총 섭취 칼로리: {{ overallCalories }} kcal</p>
-      <div class="divide-line"></div>
-      <div class="meal-analysis">
-        <p class="title nutri">영양 성분 분석</p>
-        <NutrientGraph :data="totalNutrients" :max="recommendedIntake" />
-      </div>
-      <div class="add-meal-box">
-        <button class="add-meal" @click="$emit('add-meal')">+ 식단 등록하기</button>
-      </div>
-    </template>
+    <div class="meal-boxes">
+      <div class="meal-box" v-for="type in ['아침', '점심', '저녁']" :key="type">
+        <p class="meal-title">{{ type }}</p>
 
-    <!-- <MealForm :edit="selectedMeal" @close="closeForm" @update-meal="updateMeal" @add-meal="addMeal" /> -->
+        <div v-if="mealsByType(type).length > 0">
+          <div class="meal-item" v-for="meal in mealsByType(type)" :key="meal.dietNo">
+            <ul class="food-list">
+              <li v-for="(food, idx) in meal.foods" :key="idx" class="food-name">
+                {{ food.foodName }}
+              </li>
+            </ul>
+            <p class="calorie">{{ totalCalories(meal.foods) }} kcal</p>
+            <button class="edit-meal" @click="$emit('edit-meal', meal)">수정</button>
+            <button class="view-meal" @click="$emit('view-detail', meal.dietNo)">상세보기</button>
+          </div>
+        </div>
+
+        <!-- 아무 식단도 없을 때 -->
+        <div v-else class="empty-meal">등록된 식단이 없습니다.</div>
+      </div>
+    </div>
+    <p class="summary">총 섭취 칼로리: {{ overallCalories }} kcal</p>
+    <div class="divide-line"></div>
+    <div class="meal-analysis">
+      <p class="title nutri">영양 성분 분석</p>
+      <NutrientGraph :data="totalNutrients" :max="recommendedIntake" />
+    </div>
+    <div class="add-meal-box">
+      <button class="add-meal" @click="$emit('add-meal')">+ 식단 등록하기</button>
+    </div>
   </section>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import MealForm from "./MealForm.vue";
-import NutrientGraph from "@/components/diet/NutrientGraph.vue";
 import { useDietStore } from "@/stores/diet";
+import NutrientGraph from "@/components/diet/NutrientGraph.vue";
 import dayjs from "dayjs";
 
 const dietStore = useDietStore();
 const meals = ref([]);
-const showForm = ref(false);
 const today = dayjs().format("YYYY-MM-DD");
 
 const fetchTodayDiets = async () => {
   try {
     await dietStore.getDietByDate(today, today);
-    const rawData = dietStore.dietList;
-    const grouped = ["아침", "점심", "저녁"].map((type) => ({
-      type,
-      label: type,
-      foods: rawData.filter((d) => d.mealType === type).flatMap((d) => d.foods || []),
-    }));
-    meals.value = grouped;
+    meals.value = dietStore.dietList;
   } catch (e) {
     console.error("식단 불러오기 실패", e);
   }
 };
 
 onMounted(fetchTodayDiets);
+
+// 🔽 type별 필터링 함수
+const mealsByType = (type) => {
+  return meals.value.filter((meal) => meal.mealType === type);
+};
 
 const totalCalories = (foods) => foods.reduce((sum, food) => sum + (food.calorie || 0), 0);
 const overallCalories = computed(() => meals.value.reduce((total, meal) => total + totalCalories(meal.foods), 0));
@@ -76,20 +76,11 @@ const totalNutrients = computed(() => {
     { carbohydrate: 0, protein: 0, fat: 0, sugar: 0 }
   );
 });
-const editMeal = (meal) => {
-  // editingMeal.value = meal;
-  showForm.value = true;
-};
 const recommendedIntake = {
   carbohydrate: 324,
   protein: 55,
   fat: 54,
   sugar: 50,
-};
-
-const addMeal = () => {
-  fetchTodayDiets();
-  showForm.value = false;
 };
 </script>
 

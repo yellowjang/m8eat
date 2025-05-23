@@ -13,7 +13,23 @@ public class DietsFood {
     private double carbohydrate;
     private double sugar;
     private double cholesterol;
-    // ✅ 생성자, getter/setter
+	public DietsFood(int no, int dietNo, int foodId, String foodName, double amount, int calorie, double protein,
+			double fat, double carbohydrate, double sugar, double cholesterol) {
+		super();
+		this.no = no;
+		this.dietNo = dietNo;
+		this.foodId = foodId;
+		this.foodName = foodName;
+		this.amount = amount;
+		this.calorie = calorie;
+		this.protein = protein;
+		this.fat = fat;
+		this.carbohydrate = carbohydrate;
+		this.sugar = sugar;
+		this.cholesterol = cholesterol;
+	}
+	public DietsFood() {
+	}
 	public int getNo() {
 		return no;
 	}
@@ -80,23 +96,7 @@ public class DietsFood {
 	public void setCholesterol(double cholesterol) {
 		this.cholesterol = cholesterol;
 	}
-	public DietsFood(int no, int dietNo, int foodId, String foodName, double amount, int calorie, double protein,
-			double fat, double carbohydrate, double sugar, double cholesterol) {
-		super();
-		this.no = no;
-		this.dietNo = dietNo;
-		this.foodId = foodId;
-		this.foodName = foodName;
-		this.amount = amount;
-		this.calorie = calorie;
-		this.protein = protein;
-		this.fat = fat;
-		this.carbohydrate = carbohydrate;
-		this.sugar = sugar;
-		this.cholesterol = cholesterol;
-	}
-	public DietsFood() {
-		// TODO Auto-generated constructor stub
-	}
+
+
     
 }

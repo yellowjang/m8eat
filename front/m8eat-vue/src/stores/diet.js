@@ -43,16 +43,20 @@ export const useDietStore = defineStore("diets", () => {
     }
   };
 
-  /** 식단 상세 조회 */
-  const getDietDetail = async (dietNo) => {
-    try {
-      const res = await axios.get(`${REST_API_URL}/${dietNo}`, tokenHeader());
-      diet.value = res.data;
-    } catch (err) {
-      console.error("식단 상세 조회 실패", err);
+/** 식단 상세 조회 */
+const getDietDetail = async (dietNo) => {
+  try {
+    const res = await axios.get(`${REST_API_URL}/${dietNo}`, tokenHeader());
+    if (res.data && res.data.length > 0) {
+      diet.value = res.data[0];
+    } else {
+      diet.value = null;
     }
-  };
-
+  } catch (err) {
+    console.error("식단 상세 조회 실패", err);
+    diet.value = null;
+  }
+};
   /** 식단 수정 */
   const updateDiet = async (dietNo, payload) => {
     try {
