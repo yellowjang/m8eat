@@ -80,16 +80,24 @@ public class DietController {
 	}
 
 	// 식단 상세 조회
+//	@GetMapping("/{dietNo}")
+//	public ResponseEntity<?> getDietsByDietNo(@PathVariable int dietNo) {
+////		System.out.println(startDate + " " + endDate);
+//		List<DietResponse> dietList = dietService.getDietsByDietNo(dietNo);
+//		if (dietList == null || dietList.size() == 0) {
+//			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+//		}
+//		return ResponseEntity.ok(dietList);
+//	}
+//	
 	@GetMapping("/{dietNo}")
-	public ResponseEntity<?> getDietsByDietNo(@PathVariable int dietNo) {
-//		System.out.println(startDate + " " + endDate);
-		List<DietResponse> dietList = dietService.getDietsByDietNo(dietNo);
-		if (dietList == null || dietList.size() == 0) {
-			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
-		}
-		return ResponseEntity.ok(dietList);
+	public ResponseEntity<List<DietResponse>> getDietDetail(@PathVariable int dietNo) {
+	    List<DietResponse> detail = dietService.getDietsByDietNo(dietNo);
+	    System.out.println("컨트롤러 " +detail.toString());
+	    return detail != null ?
+	        ResponseEntity.ok(detail) :
+	        ResponseEntity.notFound().build();
 	}
-	
 	// 식단 등록 
 	@PostMapping
 	public ResponseEntity<String> writeDiets(@ModelAttribute DietRequest dietReq, HttpSession session) {

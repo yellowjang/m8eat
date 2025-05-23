@@ -26,6 +26,7 @@ const resetSelection = () => {
 const viewMealDetail = async (dietNo) => {
   await dietStore.getDietDetail(dietNo);
   selectedMeal.value = dietStore.diet;
+  console.log(selectedMeal.value);
 };
 </script>
 
