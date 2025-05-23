@@ -3,10 +3,10 @@ package com.prj.m8eat.controller;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -93,7 +93,6 @@ public class DietController {
 	@GetMapping("/{dietNo}")
 	public ResponseEntity<List<DietResponse>> getDietDetail(@PathVariable int dietNo) {
 	    List<DietResponse> detail = dietService.getDietsByDietNo(dietNo);
-	    System.out.println("컨트롤러 " +detail.toString());
 	    return detail != null ?
 	        ResponseEntity.ok(detail) :
 	        ResponseEntity.notFound().build();
@@ -115,15 +114,13 @@ public class DietController {
 	    // 이미지 파일 저장 처리
 	    MultipartFile file = dietReq.getFile();
 	    if (file != null && !file.isEmpty()) {
-	        String originalFilename = file.getOriginalFilename();
-	        String uploadDirPath = baseDir; // 서버 저장 경로 설정
-	        File uploadDir = new File(uploadDirPath);
-	        if (!uploadDir.exists()) uploadDir.mkdirs();
-
+	    	String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+	    	File uploadDir = new File(baseDir);
+	    	if (!uploadDir.exists()) uploadDir.mkdirs();
 	        try {
-	            File saveFile = new File(uploadDir, originalFilename);
-	            file.transferTo(saveFile);
-	            diet.setFilePath("/upload/" + originalFilename);
+	        	File saveFile = new File(uploadDir, fileName);
+	        	file.transferTo(saveFile);
+	        	diet.setFilePath("/upload/" + fileName);  // URL 경로
 	        } catch (IOException e) {
 	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 저장 실패");
 	        }

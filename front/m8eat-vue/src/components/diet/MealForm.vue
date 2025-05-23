@@ -29,18 +29,20 @@
       <div class="food-info">
         <p class="input-title">상세 시간</p>
         <VueDatePicker v-model="mealDate" :format="'yyyy-MM-dd'" />
-        <label>
-          <input type="radio" name="meal" value="아침" v-model="mealTime" />
-          아침
-        </label>
-        <label>
-          <input type="radio" name="meal" value="점심" v-model="mealTime" />
-          점심
-        </label>
-        <label>
-          <input type="radio" name="meal" value="저녁" v-model="mealTime" />
-          저녁
-        </label>
+        <div class="meal-type">
+          <label>
+            <input type="radio" name="meal" value="아침" v-model="mealTime" />
+            아침
+          </label>
+          <label>
+            <input type="radio" name="meal" value="점심" v-model="mealTime" />
+            점심
+          </label>
+          <label>
+            <input type="radio" name="meal" value="저녁" v-model="mealTime" />
+            저녁
+          </label>
+        </div>
       </div>
 
       <!-- 음식 입력 -->
@@ -210,6 +212,10 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
+.meal-type {
+  margin-top: 15px;
+}
+
 .add-button {
   width: 60px;
 }

@@ -1,19 +1,27 @@
 <template>
   <div>
-    <MealForm v-if="selectedMeal === 'create'" @close="resetSelection" @add-meal="refreshMeals" />
-    <MealEditForm v-else-if="selectedMeal && selectedMeal !== 'create'" :edit="selectedMeal" @close="resetSelection" @update-meal="refreshMeals" />
-    <MealToday v-else @add-meal="selectedMeal = 'create'" @edit-meal="selectedMeal = $event" />
+    <Modal v-if="selectedMeal === 'create'" @close="resetSelection">
+      <MealForm @close="resetSelection" @add-meal="refreshMeals" />
+    </Modal>
+    <Modal v-if="selectedMeal && selectedMeal !== 'create'" @close="resetSelection">
+      <MealEditForm :edit="selectedMeal" @close="resetSelection" @update-meal="refreshMeals" />
+    </Modal>
+    <MealToday v-if="!selectedMeal" @add-meal="selectedMeal = 'create'" @edit-meal="handleEditMeal" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
+import { useRoute } from "vue-router";
 import MealToday from "@/components/diet/MealToday.vue";
 import MealForm from "@/components/diet/MealForm.vue";
 import MealEditForm from "@/components/diet/MealEditForm.vue";
+import Modal from "@/components/common2/Modal.vue";
 import { useDietStore } from "@/stores/diet";
+
 const selectedMeal = ref(null);
 const dietStore = useDietStore();
+const route = useRoute();
 
 const refreshMeals = () => {
   selectedMeal.value = null;
@@ -25,11 +33,40 @@ const resetSelection = () => {
 
 const fetchDetail = async () => {
   const dietNo = route.params.dietNo;
-  await dietStore.getDietDetail(dietNo);
-  selectedMeal.value = dietStore.diet;
+  if (dietNo) {
+    await dietStore.getDietDetail(dietNo);
+    selectedMeal.value = JSON.parse(JSON.stringify(dietStore.diet));
+  }
+};
+
+const handleEditMeal = async (meal) => {
+  await dietStore.getDietDetail(meal.dietNo);
+  selectedMeal.value = JSON.parse(JSON.stringify(dietStore.diet));
 };
 
 onMounted(fetchDetail);
+
+const props = defineProps({
+  edit: Object,
+});
+
+const mealDate = ref(null);
+const mealTime = ref("");
+const foods = ref([]);
+const file = ref(null);
+const previewUrl = ref(null);
+watch(
+  () => props.edit,
+  (newVal) => {
+    if (newVal) {
+      mealDate.value = new Date(newVal.mealDate);
+      mealTime.value = newVal.mealType;
+      foods.value = [...newVal.foods];
+      previewUrl.value = newVal.filePath || null;
+    }
+  },
+  { immediate: true } // mount 시 바로 실행
+);
 </script>
 
 <style scoped>

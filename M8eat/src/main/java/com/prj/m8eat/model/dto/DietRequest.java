@@ -67,11 +67,11 @@ public class DietRequest {
 		return "DietRequest [dietNo=" + dietNo + ", userNo=" + userNo + ", mealType=" + mealType + ", file=" + file
 				+ ", filePath=" + filePath + ", foods=" + foods + "]";
 	}
-	public String getMealDate() {
-	    return mealDate;
+	public CharSequence getMealDate() {
+		return mealDate;
 	}
 	public void setMealDate(String mealDate) {
-	    this.mealDate = mealDate;
+		this.mealDate = mealDate;
 	}
 	
 }

@@ -11,7 +11,7 @@
         {{ formatTime(diet.regDate) }}
       </p>
       <div class="image-box" v-if="diet.filePath">
-        <img :src="diet.filePath" alt="식단 이미지" class="diet-image" />
+        <img :src="`http://localhost:8080${diet.filePath}`" alt="식단 이미지" class="diet-image" />
       </div>
 
       <h3>음식 목록</h3>
