@@ -32,8 +32,8 @@
       <div class="social-login">
         <p>간편 로그인하기</p>
         <div class="social-buttons">
-          <a href=""><img src="@/assets/icon/google.png" /></a>
-          <a href=""><img src="@/assets/icon/kakao.png" /></a>
+          <a :href="`${REST_API_URL}/oauth/google/login`"><img src="@/assets/icon/google.png" /></a>
+          <a :href="`${REST_API_URL}/oauth/kakao/login`"><img src="@/assets/icon/kakao.png" /></a>
         </div>
       </div>
     </div>
@@ -45,6 +45,7 @@ import { ref } from "vue";
 import { useUserStore } from "@/stores/user";
 import router from "@/router";
 
+const REST_API_URL = ref(`http://localhost:8080`);
 const store = useUserStore();
 
 const id = ref("");
@@ -62,6 +63,11 @@ const login = async () => {
     password.value = ""
   }
 };
+
+
+const kakaoLogin = () => {
+  store.kakaoLogin();
+}
 </script>
 
 <style lang="scss" scoped>

@@ -23,6 +23,7 @@ function base64UrlDecode(str) {
 
 export const useUserStore = defineStore("user", () => {
 
+
   const loginUser = ref(null)
 
   const signup = (user) => {
@@ -78,5 +79,12 @@ export const useUserStore = defineStore("user", () => {
     }
   };
 
-  return { signup, login };
+
+  const kakaoLogin = async () => {
+    window.location.href = `${REST_API_URL}/oauth/kakao/login`;
+    // console.log(response)
+    // router.push({name: 'mainpage'})
+  }
+
+  return { signup, login, loginUser, kakaoLogin };
 });
