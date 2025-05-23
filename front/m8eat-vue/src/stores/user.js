@@ -60,31 +60,16 @@ export const useUserStore = defineStore("user", () => {
           id: loginUser.id,
           password: loginUser.password,
       });
-      
-      const token = response.data["access-token"].split(".")
-      
-      const payload = JSON.parse(base64UrlDecode(token[1]))
-      console.log("payload", payload)
-  
-      sessionStorage.setItem("access-token", response.data["access-token"])
-      loginUser.value = payload
-      console.log(loginUser.value)
   
       return { success: true, message: '로그인 성공' }
       
     } catch (err) {
       console.log(err);
-      // alert(err.response.data.message)
-      return {success: false, message: err.response.data.message}
+      return {success: false, message: err.response?.data?.message || '로그인 실패'}
     }
   };
 
 
-  const kakaoLogin = async () => {
-    window.location.href = `${REST_API_URL}/oauth/kakao/login`;
-    // console.log(response)
-    // router.push({name: 'mainpage'})
-  }
 
-  return { signup, login, loginUser, kakaoLogin };
+  return { signup, login, loginUser };
 });

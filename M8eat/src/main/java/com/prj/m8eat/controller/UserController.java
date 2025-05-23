@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,10 +24,11 @@ import com.prj.m8eat.model.dto.User;
 import com.prj.m8eat.model.dto.UserHealthInfo;
 import com.prj.m8eat.model.service.UserService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @RestController
-@CrossOrigin("*")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class UserController {
 	
 	private final UserService userService;
@@ -51,24 +53,33 @@ public class UserController {
 	}
 	
 	@PostMapping("/auth/login")
-	public ResponseEntity<Map<String, Object>> login(@RequestBody User user) {
+	public ResponseEntity<Map<String, Object>> login(@RequestBody User user, HttpServletResponse response) {
 		System.out.println("controller login " + user);
 		LoginResponse result = userService.login(user);
 		
-		Map<String, Object> resMap = new HashMap<>();
-		HttpStatus status = null;
-		
 		// 로그인 성공
 		if (result.isLogin()) { 
-			status = HttpStatus.ACCEPTED;
-			resMap.put("message", "login 성공");
-			resMap.put("access-token", util.createToken(result.getUser()));
+	        // 1. JWT 생성
+	        String jwt = util.createToken(result.getUser());
+
+	        // 2. HttpOnly 쿠키로 설정
+	        ResponseCookie cookie = ResponseCookie.from("access-token", jwt)
+	            .httpOnly(true)
+	            .secure(false) // 운영 시 true + https 필요
+	            .sameSite("Lax")
+	            .path("/")
+	            .maxAge(60 * 60) // 1시간
+	            .build();
+
+	        // 3. 쿠키 전송
+	        response.setHeader("Set-Cookie", cookie.toString());
+
+	        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
 		} else {  // 로그인 실패
-			status = HttpStatus.INTERNAL_SERVER_ERROR;
-			resMap.put("message", result.getMessage());
+	        Map<String, Object> resMap = new HashMap<>();
+	        resMap.put("message", result.getMessage());
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(resMap);
 		}
-		
-		return new ResponseEntity<Map<String,Object>>(resMap, status);
 	}
 	
 
