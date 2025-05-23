@@ -2,6 +2,7 @@ package com.prj.m8eat.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -89,44 +90,38 @@ public class DietController {
 		return ResponseEntity.ok(dietList);
 	}
 	
+	// 식단 등록 
 	@PostMapping
 	public ResponseEntity<String> writeDiets(@ModelAttribute DietRequest dietReq, HttpSession session) {
 	    Diet diet = new Diet();
-	    diet.setUserNo(2); // 로그인 정보로 교체 예정
+	    diet.setUserNo(2); // TODO: 로그인 사용자 정보로 교체
 	    diet.setMealType(dietReq.getMealType());
+
 	    try {
-	        OffsetDateTime odt = OffsetDateTime.parse(dietReq.getMealDate());
-	        diet.setMealDate(odt.toLocalDate()); // 날짜만 저장
+//	        OffsetDateTime odt = OffsetDateTime.parse(dietReq.getMealDate());
+	        diet.setMealDate(LocalDate.parse(dietReq.getMealDate())); 
 	    } catch (DateTimeParseException e) {
 	        return ResponseEntity.badRequest().body("날짜 형식 오류: " + e.getMessage());
 	    }
-	    // (파일 저장 코드 동일)
+
+	    // 이미지 파일 저장 처리
 	    MultipartFile file = dietReq.getFile();
+	    if (file != null && !file.isEmpty()) {
+	        String originalFilename = file.getOriginalFilename();
+	        String uploadDirPath = baseDir; // 서버 저장 경로 설정
+	        File uploadDir = new File(uploadDirPath);
+	        if (!uploadDir.exists()) uploadDir.mkdirs();
 
-		if (file != null && !file.isEmpty()) {
-			String originalFilename = file.getOriginalFilename();
-//			String uploadDirPath = "/Users/jang-ayoung/Desktop/m8eat/data"; // 수정수정수정
-//			String uploadDirPath = "C:\\SSAFY\\m8eat"; // 수정수정수정
-//			String uploadDirPath = "C:\\Users\\kmj\\Desktop\\SSAFY\\m8eat\\data"; // 수정수정수정
+	        try {
+	            File saveFile = new File(uploadDir, originalFilename);
+	            file.transferTo(saveFile);
+	            diet.setFilePath("/upload/" + originalFilename);
+	        } catch (IOException e) {
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 저장 실패");
+	        }
+	    }
 
-			String uploadDirPath = baseDir; // 수정수정수정
-
-			File uploadDir = new File(uploadDirPath);
-			if (!uploadDir.exists()) {
-				uploadDir.mkdirs();
-			}
-
-			try {
-				File saveFile = new File(uploadDir, originalFilename);
-				file.transferTo(saveFile);
-				diet.setFilePath("/upload/" + originalFilename);
-				System.out.println("controller " + diet);
-			} catch (IOException e) {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 저장 실패");
-			}
-		}
-
-
+	    // 음식 리스트 파싱
 	    ObjectMapper objectMapper = new ObjectMapper();
 	    List<DietsFood> foodList;
 	    try {
@@ -135,12 +130,14 @@ public class DietController {
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("음식 정보 파싱 실패: " + e.getMessage());
 	    }
 
-	    if (dietService.writeDiets(diet, foodList)) {
-	        return ResponseEntity.ok("식단이 성공적으로 등록되었습니다.");
+	    // 트랜잭션 서비스 호출
+	    try {
+	        int dietNo = dietService.createDietWithFoods(diet, foodList);
+	        return ResponseEntity.ok("식단이 성공적으로 등록되었습니다. (dietNo=" + dietNo + ")");
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("식단 등록에 실패했습니다: " + e.getMessage());
 	    }
-	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("식단 등록에 실패했습니다");
 	}
-	
 
 	// 식단 등록
 //	@PostMapping

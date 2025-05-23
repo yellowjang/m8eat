@@ -3,100 +3,76 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.prj.m8eat.model.dao.DietDao">
-	
-	<!-- 식단 전체 조회 -->
-	<select id="selectAllDiets" resultType="Diet">
-		SELECT * 
-		 FROM diets;
-	</select>
-	<select id="selectAllDietsFood" resultType="DietsFood">
-		SELECT * 
-		 FROM diets_food;
-	</select>
-	
-	<!-- 유저별 식단 조회 -->
-	<select id="selectDietsByUserNo" parameterType="int" resultType="Diet">
-		SELECT * 
-		 FROM diets
-		 WHERE user_no=#{userNo}
-	</select>
-	<select id="selectDietsFoodByDietNo" parameterType="int" resultType="DietsFood">
-		SELECT * 
-		 FROM diets_food
-		 WHERE diet_no=#{dietNo}
-	</select>
-	
-	<!-- 날짜별 식단 조회 -->
-	<select id="selectDietsByDate" parameterType="Map" resultType="Diet">
-		SELECT * 
-		 FROM diets
- 		 WHERE reg_date BETWEEN #{startDate} AND #{endDate};
-	</select>
-	
-	<!-- 식단 상세 조회 -->
-	<select id="selectDietsByDietNo" parameterType="int" resultType="Diet">
-		SELECT * 
-		 FROM diets
-		 WHERE diet_no=#{dietNo}
-	</select>
-	
-	<!-- 식단 기록 -->
-	<insert id="insertDiet" parameterType="Diet" useGeneratedKeys="true" keyProperty="dietNo">
-	  INSERT INTO diets (user_no, meal_date, meal_type, file_path)
-	  VALUES (#{userNo}, #{mealDate}, #{mealType}, #{filePath})
-	</insert>
-	
-	<!-- 식단 음식 추가 -->
-	<insert id="insertDietsFood" parameterType="DietsFood">
-	  INSERT INTO diets_food (
-	    diet_no,food_id, food_name, amount,calorie,
-	    protein,
-	    fat,
-	    carbohydrate,
-	    sugar,
-	    cholesterol
-	  )
-	  VALUES (
-	    #{dietNo},
-	    #{foodId},
-	    #{foodName},
-	    #{amount},
-	    #{calorie},
-	    #{protein},
-	    #{fat},
-	    #{carbohydrate},
-	    #{sugar},
-	    #{cholesterol}
-	  )
-	</insert>
-	
-	<!-- 식단 삭제 -->
-	<delete id="deleteDiet" parameterType="int">
-		DELETE FROM diets
- 		 WHERE diet_no=#{dietNo}
-	</delete>
-	
-	<!-- 식단 수정 -->
-	<delete id="deleteDietFood" parameterType="int">
-		DELETE FROM diets_food
- 		 WHERE diet_no=#{dietNo}
-	</delete>
-	<update id="updateDiet" >
-		UPDATE diets
-		 SET meal_type=#{mealType}, file_path=#{filePath}
-		 WHERE diet_no = #{dietNo};
-	</update>
-	
-	<!-- google api -->
-	    <!-- 전체 음식 이름 목록 (유사도 비교용) -->
-	<select id="getAllDietNames" resultType="string">
-	  SELECT name_ko FROM food
-	</select>
-	
-	<select id="getDietByName" parameterType="string" resultType="FoodInfo">
-	  SELECT * FROM food WHERE name_ko = #{name} LIMIT 1
-	</select>
 
+  <!-- 식단 전체 조회 -->
+  <select id="selectAllDiets" resultType="com.prj.m8eat.model.dto.Diet">
+    SELECT * FROM diets;
+  </select>
+  <select id="selectAllDietsFood" resultType="com.prj.m8eat.model.dto.DietsFood">
+    SELECT * FROM diets_food;
+  </select>
 
+  <!-- 유저별 식단 조회 -->
+  <select id="selectDietsByUserNo" parameterType="int" resultType="com.prj.m8eat.model.dto.Diet">
+    SELECT * FROM diets WHERE user_no=#{userNo}
+  </select>
+  
+  <!-- 날짜별 식단 조회 -->
+  <select id="selectDietsByDate" parameterType="Map" resultType="com.prj.m8eat.model.dto.Diet">
+    SELECT * FROM diets WHERE reg_date BETWEEN #{startDate} AND #{endDate};
+  </select>
+
+  <!-- 식단 상세 조회 -->
+  <select id="selectDietsByDietNo" parameterType="int" resultType="com.prj.m8eat.model.dto.Diet">
+    SELECT * FROM diets WHERE diet_no=#{dietNo}
+  </select>
+
+  <!-- 식단별 음식 조회 -->
+  <select id="selectDietsFoodByDietNo" parameterType="int" resultType="com.prj.m8eat.model.dto.DietsFood">
+    SELECT df.no, df.diet_no, df.food_id, df.food_name, df.amount,
+           df.calorie, df.protein, df.fat, df.carbohydrate, df.sugar, df.cholesterol
+    FROM diets_food df
+    WHERE df.diet_no = #{dietNo}
+  </select>
+
+  <!-- 식단 등록 -->
+  <insert id="insertDiet" parameterType="com.prj.m8eat.model.dto.Diet" useGeneratedKeys="true" keyProperty="dietNo">
+    INSERT INTO diets (user_no, meal_date, meal_type, file_path)
+    VALUES (#{userNo}, #{mealDate}, #{mealType}, #{filePath})
+  </insert>
+
+  <!-- 식단 음식 추가 -->
+  <insert id="insertDietsFood" parameterType="com.prj.m8eat.model.dto.DietsFood">
+    INSERT INTO diets_food (
+      diet_no, food_id, food_name, amount, calorie,
+      protein, fat, carbohydrate, sugar, cholesterol
+    ) VALUES (
+      #{dietNo}, #{foodId}, #{foodName}, #{amount}, #{calorie},
+      #{protein}, #{fat}, #{carbohydrate}, #{sugar}, #{cholesterol}
+    )
+  </insert>
+
+  <!-- 식단 삭제 -->
+  <delete id="deleteDiet" parameterType="int">
+    DELETE FROM diets WHERE diet_no=#{dietNo}
+  </delete>
+  <delete id="deleteDietFood" parameterType="int">
+    DELETE FROM diets_food WHERE diet_no=#{dietNo}
+  </delete>
+
+  <!-- 식단 수정 -->
+  <update id="updateDiet" parameterType="com.prj.m8eat.model.dto.Diet">
+    UPDATE diets
+    SET meal_type=#{mealType}, file_path=#{filePath}
+    WHERE diet_no = #{dietNo};
+  </update>
+
+  <!-- google api -->
+  <select id="getAllDietNames" resultType="string">
+    SELECT name_ko FROM food
+  </select>
+  <select id="getDietByName" parameterType="string" resultType="com.prj.m8eat.model.dto.FoodInfo">
+    SELECT * FROM food WHERE name_ko = #{name} LIMIT 1
+  </select>
 
 </mapper>

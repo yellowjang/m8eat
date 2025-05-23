@@ -14,6 +14,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -24,11 +25,13 @@ import com.google.cloud.vision.v1.ImageAnnotatorClient;
 import com.google.cloud.vision.v1.LocalizedObjectAnnotation;
 import com.google.protobuf.ByteString;
 import com.prj.m8eat.model.dao.DietDao;
+import com.prj.m8eat.model.dao.FoodDao;
 import com.prj.m8eat.model.dto.CropBox;
 import com.prj.m8eat.model.dto.Diet;
 import com.prj.m8eat.model.dto.DietRequest;
 import com.prj.m8eat.model.dto.DietResponse;
 import com.prj.m8eat.model.dto.DietsFood;
+import com.prj.m8eat.model.dto.Food;
 import com.prj.m8eat.model.dto.FoodInfo;
 //내부 유틸 클래스들 (직접 만든 클래스 기준)
 import com.prj.m8eat.util.GoogleVisionUtil;
@@ -40,11 +43,13 @@ public class DietServiceImpl implements DietService {
 	private final DietDao dietDao;
 	private final GoogleVisionUtil googleVisionUtil;
 	private final OpenAIUtil openAIUtil;
-
-	public DietServiceImpl(DietDao dietDao, GoogleVisionUtil googleVisionUtil, OpenAIUtil openAIUtil) {
+	private final FoodDao foodDao;
+	
+	public DietServiceImpl(DietDao dietDao, GoogleVisionUtil googleVisionUtil, OpenAIUtil openAIUtil, FoodDao foodDao) {
 		this.dietDao = dietDao;
 		this.googleVisionUtil = googleVisionUtil;
 		this.openAIUtil = openAIUtil;
+		this.foodDao = foodDao;
 	}
 
 	@Value("${file.upload.dir}")
@@ -268,21 +273,54 @@ public class DietServiceImpl implements DietService {
 		return dietList;
 	}
 
+//	@Override
+//	public List<DietResponse> getDietsByDietNo(int dietNo) {
+//		List<DietResponse> dietList = new ArrayList<>();
+//
+////        List<Diet> diets = dietDao.selectDietsByDietNo(dietNo);
+//		Diet diet = dietDao.selectDietsByDietNo(dietNo);
+////        for (Diet diet : diets) {
+//		DietResponse res = new DietResponse(diet.getDietNo(), diet.getUserNo(), diet.getFilePath(), diet.getRegDate(),
+//				diet.getMealType());
+//		List<DietsFood> dietsFood = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
+//		res.setFoods(dietsFood);
+//		dietList.add(res);
+////        }
+//
+//		return dietList;
+//	}
+
 	@Override
 	public List<DietResponse> getDietsByDietNo(int dietNo) {
-		List<DietResponse> dietList = new ArrayList<>();
+	    List<DietResponse> dietList = new ArrayList<>();
 
-//        List<Diet> diets = dietDao.selectDietsByDietNo(dietNo);
-		Diet diet = dietDao.selectDietsByDietNo(dietNo);
-//        for (Diet diet : diets) {
-		DietResponse res = new DietResponse(diet.getDietNo(), diet.getUserNo(), diet.getFilePath(), diet.getRegDate(),
-				diet.getMealType());
-		List<DietsFood> dietsFood = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
-		res.setFoods(dietsFood);
-		dietList.add(res);
-//        }
+	    Diet diet = dietDao.selectDietsByDietNo(dietNo);
+	    DietResponse res = new DietResponse(
+	        diet.getDietNo(),
+	        diet.getUserNo(),
+	        diet.getFilePath(),
+	        diet.getRegDate(),
+	        diet.getMealType()
+	    );
 
-		return dietList;
+	    List<DietsFood> dietsFoodList = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
+	    for (DietsFood df : dietsFoodList) {
+	        Food food = foodDao.selectFoodById(df.getFoodId());
+	        if (food != null) {
+	            df.setFoodName(food.getNameKo());
+	            df.setCalorie((int) Math.round(food.getCalories() * (df.getAmount() / 100.0)));
+	            df.setProtein(food.getProtein() * (df.getAmount() / 100.0));
+	            df.setFat(food.getFat() * (df.getAmount() / 100.0));
+	            df.setCarbohydrate(food.getCarbohydrate() * (df.getAmount() / 100.0));
+	            df.setSugar(food.getSugar() * (df.getAmount() / 100.0));
+	            df.setCholesterol(food.getCholesterol() * (df.getAmount() / 100.0));
+	        }
+	    }
+
+	    res.setFoods(dietsFoodList);
+	    dietList.add(res);
+
+	    return dietList;
 	}
 
 	@Override
@@ -297,6 +335,21 @@ public class DietServiceImpl implements DietService {
 
 		return true;
 	}
+	
+
+    @Transactional
+    @Override
+    public int createDietWithFoods(Diet diet, List<DietsFood> foods) {
+        dietDao.insertDiet(diet); // dietNo 생성됨
+        int dietNo = diet.getDietNo();
+
+        for (DietsFood food : foods) {
+            food.setDietNo(dietNo); // 연결
+            dietDao.insertDietsFood(food);
+        }
+
+        return dietNo;
+    }
 
 
 }
