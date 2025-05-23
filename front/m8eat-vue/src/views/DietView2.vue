@@ -2,12 +2,12 @@
   <div>
     <MealForm v-if="selectedMeal === 'create'" @close="resetSelection" @add-meal="refreshMeals" />
     <MealEditForm v-else-if="selectedMeal && selectedMeal !== 'create'" :edit="selectedMeal" @close="resetSelection" @update-meal="refreshMeals" />
-    <MealToday v-else @add-meal="selectedMeal = 'create'" @view-detail="viewMealDetail" @edit-meal="selectedMeal = $event" />
+    <MealToday v-else @add-meal="selectedMeal = 'create'" @edit-meal="selectedMeal = $event" />
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import MealToday from "@/components/diet/MealToday.vue";
 import MealForm from "@/components/diet/MealForm.vue";
 import MealEditForm from "@/components/diet/MealEditForm.vue";
@@ -23,11 +23,13 @@ const resetSelection = () => {
   selectedMeal.value = null;
 };
 
-const viewMealDetail = async (dietNo) => {
+const fetchDetail = async () => {
+  const dietNo = route.params.dietNo;
   await dietStore.getDietDetail(dietNo);
   selectedMeal.value = dietStore.diet;
-  console.log(selectedMeal.value);
 };
+
+onMounted(fetchDetail);
 </script>
 
 <style scoped>

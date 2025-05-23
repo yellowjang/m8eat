@@ -14,7 +14,7 @@
             </ul>
             <p class="calorie">{{ totalCalories(meal.foods) }} kcal</p>
             <button class="edit-meal" @click="$emit('edit-meal', meal)">수정</button>
-            <button class="view-meal" @click="$emit('view-detail', meal.dietNo)">상세보기</button>
+            <router-link :to="`/diet/${meal.dietNo}`">상세보기</router-link>
           </div>
         </div>
 
