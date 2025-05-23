@@ -77,16 +77,42 @@ const router = createRouter({
   ],
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const store = useUserStore();
+
+  // ✅ loginUser가 없으면 checkLogin 시도
+  if (store.loginUser === null) {
+    try {
+      await store.checkLogin(); // 쿠키 기반 로그인 복원
+    } catch {
+      // 로그인 복구 실패해도 진행
+    }
+  }
+
   const isLoggedIn = store.loginUser !== null;
+  console.log("🔍 라우터 가드 실행, 로그인 상태:", isLoggedIn);
 
   if (to.meta.requiresAuth && !isLoggedIn) {
-    alert("로그인이 필요합니다.")
-    next({name: 'login'})
+    alert("로그인이 필요합니다.");
+    next({ name: "login" });
   } else {
     next();
   }
-})
+});
+
+
+// router.beforeEach((to, from, next) => {
+//   const store = useUserStore();
+//   const isLoggedIn = store.loginUser !== null;
+
+//   console.log("beforeEAchhhhh ", store.loginUser)
+
+//   if (to.meta.requiresAuth && !isLoggedIn) {
+//     alert("로그인이 필요합니다.")
+//     next({name: 'login'})
+//   } else {
+//     next();
+//   }
+// })
 
 export default router;
