@@ -65,9 +65,6 @@ const login = async () => {
 };
 
 
-const kakaoLogin = () => {
-  store.kakaoLogin();
-}
 </script>
 
 <style lang="scss" scoped>
