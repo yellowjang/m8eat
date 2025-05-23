@@ -290,11 +290,55 @@ public class DietServiceImpl implements DietService {
 //		return dietList;
 //	}
 
+//	@Override
+//	public List<DietResponse> getDietsByDietNo(int dietNo) {
+//	    List<DietResponse> dietList = new ArrayList<>();
+//	    System.out.println("서비스에 다이어트 넘버 들어옴"+dietNo);
+//	    Diet diet = dietDao.selectDietsByDietNo(dietNo);
+//	    
+//	    DietResponse res = new DietResponse(
+//	        diet.getDietNo(),
+//	        diet.getUserNo(),
+//	        diet.getFilePath(),
+//	        diet.getRegDate(),
+//	        diet.getMealType()
+//	    );
+//	    res.setMealDate(diet.getMealDate()); // 🔹 여기 추가
+//	    List<DietsFood> dietsFoodList = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
+//	    System.out.println("▶▶ 리스트 사이즈: " + dietsFoodList.size());
+//	    res.setFoods(dietsFoodList);
+//	    for (DietsFood df : dietsFoodList) {
+//	        // food_id로 food 마스터 정보 조회 후 계산된 영양소를 설정
+//	        Food masterFood = foodDao.selectFoodById(df.getFoodId());
+//	        if (masterFood != null) {
+//	            df.setFoodName(masterFood.getNameKo());
+//	            df.setCalorie((int) Math.round(masterFood.getCalories() * (df.getAmount() / 100.0)));
+//	            df.setProtein(masterFood.getProtein() * (df.getAmount() / 100.0));
+//	            df.setFat(masterFood.getFat() * (df.getAmount() / 100.0));
+//	            df.setCarbohydrate(masterFood.getCarbohydrate() * (df.getAmount() / 100.0));
+//	            df.setSugar(masterFood.getSugar() * (df.getAmount() / 100.0));
+//	            df.setCholesterol(masterFood.getCholesterol() * (df.getAmount() / 100.0));
+//	        }
+//	    }
+//
+//	    res.setFoods(dietsFoodList);
+//	    System.out.println("▶▶ diets_food 리스트 사이즈: " + dietsFoodList.size());
+//	    for (DietsFood df : dietsFoodList) {
+//	        System.out.println("▶▶ 음식명: " + df.getFoodName() + ", g: " + df.getAmount());
+//	    }
+//
+//	    dietList.add(res);
+//
+//	    return dietList;
+//	}
+
 	@Override
 	public List<DietResponse> getDietsByDietNo(int dietNo) {
 	    List<DietResponse> dietList = new ArrayList<>();
-	    System.out.println("서비스에 다이어트 넘버 들어옴"+dietNo);
+	    System.out.println("서비스에 다이어트 넘버 들어옴: " + dietNo);
+
 	    Diet diet = dietDao.selectDietsByDietNo(dietNo);
+
 	    DietResponse res = new DietResponse(
 	        diet.getDietNo(),
 	        diet.getUserNo(),
@@ -302,28 +346,21 @@ public class DietServiceImpl implements DietService {
 	        diet.getRegDate(),
 	        diet.getMealType()
 	    );
-	    res.setMealDate(diet.getMealDate()); // 🔹 여기 추가
+	    res.setMealDate(diet.getMealDate());
+
 	    List<DietsFood> dietsFoodList = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
+	    System.out.println("▶▶ diets_food 리스트 사이즈: " + dietsFoodList.size());
+
 	    for (DietsFood df : dietsFoodList) {
-	        // food_id로 food 마스터 정보 조회 후 계산된 영양소를 설정
-	        Food masterFood = foodDao.selectFoodById(df.getFoodId());
-	        if (masterFood != null) {
-	            df.setFoodName(masterFood.getNameKo());
-	            df.setCalorie((int) Math.round(masterFood.getCalories() * (df.getAmount() / 100.0)));
-	            df.setProtein(masterFood.getProtein() * (df.getAmount() / 100.0));
-	            df.setFat(masterFood.getFat() * (df.getAmount() / 100.0));
-	            df.setCarbohydrate(masterFood.getCarbohydrate() * (df.getAmount() / 100.0));
-	            df.setSugar(masterFood.getSugar() * (df.getAmount() / 100.0));
-	            df.setCholesterol(masterFood.getCholesterol() * (df.getAmount() / 100.0));
-	        }
+	        System.out.println("▶▶ 음식명: " + df.getFoodName() + ", g: " + df.getAmount());
 	    }
 
+	    // 👉 masterFood로 계산하지 말고 그대로 사용
 	    res.setFoods(dietsFoodList);
 	    dietList.add(res);
 
 	    return dietList;
 	}
-
 	@Override
 	public boolean writeDiets(Diet diet, List<DietsFood> inputFoods) {
 		if (dietDao.insertDiet(diet) != 1)
