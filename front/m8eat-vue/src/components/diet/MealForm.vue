@@ -1,6 +1,6 @@
 <template>
   <section class="meal-form">
-    <p class="sub-title">식단 등록</p>
+    <p class="sub-title">{{ props.edit ? "식단 수정" : "식단 등록" }}</p>
     <form @submit.prevent="handleSubmit">
       <!-- 이미지 업로드 -->
       <div class="image-upload-box">
@@ -67,7 +67,7 @@
 
       <div class="total-calories">총 칼로리: {{ totalCalories }} kcal</div>
       <div class="button-row">
-        <button type="submit">식단 추가하기</button>
+        <button type="submit">{{ props.edit ? "식단 수정하기" : "식단 추가하기" }}</button>
       </div>
     </form>
     <button class="back-button" @click="$emit('close')">← 뒤로가기</button>
@@ -97,11 +97,20 @@ const previewUrl = ref(null);
 
 const selectedFood = ref(null);
 const filteredFoods = ref([]);
-
+const props = defineProps({
+  edit: Object, // null이면 새로 등록
+});
 onMounted(() => {
   foodStore.fetchFoods();
+  if (props.edit) {
+    mealDate.value = new Date(props.edit.mealDate);
+    mealTime.value = props.edit.mealType;
+    foods.value = props.edit.foods;
+  }
 });
-
+if (props.edit && props.edit.filePath) {
+  previewUrl.value = props.edit.filePath;
+}
 const handleFileChange = (e) => {
   const selectedFile = e.target.files[0];
   if (selectedFile) {
@@ -162,20 +171,40 @@ const removeFood = (index) => {
 
 const totalCalories = computed(() => foods.value.reduce((sum, food) => sum + food.calorie, 0));
 
+// const handleSubmit = async () => {
+//   const formData = new FormData();
+//   formData.append("mealType", mealTime.value);
+//   formData.append("mealDate", mealDate.value.toISOString().slice(0, 10));
+//   if (file.value) {
+//     formData.append("file", file.value);
+//   }
+//   formData.append("foods", JSON.stringify(foods.value));
+//   try {
+//     await dietStore.createDiet(formData);
+//     alert("식단이 성공적으로 등록되었습니다.");
+//   } catch (error) {
+//     console.error("식단 등록 실패:", error);
+//     alert("식단 등록에 실패했습니다.");
+//   }
+// };
 const handleSubmit = async () => {
   const formData = new FormData();
   formData.append("mealType", mealTime.value);
   formData.append("mealDate", mealDate.value.toISOString().slice(0, 10));
-  if (file.value) {
-    formData.append("file", file.value);
-  }
   formData.append("foods", JSON.stringify(foods.value));
-  try {
+  if (file.value) formData.append("file", file.value);
+
+  if (props.edit) {
+    formData.append("dietNo", props.edit.dietNo);
+    formData.append("userNo", props.edit.userNo);
+    await axios.put(`/api/diet/${props.edit.dietNo}`, formData);
+    alert("식단이 성공적으로 수정되었습니다.");
+
+    emit("update-meal");
+  } else {
     await dietStore.createDiet(formData);
     alert("식단이 성공적으로 등록되었습니다.");
-  } catch (error) {
-    console.error("식단 등록 실패:", error);
-    alert("식단 등록에 실패했습니다.");
+    emit("add-meal");
   }
 };
 </script>

@@ -1,7 +1,6 @@
 <template>
   <section class="meal-today">
     <h2 class="title">오늘의 식단</h2>
-    <!-- showForm이 false일 때만 기존 박스 보여줌 -->
     <template v-if="!showForm">
       <div class="meal-boxes">
         <div v-for="meal in meals" :key="meal.type" class="meal-box">
@@ -14,28 +13,28 @@
           <div>
             <p class="calorie">{{ totalCalories(meal.foods) }} kcal</p>
           </div>
+          <button class="edit-meal" @click="$emit('edit-meal', meal)">수정</button>
         </div>
       </div>
       <p class="summary">총 섭취 칼로리: {{ overallCalories }} kcal</p>
-      <div>
-        <p>식단 분석</p>
-        <div>
-          <!-- 그래프 위치 -->
-        </div>
+      <div class="divide-line"></div>
+      <div class="meal-analysis">
+        <p class="title nutri">영양 성분 분석</p>
+        <NutrientGraph :data="totalNutrients" :max="recommendedIntake" />
       </div>
       <div class="add-meal-box">
-        <button class="add-meal" @click="showForm = true">+ 식단 등록하기</button>
+        <button class="add-meal" @click="$emit('add-meal')">+ 식단 등록하기</button>
       </div>
     </template>
 
-    <!-- showForm이 true일 때는 MealForm만 표시 -->
-    <MealForm v-else @close="showForm = false" @add-meal="addMeal" />
+    <!-- <MealForm :edit="selectedMeal" @close="closeForm" @update-meal="updateMeal" @add-meal="addMeal" /> -->
   </section>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import MealForm from "./MealForm.vue";
+import NutrientGraph from "@/components/diet/NutrientGraph.vue";
 import { useDietStore } from "@/stores/diet";
 import dayjs from "dayjs";
 
@@ -63,6 +62,30 @@ onMounted(fetchTodayDiets);
 
 const totalCalories = (foods) => foods.reduce((sum, food) => sum + (food.calorie || 0), 0);
 const overallCalories = computed(() => meals.value.reduce((total, meal) => total + totalCalories(meal.foods), 0));
+const totalNutrients = computed(() => {
+  return meals.value.reduce(
+    (acc, meal) => {
+      for (const food of meal.foods || []) {
+        acc.carbohydrate += food.carbohydrate || 0;
+        acc.protein += food.protein || 0;
+        acc.fat += food.fat || 0;
+        acc.sugar += food.sugar || 0;
+      }
+      return acc;
+    },
+    { carbohydrate: 0, protein: 0, fat: 0, sugar: 0 }
+  );
+});
+const editMeal = (meal) => {
+  // editingMeal.value = meal;
+  showForm.value = true;
+};
+const recommendedIntake = {
+  carbohydrate: 324,
+  protein: 55,
+  fat: 54,
+  sugar: 50,
+};
 
 const addMeal = () => {
   fetchTodayDiets();
@@ -71,10 +94,16 @@ const addMeal = () => {
 </script>
 
 <style lang="scss" scoped>
+.divide-line {
+  border-bottom: solid 0.3px #f1caca;
+  margin: 10px 0px;
+}
 .title {
   font-size: 20px;
   font-weight: 700;
+  margin-bottom: 15px;
 }
+
 .meal-boxes {
   display: flex;
   gap: 1rem;
@@ -109,6 +138,11 @@ const addMeal = () => {
   font-weight: 700;
   font-size: 16px;
   color: #4e4949;
+  background-color: #ececec 70%;
+  border-radius: 3px;
+  width: 200px;
+  text-align: center;
+  margin-left: auto;
 }
 .add-meal {
   text-align: right;
@@ -121,5 +155,12 @@ const addMeal = () => {
 }
 .add-meal-box {
   display: flex;
+}
+
+.nutrient-graph {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 1rem;
 }
 </style>
