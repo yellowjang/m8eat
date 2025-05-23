@@ -21,7 +21,7 @@
       </template>
 
       <template v-else>
-        <RouterLink to="/login" class="nav-btn">로그인</RouterLink>
+        <RouterLink :to="{name: 'login'}" class="nav-btn">로그인</RouterLink>
         <RouterLink to="/signup" class="nav-btn">회원가입</RouterLink>
       </template>
     </div>
