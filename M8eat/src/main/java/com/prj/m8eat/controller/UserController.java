@@ -41,7 +41,6 @@ public class UserController {
 	}
 	
 	@PostMapping("/auth/signup")
-//	public ResponseEntity<Void> signup(@RequestBody User user, @RequestBody UserHealthInfo healthInfo) {
 	public ResponseEntity<Void> signup(@RequestBody SignupRequestDTO reqDto) {
 		System.out.println("Controller signuppppppppppppppppppppppp");
 		User user = reqDto.getUser();
