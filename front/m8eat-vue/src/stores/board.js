@@ -2,6 +2,7 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 import router from "@/router";
 import api from "@/api";
+import BoardList from "@/components/board/BoardList.vue";
 
 const REST_API_URL = `http://localhost:8080/boards`;
 
@@ -22,38 +23,51 @@ function base64UrlDecode(str) {
 }
 
 export const useBoardStore = defineStore("board", () => {
-
   const getBoardList = async () => {
     try {
-      const response = await api.get(`${REST_API_URL}`)
-      console.log("getBoardList Store", response.data)
-      return response.data
+      const response = await api.get(`${REST_API_URL}`);
+      console.log("getBoardList Store", response.data);
+      return response.data;
     } catch (error) {
       console.error("게시판 목록 불러오기 실패", error);
-      throw error
+      throw error;
     }
-  }
+  };
 
   const getBoardDetail = async (boardNo) => {
     try {
-      const response = await api.get(`${REST_API_URL}/${boardNo}`)
-      console.log(response.data)
-      return response.data
+      const response = await api.get(`${REST_API_URL}/${boardNo}`);
+      console.log(response.data);
+      return response.data;
     } catch (error) {
       console.error("게시판 상세 정보 불러오기 실패", error);
-      throw error
+      throw error;
     }
-  }
+  };
 
   const removeBoard = async (boardNo) => {
     try {
-      const response = await api.delete(`${REST_API_URL}/${boardNo}`)
-      console.log(response.data)
+      const response = await api.delete(`${REST_API_URL}/${boardNo}`);
+      console.log(response.data);
     } catch {
       console.error("게시글 삭제 실패", error);
-      throw error
+      throw error;
     }
-  }
+  };
 
-  return { getBoardList, getBoardDetail, removeBoard, }
-})
+  const addBoard = async (formData) => {
+    const config = {
+      headers: { "Content-Type": "multipart/form-data" },
+    };
+
+    try {
+      await api.post("http://localhost:8080/boards", formData, config);
+
+    } catch (error) {
+      console.error("게시글 등록 실패: ", error);
+      throw error;
+    }
+  };
+
+  return { getBoardList, getBoardDetail, removeBoard, addBoard };
+});

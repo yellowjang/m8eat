@@ -5,10 +5,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,22 +26,29 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prj.m8eat.jwt.JwtUtil;
 import com.prj.m8eat.model.dto.Board;
 import com.prj.m8eat.model.dto.BoardsComment;
 import com.prj.m8eat.model.dto.Food;
 import com.prj.m8eat.model.dto.User;
 import com.prj.m8eat.model.service.BoardService;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpSession;
 
 //@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/boards")
 public class BoardController {
-	private final BoardService boardService;
 
-	public BoardController(BoardService boardService) {
+	@Value("${file.upload.dir}")
+	private String uploadDirPath;
+	
+	private final BoardService boardService;
+	private final JwtUtil util;
+	public BoardController(BoardService boardService, JwtUtil util) {
 		this.boardService = boardService;
+		this.util = util;
 	}
 
 	// 전체 게시글 조회
@@ -83,12 +92,26 @@ public class BoardController {
 
 	// 게시글 등록
 	@PostMapping
-	public ResponseEntity<String> boardWrite(@ModelAttribute Board board) {
-		MultipartFile file = board.getFile();
+	public ResponseEntity<String> boardWrite(@ModelAttribute Board board, 
+											@CookieValue("access-token") String token) {
+		System.out.println("boardwriteeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+		System.out.println("boardddddddddddddddddddddddd " + board);
 
+	    // ✅ 토큰 검증 + 정보 추출
+	    if (util.validate(token)) {
+	        Claims claims = util.getClaims(token);
+	        Integer userNo = (Integer) claims.get("userNo"); // 또는 Long 형변환 조심
+	        board.setUserNo(userNo); // ✅ 게시글 작성자 정보 설정
+	    } else {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
+	    }
+		
+		
+		MultipartFile file = board.getFile();
+		
 		if (file != null && !file.isEmpty()) {
 			String originalFilename = file.getOriginalFilename();
-			String uploadDirPath = "/Users/jang-ayoung/Desktop/m8eat/data";
+//			String uploadDirPath = "/Users/jang-ayoung/Desktop/m8eat/data";
 
 			File uploadDir = new File(uploadDirPath);
 			if (!uploadDir.exists()) {

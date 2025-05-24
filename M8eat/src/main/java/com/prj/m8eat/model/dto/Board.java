@@ -60,4 +60,11 @@ public class Board {
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
 	}
+	@Override
+	public String toString() {
+		return "Board [boardNo=" + boardNo + ", userNo=" + userNo + ", title=" + title + ", content=" + content
+				+ ", viewCnt=" + viewCnt + ", regDate=" + regDate + ", file=" + file + ", filePath=" + filePath + "]";
+	}
+	
+	
 }
