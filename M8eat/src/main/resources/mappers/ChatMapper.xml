@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.prj.m8eat.model.dao.ChatDao">
+
+ <!-- 채팅방 조회 -->
+  <select id="selectChatRoom" resultType="ChatRoom">
+    SELECT * FROM chat_room
+    WHERE (user1 = #{user1} AND user2 = #{user2})
+       OR (user1 = #{user2} AND user2 = #{user1})
+    LIMIT 1
+  </select>
+
+  <!-- 채팅방 생성 -->
+  <insert id="insertChatRoom" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO chat_room (user1, user2)
+    VALUES (#{user1}, #{user2})
+  </insert>
+
+  <!-- 채팅 메시지 목록 조회 -->
+  <select id="selectMessages" resultType="ChatMessage">
+    SELECT * FROM chat_message
+    WHERE room_id = #{roomId}
+    ORDER BY sent_at ASC
+  </select>
+
+  <!-- 채팅 메시지 저장 -->
+  <insert id="insertChatMessage" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO chat_message (room_id, sender, content)
+    VALUES (#{roomId}, #{sender}, #{content})
+  </insert>
+
+</mapper>
