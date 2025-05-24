@@ -55,17 +55,14 @@ const login = async () => {
   const res = await store.login({ id: id.value, password: password.value });
 
   if (res.success) {
-    
-    alert(res.message)
-    router.push({name: 'mainpage'})
+    alert(res.message);
+    router.push({ name: "mainpage" });
   } else {
-    alert(res.message)
-    id.value = ""
-    password.value = ""
+    alert(res.message);
+    id.value = "";
+    password.value = "";
   }
 };
-
-
 </script>
 
 <style lang="scss" scoped>

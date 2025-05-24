@@ -21,7 +21,7 @@
       </template>
 
       <template v-else>
-        <RouterLink :to="{name: 'login'}" class="nav-btn">로그인</RouterLink>
+        <RouterLink :to="{ name: 'login' }" class="nav-btn">로그인</RouterLink>
         <RouterLink to="/signup" class="nav-btn">회원가입</RouterLink>
       </template>
     </div>
@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted  } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/user";
 
@@ -37,7 +37,7 @@ const store = useUserStore();
 
 // 로그인 여부 및 사용자 정보
 const isLoggedIn = computed(() => store.loginUser !== null); // 실제론 store 또는 auth composable 사용
-const userName = computed(() => store.loginUser?.name ?? '');
+const userName = computed(() => store.loginUser?.name ?? "");
 
 const profileImageUrl = ref("https://via.placeholder.com/40");
 
@@ -52,16 +52,15 @@ const goToMyPage = () => {
   router.push("/mypage");
 };
 
-
-
-
 const logout = async () => {
   try {
     await store.logout();
     alert("로그아웃 되었습니다.");
-    router.push({name: 'login'})
+    router.push({ name: "login" }).then(() => {
+      store.justLoggedOut = false;
+    });
   } catch {
-    alert("로그아웃에 실패")
+    alert("로그아웃에 실패");
   }
 
   // isLoggedIn.value = false;
