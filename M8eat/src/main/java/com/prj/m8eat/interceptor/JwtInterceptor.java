@@ -20,14 +20,14 @@ public class JwtInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 		
-		System.out.println("🟡 인터셉터 진입: " + request.getRequestURI());
+//		System.out.println("🟡 인터셉터 진입: " + request.getRequestURI());
 
 		if (request.getMethod().equals("OPTIONS")) { 
 			return true;
 		}
 		
 		String token = getTokenFromCookie(request);
-		System.out.println("prehandleeeeeeeeeeee " + token);
+//		System.out.println("prehandleeeeeeeeeeee " + token);
 		
 		if (token != null && jwtUtil.validate(token)) {
 			return true;

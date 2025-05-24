@@ -24,19 +24,13 @@
             <span class="file-name">{{ getFileName(board.filePath) }}</span>
             <a :href="getImageUrl(board.filePath)" download target="_blank" class="download-icon" title="다운로드">📎</a>
           </div>
-
-          <!-- 이미지가 아닌 경우 -->
-          <!-- <div v-else class="file-download">
-            <p>첨부 파일: {{ getFileName(board.filePath) }}</p>
-            <a :href="getImageUrl(board.filePath)" download target="_blank" class="download-link">다운로드</a>
-          </div> -->
         </div>
       </div>
       <div class="detail-actions">
         <!-- TODO : 목록, 수정, 삭제 버튼 클릭 시 이벤트 처리 필요 -->
         <button class="btn" @click="requestBoardList">목록</button>
         <button class="btn btn-danger" @click="requestBoardDelete" v-if="board.userNo === userStore.loginUser?.userNo">삭제</button>
-        <button class="btn btn-secondary">수정</button>
+        <button class="btn btn-secondary" @click="requestBoardUpdateForm" v-if="board.userNo === userStore.loginUser?.userNo">수정</button>
       </div>
     </div>
   </div>
@@ -83,6 +77,19 @@ const requestBoardDelete = async () => {
   }
 };
 
+const requestBoardUpdateForm = async () => {
+  const boardNo = route.params.boardNo;
+  router.push({ name: "boardUpdateForm", params: { boardNo } });
+  // try {
+  //   const boardNo = route.params.boardNo;
+  //   await boardStore.updateBoard(boardNo);
+  //   alert("수정되었습니다.");
+  //   router.push({ name: "boardDetail", params: boardNo });
+  // } catch {
+  //   alert("요청을 처리하지 못했습니다.");
+  // }
+};
+
 const getImageUrl = (filePath) => {
   return `http://localhost:8080${filePath}`;
 };
@@ -96,6 +103,7 @@ const isImage = (filePath) => {
 const getFileName = (filePath) => {
   return filePath.split("/").pop();
 };
+
 requestBoardDetail();
 import "@/style/Board.scss";
 </script>

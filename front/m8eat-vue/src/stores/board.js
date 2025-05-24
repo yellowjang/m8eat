@@ -61,13 +61,24 @@ export const useBoardStore = defineStore("board", () => {
     };
 
     try {
-      await api.post("http://localhost:8080/boards", formData, config);
-
+      await api.post(`${REST_API_URL}`, formData, config);
     } catch (error) {
       console.error("게시글 등록 실패: ", error);
       throw error;
     }
   };
 
-  return { getBoardList, getBoardDetail, removeBoard, addBoard };
+  const updateBoard = async (formData, boardNo) => {
+    const config = {
+      headers: { "Content-Type": "multipart/form-data" },
+    };
+    try {
+      await api.put(`${REST_API_URL}/${boardNo}`, formData, config);
+    } catch (error) {
+      console.error("게시글 수정 실패: ", error);
+      throw error;
+    }
+  };
+
+  return { getBoardList, getBoardDetail, removeBoard, addBoard, updateBoard };
 });

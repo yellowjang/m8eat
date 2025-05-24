@@ -42,7 +42,7 @@ public class JwtUtil {
     // ✅ 2. 유효성 검증
     public boolean validate(String token) {
         try {
-        	System.out.println("✅ 토큰 검증 시도: " + token);
+//        	System.out.println("✅ 토큰 검증 시도: " + token);
             Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
             return true;
         } catch (Exception e) {

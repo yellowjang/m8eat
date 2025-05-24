@@ -148,13 +148,16 @@ public class BoardController {
 	// 게시글 수정
 	@PutMapping(value = "/{boardNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<String> updateBoard(@PathVariable int boardNo, @ModelAttribute Board board) {
+		
+		System.out.println("board updateeeeeeeeeeeeeee "+ board);
+		
 		board.setBoardNo(boardNo);
 		MultipartFile file = board.getFile();
 
 		// 새 파일이 업로드된 경우에만 저장
 		if (file != null && !file.isEmpty()) {
 			String originalFilename = file.getOriginalFilename();
-			String uploadDirPath = "/Users/jang-ayoung/Desktop/m8eat/data";
+//			String uploadDirPath = "/Users/jang-ayoung/Desktop/m8eat/data";
 
 			File uploadDir = new File(uploadDirPath);
 			if (!uploadDir.exists()) {
