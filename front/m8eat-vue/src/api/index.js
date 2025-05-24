@@ -12,22 +12,6 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// api.interceptors.response.use(
-//   response => response,
-//   error => {
-//     if (error.response?.status === 401) {
-//       const store = useUserStore();
-//       store.loginUser = null;
-
-//       alert("로그인 세션이 만료되었습니다. 다시 로그인해주세요.")
-//       router.push({name: 'login'})
-//     }
-//     return Promise.reject(error)
-//   }
-// )
-
-// export let isSessionExpiredNotified = false; // 딱 한 번만 alert 띄우도록
-
 api.interceptors.response.use(
   (response) => response,
   (error) => {

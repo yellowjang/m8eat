@@ -14,6 +14,7 @@ import ApiTest from "@/components/board/ApiTest.vue";
 
 import { useUserStore } from "@/stores/user";
 import BoardUpdate from "@/components/board/BoardUpdate.vue";
+import ChatView from "@/views/ChatView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -79,6 +80,11 @@ const router = createRouter({
       path: "/apiTest",
       name: "apiTest",
       component: ApiTest,
+    },
+    {
+      path: "/chat/:targetId",
+      name: "ChatView",
+      component: ChatView,
     },
   ],
 });
