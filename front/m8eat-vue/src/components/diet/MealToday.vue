@@ -2,18 +2,42 @@
   <section class="meal-today">
     <h2 class="title">오늘의 식단</h2>
     <div class="add-meal-box">
-      <button class="add-meal" @click="$emit('add-meal')">+ 식단 등록하기</button>
+      <button class="add-meal" @click="$emit('add-meal')">
+        + 식단 등록하기
+      </button>
     </div>
     <div class="meal-boxes">
-      <div class="meal-box" v-for="type in ['아침', '점심', '저녁']" :key="type">
+      <div
+        class="meal-box"
+        v-for="type in ['아침', '점심', '저녁']"
+        :key="type"
+      >
         <p class="meal-title">{{ type }}</p>
 
         <div v-if="mealsByType(type).length > 0">
-          <button class="edit-meal" @click="$emit('edit-meal', mealsByType(type)[0])">수정</button>
-          <div class="meal-item" v-for="meal in mealsByType(type)" :key="meal.dietNo">
-            <router-link class="view-detail" :to="`/diet/${meal.dietNo}`">상세보기</router-link>
+          <button
+            class="edit-meal"
+            @click="$emit('edit-meal', mealsByType(type)[0])"
+          >
+            수정
+          </button>
+          <div
+            class="meal-item"
+            v-for="meal in mealsByType(type)"
+            :key="meal.dietNo"
+          >
+            <router-link class="view-detail" :to="`/diet/${meal.dietNo}`"
+              >상세보기</router-link
+            >
+            <button class="delete-meal" @click="deleteMeal(meal.dietNo)">
+              삭제
+            </button>
             <ul class="food-list">
-              <li v-for="(food, idx) in meal.foods" :key="idx" class="food-name">
+              <li
+                v-for="(food, idx) in meal.foods"
+                :key="idx"
+                class="food-name"
+              >
                 {{ food.foodName }}
               </li>
             </ul>
@@ -35,10 +59,11 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import { useDietStore } from "@/stores/diet";
 import NutrientGraph from "@/components/diet/NutrientGraph.vue";
 import dayjs from "dayjs";
-
+const router = useRouter();
 const dietStore = useDietStore();
 const meals = ref([]);
 const today = dayjs().format("YYYY-MM-DD");
@@ -59,8 +84,11 @@ const mealsByType = (type) => {
   return meals.value.filter((meal) => meal.mealType === type);
 };
 
-const totalCalories = (foods) => foods.reduce((sum, food) => sum + (food.calorie || 0), 0);
-const overallCalories = computed(() => meals.value.reduce((total, meal) => total + totalCalories(meal.foods), 0));
+const totalCalories = (foods) =>
+  foods.reduce((sum, food) => sum + (food.calorie || 0), 0);
+const overallCalories = computed(() =>
+  meals.value.reduce((total, meal) => total + totalCalories(meal.foods), 0)
+);
 const totalNutrients = computed(() => {
   return meals.value.reduce(
     (acc, meal) => {
@@ -75,6 +103,19 @@ const totalNutrients = computed(() => {
     { carbohydrate: 0, protein: 0, fat: 0, sugar: 0 }
   );
 });
+const deleteMeal = async (dietNo) => {
+  if (confirm("정말로 이 식단을 삭제하시겠습니까?")) {
+    try {
+      await dietStore.deleteDiet(dietNo);
+      alert("식단이 삭제되었습니다.");
+      await fetchTodayDiets(); // 목록만 갱신
+      // window.location.reload();
+    } catch (e) {
+      console.error("삭제 중 오류 발생:", e);
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  }
+};
 const recommendedIntake = {
   carbohydrate: 324,
   protein: 55,
@@ -166,5 +207,22 @@ const recommendedIntake = {
   flex-direction: column;
   gap: 10px;
   margin-top: 1rem;
+}
+
+.delete-meal {
+  background: none;
+  border: none;
+  color: #c94e4e;
+  font-size: 12px;
+  margin-left: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.delete-meal:hover {
+  color: white;
+  background-color: #c94e4e;
+  border-radius: 3px;
+  padding: 2px 6px;
 }
 </style>
