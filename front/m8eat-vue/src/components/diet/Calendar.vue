@@ -45,6 +45,7 @@ onMounted(async () => {
       :hide-weekends="!showWeekends"
       :views="['month', 'day', 'week']"
       default-view="month"
+      events-on-month-view
       locale="ko"
       :events="calendarEvents"
       @view-change="(e) => console.log('view-change', e)"

@@ -1,22 +1,22 @@
 <template>
   <section class="diet-detail">
     <h2>식단 상세 보기</h2>
-    <div v-if="diet">
+    <div v-if="dietDetail">
       <p>
         <strong>식단 날짜:</strong>
-        {{ formatDate(diet.regDate) }}
+        {{ formatDate(dietDetail.mealDate) }}
       </p>
       <p>
         <strong>등록 시간:</strong>
-        {{ formatTime(diet.regDate) }}
+        {{ formatTime(dietDetail.regDate) }}
       </p>
-      <div class="image-box" v-if="diet.filePath">
-        <img :src="diet.filePath" alt="식단 이미지" class="diet-image" />
+      <div class="image-box" v-if="dietDetail.filePath">
+        <img :src="dietDetail.filePath" alt="식단 이미지" class="diet-image" />
       </div>
 
       <h3>음식 목록</h3>
       <ul class="food-list">
-        <li v-for="(food, idx) in diet.foods" :key="idx">
+        <li v-for="(food, idx) in dietDetail.foods" :key="idx">
           <p>
             <strong>{{ food.foodName }}</strong>
           </p>
@@ -29,6 +29,7 @@
           <p>당: {{ food.sugar }}g | 콜레스테롤: {{ food.cholesterol }}mg</p>
         </li>
       </ul>
+      <NutrientBarChart :data="totalNutrients" />
     </div>
     <div v-else>
       <p>식단 정보를 불러오는 중입니다...</p>
@@ -37,20 +38,23 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useDietStore } from "@/stores/diet";
+import NutrientBarChart from "@/components/diet/NutrientBarChart.vue";
 
 const route = useRoute();
 const dietStore = useDietStore();
 const diet = ref(null);
+const dietDetail = ref(null);
 
 onMounted(async () => {
   const dietNo = route.params.dietNo;
   await dietStore.getDietDetail(dietNo);
-  diet.value = dietStore.diet;
+  console.log("✅ dietDetail:", dietStore.dietDetail); // ← 이게 null이면 백엔드 문제
+  dietDetail.value = dietStore.dietDetail;
 });
-
+console.log("📦 route.params:", route.params);
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   return date.toLocaleDateString("ko-KR");
@@ -60,6 +64,19 @@ const formatTime = (dateStr) => {
   const date = new Date(dateStr);
   return date.toLocaleTimeString("ko-KR");
 };
+const totalNutrients = computed(() => {
+  return dietDetail.value?.foods?.reduce(
+    (acc, food) => {
+      acc.carbohydrate += food.carbohydrate || 0;
+      acc.protein += food.protein || 0;
+      acc.fat += food.fat || 0;
+      acc.sugar += food.sugar || 0;
+      acc.cholesterol += food.cholesterol || 0;
+      return acc;
+    },
+    { carbohydrate: 0, protein: 0, fat: 0, sugar: 0, cholesterol: 0 }
+  );
+});
 </script>
 
 <style scoped>

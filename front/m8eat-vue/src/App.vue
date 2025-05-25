@@ -13,6 +13,27 @@ import "vue-cal/style.css";
 </template>
 
 <style>
+.vuecal__body {
+  height: 500px;
+}
+.vuecal__scrollable--month-view .vuecal__cell-date {
+  font-size: 11px;
+  margin: 1px;
+  width: 1.7em;
+}
+.vuecal__body-wrap {
+  overflow: hidden;
+}
+.vuecal__body {
+  aspect-ratio: 13 / 9;
+  overflow: auto;
+}
+.vuecal__cell {
+  overflow: auto;
+}
+.vuecal__event {
+  padding: 0 2px;
+}
 .vuecal__event {
   height: auto !important;
   min-height: 20px !important;
