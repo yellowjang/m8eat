@@ -1,6 +1,7 @@
 package com.prj.m8eat.model.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class DietResponse {
@@ -9,24 +10,26 @@ public class DietResponse {
 	private int userNo;
 	private String filePath;
 	private String regDate;
-	private LocalDate mealDate;
+	private LocalDateTime mealDate;
 	private String mealType;
+
 
 	// ✅ DietsFood로 수정 (실제 섭취한 음식 정보 리스트)
 	private List<DietsFood> foods;
 
-	public DietResponse(int i, int j, String string, LocalDate localDate, String string2, String string3) {
-	}
 
-	public DietResponse(int dietNo, int userNo, String filePath, String regDate, String mealType) {
+	public DietResponse(int dietNo, LocalDateTime mealDate,int userNo, String filePath, String regDate, String mealType) {
 		this.dietNo = dietNo;
+		this.mealDate = mealDate;
 		this.userNo = userNo;
 		this.filePath = filePath;
 		this.regDate = regDate;
 		this.mealType = mealType;
 	}
 
-	public int getDietNo() {
+
+
+    public int getDietNo() {
 		return dietNo;
 	}
 
@@ -74,11 +77,11 @@ public class DietResponse {
 		this.foods = foods;
 	}
 
-	public LocalDate getMealDate() {
+	public LocalDateTime getMealDate() {
 		return mealDate;
 	}
 
-	public void setMealDate(LocalDate mealDate) {
+	public  <LacalDateTime> void setMealDate(LocalDateTime mealDate) {
 		this.mealDate = mealDate;
 	}
 }

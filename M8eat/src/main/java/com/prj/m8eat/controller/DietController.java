@@ -2,7 +2,8 @@ package com.prj.m8eat.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +51,7 @@ public class DietController {
 	@GetMapping
 	public ResponseEntity<?> getAllDiets() {
 		List<DietResponse> dietList = dietService.getAllDiets();
-		System.out.println(dietList);
+//		System.out.println(dietList);
 		if (dietList == null || dietList.size() == 0) {
 			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
 		}
@@ -105,8 +106,12 @@ public class DietController {
 	    diet.setMealType(dietReq.getMealType());
 
 	    try {
-//	        OffsetDateTime odt = OffsetDateTime.parse(dietReq.getMealDate());
-	        diet.setMealDate(LocalDate.parse(dietReq.getMealDate())); 
+	    	// 프론트에서 보낸 형식에 따라 포맷 지정 (아래 중 택1)
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); 
+//	         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+	        System.out.println("날짜형식ㅁㄴㅇㅎ"+dietReq.getMealDate());
+	        diet.setMealDate(dietReq.getMealDate()); 
+	        
 	    } catch (DateTimeParseException e) {
 	        return ResponseEntity.badRequest().body("날짜 형식 오류: " + e.getMessage());
 	    }

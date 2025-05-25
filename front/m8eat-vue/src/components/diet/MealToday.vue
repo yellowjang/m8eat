@@ -63,32 +63,39 @@ import { useRouter } from "vue-router";
 import { useDietStore } from "@/stores/diet";
 import NutrientGraph from "@/components/diet/NutrientGraph.vue";
 import dayjs from "dayjs";
-const router = useRouter();
+
 const dietStore = useDietStore();
 const meals = ref([]);
-const today = dayjs().format("YYYY-MM-DD");
+const todayStart = dayjs().startOf("day").format("YYYY-MM-DD HH:mm:ss");
+const todayEnd = dayjs().endOf("day").format("YYYY-MM-DD HH:mm:ss");
 
 const fetchTodayDiets = async () => {
   try {
-    await dietStore.getDietByDate(today, today);
-    meals.value = dietStore.dietList;
+    await dietStore.getDietByDate(todayStart, todayEnd);
+    if (dietStore.dietByDateList.length === 0) {
+      console.warn("오늘 식단이 없습니다.");
+    }
+    meals.value = [...dietStore.dietByDateList];
+    console.log("오늘 식단:", meals.value);
   } catch (e) {
     console.error("식단 불러오기 실패", e);
+    meals.value = [];
   }
 };
 
 onMounted(fetchTodayDiets);
 
-// 🔽 type별 필터링 함수
 const mealsByType = (type) => {
   return meals.value.filter((meal) => meal.mealType === type);
 };
 
 const totalCalories = (foods) =>
   foods.reduce((sum, food) => sum + (food.calorie || 0), 0);
+
 const overallCalories = computed(() =>
   meals.value.reduce((total, meal) => total + totalCalories(meal.foods), 0)
 );
+
 const totalNutrients = computed(() => {
   return meals.value.reduce(
     (acc, meal) => {
@@ -103,19 +110,20 @@ const totalNutrients = computed(() => {
     { carbohydrate: 0, protein: 0, fat: 0, sugar: 0 }
   );
 });
+
 const deleteMeal = async (dietNo) => {
   if (confirm("정말로 이 식단을 삭제하시겠습니까?")) {
     try {
       await dietStore.deleteDiet(dietNo);
       alert("식단이 삭제되었습니다.");
-      await fetchTodayDiets(); // 목록만 갱신
-      // window.location.reload();
+      await fetchTodayDiets();
     } catch (e) {
       console.error("삭제 중 오류 발생:", e);
       alert("삭제 중 오류가 발생했습니다.");
     }
   }
 };
+
 const recommendedIntake = {
   carbohydrate: 324,
   protein: 55,
@@ -130,18 +138,18 @@ const recommendedIntake = {
   border: none;
   font-size: 12px;
   font-weight: bold;
-  text-decoration: none; /* 밑줄 제거 */
+  text-decoration: none;
 }
 
 .view-detail:hover {
-  background-color: #d57c7c;
-  color: #ffffff;
+  color: #c94e4e;
 }
 
 .divide-line {
   border-bottom: solid 0.3px #f1caca;
   margin: 10px 0px;
 }
+
 .title {
   font-size: 20px;
   font-weight: 700;
@@ -160,23 +168,28 @@ const recommendedIntake = {
     font-weight: bold;
   }
 }
+
 .meal-title {
   font-size: 16px;
   font-weight: 700;
 }
+
 .food-list {
   margin: 15px 10px;
 }
+
 .food-name {
   font-size: 12px;
   font-weight: 400;
   list-style: none;
 }
+
 .calorie {
   font-size: 12px;
   font-weight: 500;
   color: #d26767;
 }
+
 .summary {
   margin-top: 1rem;
   font-weight: 700;
@@ -188,6 +201,7 @@ const recommendedIntake = {
   text-align: center;
   margin-left: auto;
 }
+
 .add-meal {
   text-align: right;
   background-color: transparent;
@@ -198,6 +212,7 @@ const recommendedIntake = {
   font-weight: 600;
   border: none;
 }
+
 .add-meal-box {
   display: flex;
 }
@@ -220,9 +235,10 @@ const recommendedIntake = {
 }
 
 .delete-meal:hover {
-  color: white;
-  background-color: #c94e4e;
-  border-radius: 3px;
-  padding: 2px 6px;
+  color: #de9c9c;
+  border: none;
+  font-size: 12px;
+  font-weight: bold;
+  text-decoration: none;
 }
 </style>

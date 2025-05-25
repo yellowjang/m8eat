@@ -13,7 +13,11 @@
             </label>
             <div v-else class="image-preview">
               <img :src="previewUrl" alt="미리보기" />
-              <button type="button" class="remove-image-button" @click="removeImage">
+              <button
+                type="button"
+                class="remove-image-button"
+                @click="removeImage"
+              >
                 <img class="remove" :src="deleteIcon" alt="제거" />
               </button>
             </div>
@@ -28,7 +32,12 @@
       <!-- 상세 시간 -->
       <div class="food-info">
         <p class="input-title">상세 시간</p>
-        <VueDatePicker v-model="mealDate" :format="'yyyy-MM-dd'" />
+        <VueDatePicker
+          v-model="mealDate"
+          :enable-time-picker="true"
+          format="yyyy-MM-dd HH:mm"
+          :minute-increment="5"
+        />
         <div class="meal-type">
           <label>
             <input type="radio" name="meal" value="아침" v-model="mealTime" />
@@ -49,13 +58,36 @@
       <div class="food-table">
         <p class="input-title">음식 입력</p>
         <div class="food-row">
-          <input type="text" placeholder="음식명" v-model="foodInput" @input="filterFoodList" @blur="confirmSelectedFood" list="food-suggestions" />
+          <input
+            type="text"
+            placeholder="음식명"
+            v-model="foodInput"
+            @input="filterFoodList"
+            @blur="confirmSelectedFood"
+            list="food-suggestions"
+          />
           <datalist id="food-suggestions">
-            <option v-for="food in filteredFoods" :key="food.foodId" :value="food.nameKo" />
+            <option
+              v-for="food in filteredFoods"
+              :key="food.foodId"
+              :value="food.nameKo"
+            />
           </datalist>
-          <input type="number" placeholder="g" v-model.number="foodAmount" @input="calculateCalories" />
-          <input type="number" placeholder="kcal" v-model.number="foodCalories" :readonly="!!selectedFood" />
-          <button class="add-button" type="button" @click="addFood">추가</button>
+          <input
+            type="number"
+            placeholder="g"
+            v-model.number="foodAmount"
+            @input="calculateCalories"
+          />
+          <input
+            type="number"
+            placeholder="kcal"
+            v-model.number="foodCalories"
+            :readonly="!!selectedFood"
+          />
+          <button class="add-button" type="button" @click="addFood">
+            추가
+          </button>
         </div>
 
         <!-- 음식 리스트 -->
@@ -69,7 +101,9 @@
 
       <div class="total-calories">총 칼로리: {{ totalCalories }} kcal</div>
       <div class="button-row">
-        <button type="submit">{{ props.edit ? "식단 수정하기" : "식단 추가하기" }}</button>
+        <button type="submit">
+          {{ props.edit ? "식단 수정하기" : "식단 추가하기" }}
+        </button>
       </div>
     </form>
     <button class="back-button" @click="$emit('close')">← 뒤로가기</button>
@@ -83,7 +117,7 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import deleteIcon from "@/assets/icon/deleteIcon.png";
 import { useDietStore } from "@/stores/diet";
 import { useFoodStore } from "@/stores/food";
-
+import dayjs from "dayjs";
 const emit = defineEmits(["close"]);
 const dietStore = useDietStore();
 const foodStore = useFoodStore();
@@ -128,11 +162,15 @@ const removeImage = () => {
 
 const filterFoodList = () => {
   const query = foodInput.value.trim().toLowerCase();
-  filteredFoods.value = foodStore.foods.filter((food) => food.nameKo.toLowerCase().includes(query));
+  filteredFoods.value = foodStore.foods.filter((food) =>
+    food.nameKo.toLowerCase().includes(query)
+  );
 };
 
 const confirmSelectedFood = () => {
-  selectedFood.value = foodStore.foods.find((f) => f.nameKo.trim() === foodInput.value.trim()) || null;
+  selectedFood.value =
+    foodStore.foods.find((f) => f.nameKo.trim() === foodInput.value.trim()) ||
+    null;
   calculateCalories();
 };
 
@@ -152,11 +190,21 @@ const addFood = () => {
     foodName: foodInput.value,
     amount: foodAmount.value,
     calorie: foodCalories.value,
-    protein: selectedFood.value ? selectedFood.value.protein * (foodAmount.value / 100) : 0,
-    fat: selectedFood.value ? selectedFood.value.fat * (foodAmount.value / 100) : 0,
-    carbohydrate: selectedFood.value ? selectedFood.value.carbohydrate * (foodAmount.value / 100) : 0,
-    sugar: selectedFood.value ? selectedFood.value.sugar * (foodAmount.value / 100) : 0,
-    cholesterol: selectedFood.value ? selectedFood.value.cholesterol * (foodAmount.value / 100) : 0,
+    protein: selectedFood.value
+      ? selectedFood.value.protein * (foodAmount.value / 100)
+      : 0,
+    fat: selectedFood.value
+      ? selectedFood.value.fat * (foodAmount.value / 100)
+      : 0,
+    carbohydrate: selectedFood.value
+      ? selectedFood.value.carbohydrate * (foodAmount.value / 100)
+      : 0,
+    sugar: selectedFood.value
+      ? selectedFood.value.sugar * (foodAmount.value / 100)
+      : 0,
+    cholesterol: selectedFood.value
+      ? selectedFood.value.cholesterol * (foodAmount.value / 100)
+      : 0,
   };
 
   foods.value.push(food);
@@ -171,7 +219,9 @@ const removeFood = (index) => {
   foods.value.splice(index, 1);
 };
 
-const totalCalories = computed(() => foods.value.reduce((sum, food) => sum + food.calorie, 0));
+const totalCalories = computed(() =>
+  foods.value.reduce((sum, food) => sum + food.calorie, 0)
+);
 
 // const handleSubmit = async () => {
 //   const formData = new FormData();
@@ -192,7 +242,10 @@ const totalCalories = computed(() => foods.value.reduce((sum, food) => sum + foo
 const handleSubmit = async () => {
   const formData = new FormData();
   formData.append("mealType", mealTime.value);
-  formData.append("mealDate", mealDate.value.toISOString().slice(0, 10));
+
+  const formattedDate = dayjs(mealDate.value).format("YYYY-MM-DD HH:mm");
+  formData.append("mealDate", formattedDate);
+
   formData.append("foods", JSON.stringify(foods.value));
   if (file.value) formData.append("file", file.value);
 

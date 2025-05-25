@@ -3,11 +3,23 @@
     <Modal v-if="selectedMeal === 'create'" @close="resetSelection">
       <MealForm @close="resetSelection" @add-meal="refreshMeals" />
     </Modal>
-    <Modal v-if="selectedMeal && selectedMeal !== 'create'" @close="resetSelection">
-      <MealEditForm :edit="selectedMeal" @close="resetSelection" @update-meal="refreshMeals" />
+    <Modal
+      v-if="selectedMeal && selectedMeal !== 'create'"
+      @close="resetSelection"
+    >
+      <MealEditForm
+        :edit="selectedMeal"
+        @close="resetSelection"
+        @update-meal="refreshMeals"
+      />
     </Modal>
-    <MealToday v-if="!selectedMeal" @add-meal="selectedMeal = 'create'" @edit-meal="handleEditMeal" />
+    <MealToday
+      v-if="!selectedMeal"
+      @add-meal="selectedMeal = 'create'"
+      @edit-meal="handleEditMeal"
+    />
   </div>
+  <Calendar />
 </template>
 
 <script setup>
@@ -18,7 +30,7 @@ import MealForm from "@/components/diet/MealForm.vue";
 import MealEditForm from "@/components/diet/MealEditForm.vue";
 import Modal from "@/components/common2/Modal.vue";
 import { useDietStore } from "@/stores/diet";
-
+import Calendar from "@/components/diet/Calendar.vue";
 const selectedMeal = ref(null);
 const dietStore = useDietStore();
 const route = useRoute();
@@ -45,7 +57,9 @@ const handleEditMeal = async (meal) => {
 };
 
 onMounted(fetchDetail);
-
+// onMounted(async () => {
+//   await getAllDiets();
+// });
 const props = defineProps({
   edit: Object,
 });

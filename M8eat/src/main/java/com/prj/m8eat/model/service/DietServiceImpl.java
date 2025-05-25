@@ -67,7 +67,7 @@ public class DietServiceImpl implements DietService {
 
 		List<Diet> diets = dietDao.selectAllDiets();
 		for (Diet diet : diets) {
-			DietResponse res = new DietResponse(diet.getDietNo(), diet.getUserNo(), diet.getFilePath(),
+			DietResponse res = new DietResponse(diet.getDietNo(), diet.getMealDate(), diet.getUserNo(), diet.getFilePath(),
 					diet.getRegDate(), diet.getMealType());
 			res.setFoods(new ArrayList<>());
 			dietList.add(res);
@@ -90,7 +90,7 @@ public class DietServiceImpl implements DietService {
 
 		List<Diet> diets = dietDao.selectDietsByUserNo(userNo);
 		for (Diet diet : diets) {
-			DietResponse res = new DietResponse(diet.getDietNo(), diet.getUserNo(), diet.getFilePath(),
+			DietResponse res = new DietResponse(diet.getDietNo(),diet.getMealDate(), diet.getUserNo(), diet.getFilePath(),
 					diet.getRegDate(), diet.getMealType());
 			List<DietsFood> dietsFood = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
 			res.setFoods(dietsFood);
@@ -263,7 +263,7 @@ public class DietServiceImpl implements DietService {
 
 		List<Diet> diets = dietDao.selectDietsByDate(map);
 		for (Diet diet : diets) {
-			DietResponse res = new DietResponse(diet.getDietNo(), diet.getUserNo(), diet.getFilePath(),
+			DietResponse res = new DietResponse(diet.getDietNo(), diet.getMealDate(), diet.getUserNo(), diet.getFilePath(),
 					diet.getRegDate(), diet.getMealType());
 			List<DietsFood> dietsFood = dietDao.selectDietsFoodByDietNo(diet.getDietNo());
 			res.setFoods(dietsFood);
@@ -341,6 +341,7 @@ public class DietServiceImpl implements DietService {
 
 	    DietResponse res = new DietResponse(
 	        diet.getDietNo(),
+	        diet.getMealDate(),
 	        diet.getUserNo(),
 	        diet.getFilePath(),
 	        diet.getRegDate(),
