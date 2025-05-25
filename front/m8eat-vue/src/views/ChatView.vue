@@ -1,5 +1,5 @@
 <!-- ChatView.vue -->
-<template>
+<!-- <template>
   <div class="chat-container">
     <div class="chat-header">{{ targetUser }}님과의 채팅</div>
 
@@ -9,9 +9,20 @@
 
     <ChatInput @send="sendMessage" />
   </div>
-</template>
+</template> -->
+<!-- <template>
+  <div class="chat-container">
+    <div class="chat-header">{{ targetUser }}님과의 채팅</div>
 
-<script setup>
+    <div class="chat-messages" ref="scrollRef">
+      <ChatMessage v-for="(msg, i) in chatStore.messages" :key="i" :message="msg" :isMine="msg.sender === currentUser" />
+    </div>
+
+    <ChatInput @send="sendMessage" />
+  </div>
+</template> -->
+
+<!-- <script setup>
 import { ref, onMounted, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useUserStore } from "@/stores/user";
@@ -68,6 +79,134 @@ onMounted(() => {
     return;
   }
   loadChat();
+});
+</script> -->
+<!-- 
+<script setup>
+import { ref, onMounted, onBeforeUnmount, nextTick } from "vue";
+import { useRoute } from "vue-router";
+import { useUserStore } from "@/stores/user";
+import { useChatStore } from "@/stores/chat";
+
+import ChatMessage from "@/components/chat/ChatMessage.vue";
+import ChatInput from "@/components/chat/ChatInput.vue";
+
+const route = useRoute();
+const userStore = useUserStore();
+const chatStore = useChatStore();
+
+const currentUser = userStore.loginUser?.id;
+chatStore.setCurrentUser(currentUser);
+
+const targetUser = route.params.targetId;
+const scrollRef = ref(null);
+
+const loadChat = async () => {
+  try {
+    const result = await chatStore.loadRoomAndMessages(currentUser, targetUser);
+    nextTick(() => {
+      scrollRef.value.scrollTop = scrollRef.value.scrollHeight;
+    });
+  } catch (e) {
+    console.error("채팅 로딩 실패:", e);
+  }
+};
+
+const sendMessage = (text) => {
+  console.log("chatview text : ", text);
+  chatStore.sendMessage(chatStore.roomId, currentUser, text);
+  nextTick(() => {
+    scrollRef.value.scrollTop = scrollRef.value.scrollHeight;
+  });
+};
+
+onMounted(() => {
+  if (!currentUser) return;
+  loadChat();
+});
+
+onBeforeUnmount(() => {
+  chatStore.disconnectWebSocket(); // 🔌 연결 해제
+});
+</script> -->
+
+<template>
+  <div class="chat-container">
+    <div class="chat-header">{{ targetUser }}님과의 채팅</div>
+
+    <div class="chat-messages" ref="scrollRef">
+      <template v-for="(msg, i) in messages" :key="i">
+        <ChatMessage v-if="msg" :message="msg" :isMine="msg.sender === currentUser" />
+      </template>
+
+      <!-- <ChatMessage v-for="(msg, i) in messages" :key="i" :message="msg" :isMine="msg.sender === currentUser" /> -->
+    </div>
+
+    <ChatInput @send="(text) => sendMessage(text)" />
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, onBeforeUnmount, nextTick, watch } from "vue";
+import { useRoute } from "vue-router";
+import { useUserStore } from "@/stores/user";
+import { useChatStore } from "@/stores/chat";
+import { storeToRefs } from "pinia";
+
+import ChatInput from "@/components/chat/ChatInput.vue";
+import ChatMessage from "@/components/chat/ChatMessage.vue";
+
+const route = useRoute();
+const userStore = useUserStore();
+const chatStore = useChatStore();
+
+const currentUser = userStore.loginUser?.id;
+chatStore.setCurrentUser(currentUser);
+
+const targetUser = route.params.targetId;
+const scrollRef = ref(null);
+
+// const messages = ref([]);
+const { messages } = storeToRefs(chatStore);
+const roomId = ref(null); // ✅ 로컬 상태로 roomId 보관
+
+watch(messages, () => {
+  nextTick(() => {
+    scrollRef.value.scrollTop = scrollRef.value.scrollHeight;
+  });
+});
+
+const loadChat = async () => {
+  const result = await chatStore.loadRoomAndMessages(currentUser, targetUser);
+  console.log("sfadsfsd", result);
+  roomId.value = result.roomId;
+  messages.value = result.messages;
+  nextTick(() => {
+    scrollRef.value.scrollTop = scrollRef.value.scrollHeight;
+  });
+};
+
+const sendMessage = (text) => {
+  console.log("sendMessage", text);
+  console.log("sendMessage", roomId.value);
+  chatStore.sendMessage(roomId.value, currentUser, text);
+};
+
+onMounted(async () => {
+  const result = await chatStore.loadRoomAndMessages(currentUser, targetUser);
+  roomId.value = result.roomId;
+  messages.value = result.messages;
+
+  // ✅ WebSocket 연결은 데이터 로딩 이후에!
+  chatStore.connectWebSocket(result.roomId);
+});
+
+// onMounted(() => {
+//   loadChat();
+// });
+
+onBeforeUnmount(() => {
+  chatStore.disconnectWebSocket();
 });
 </script>
 

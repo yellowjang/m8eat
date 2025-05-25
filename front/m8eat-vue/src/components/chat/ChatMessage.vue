@@ -6,11 +6,9 @@
 </template>
 
 <script setup>
-// defineProps({
-//   message: Object,
-//   isMine: Boolean,
-// });
-defineProps({
+import { ref, computed } from "vue";
+
+const props = defineProps({
   message: {
     type: Object,
     required: true,
@@ -18,6 +16,13 @@ defineProps({
   },
   isMine: Boolean,
 });
+
+// const message = computed(() => props.message);
+// const message = ref(props.message);
+// const { message, isMine } = defineProps();
+
+// console.log("🧾 ChatMessage.vue에서 받은 message:", props.message);
+console.log("🧾 ChatMessage.vue에서 받은 message:", props.message);
 </script>
 
 <style scoped>
