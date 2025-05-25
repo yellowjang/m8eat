@@ -1,6 +1,6 @@
 <template>
   <section class="meal-today">
-    <h2 class="title">오늘의 식단</h2>
+    <h2 class="title">{{ formattedDate }} 식단</h2>
     <div class="add-meal-box">
       <button class="add-meal" @click="$emit('add-meal')">
         + 식단 등록하기
@@ -26,9 +26,9 @@
             v-for="meal in mealsByType(type)"
             :key="meal.dietNo"
           >
-            <router-link class="view-detail" :to="`/diet/${meal.dietNo}`"
-              >상세보기</router-link
-            >
+            <router-link class="view-detail" :to="`/diet/${meal.dietNo}`">
+              상세보기
+            </router-link>
             <button class="delete-meal" @click="deleteMeal(meal.dietNo)">
               삭제
             </button>
@@ -58,32 +58,39 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed, watch } from "vue";
 import { useDietStore } from "@/stores/diet";
 import NutrientGraph from "@/components/diet/NutrientGraph.vue";
 import dayjs from "dayjs";
 
+const props = defineProps({
+  selectedDate: String,
+});
+
 const dietStore = useDietStore();
 const meals = ref([]);
-const todayStart = dayjs().startOf("day").format("YYYY-MM-DD HH:mm:ss");
-const todayEnd = dayjs().endOf("day").format("YYYY-MM-DD HH:mm:ss");
 
-const fetchTodayDiets = async () => {
+const fetchDiets = async (date) => {
   try {
-    await dietStore.getDietByDate(todayStart, todayEnd);
-    if (dietStore.dietByDateList.length === 0) {
-      console.warn("오늘 식단이 없습니다.");
-    }
+    const start = `${date} 00:00:00`;
+    const end = `${date} 23:59:59`;
+    await dietStore.getDietByDate(start, end);
+    console.log("📦 dietByDateList:", dietStore.dietByDateList); // 여기도 확인
     meals.value = [...dietStore.dietByDateList];
-    console.log("오늘 식단:", meals.value);
   } catch (e) {
     console.error("식단 불러오기 실패", e);
     meals.value = [];
   }
 };
 
-onMounted(fetchTodayDiets);
+watch(
+  () => props.selectedDate,
+  (newDate) => {
+    console.log("📦 selectedDate 변경 감지:", newDate);
+    if (newDate) fetchDiets(newDate);
+  },
+  { immediate: true }
+);
 
 const mealsByType = (type) => {
   return meals.value.filter((meal) => meal.mealType === type);
@@ -91,11 +98,9 @@ const mealsByType = (type) => {
 
 const totalCalories = (foods) =>
   foods.reduce((sum, food) => sum + (food.calorie || 0), 0);
-
 const overallCalories = computed(() =>
   meals.value.reduce((total, meal) => total + totalCalories(meal.foods), 0)
 );
-
 const totalNutrients = computed(() => {
   return meals.value.reduce(
     (acc, meal) => {
@@ -110,26 +115,28 @@ const totalNutrients = computed(() => {
     { carbohydrate: 0, protein: 0, fat: 0, sugar: 0 }
   );
 });
-
 const deleteMeal = async (dietNo) => {
   if (confirm("정말로 이 식단을 삭제하시겠습니까?")) {
     try {
       await dietStore.deleteDiet(dietNo);
       alert("식단이 삭제되었습니다.");
-      await fetchTodayDiets();
+      await fetchDiets(props.selectedDate);
     } catch (e) {
       console.error("삭제 중 오류 발생:", e);
       alert("삭제 중 오류가 발생했습니다.");
     }
   }
 };
-
 const recommendedIntake = {
   carbohydrate: 324,
   protein: 55,
   fat: 54,
   sugar: 50,
 };
+
+const formattedDate = computed(() =>
+  dayjs(props.selectedDate).format("YYYY년 MM월 DD일")
+);
 </script>
 
 <style lang="scss" scoped>

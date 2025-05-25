@@ -1,105 +1,83 @@
 <template>
-  <div>
-    <Modal v-if="selectedMeal === 'create'" @close="resetSelection">
-      <MealForm @close="resetSelection" @add-meal="refreshMeals" />
-    </Modal>
-    <Modal
-      v-if="selectedMeal && selectedMeal !== 'create'"
-      @close="resetSelection"
-    >
-      <MealEditForm
-        :edit="selectedMeal"
+  <div class="meal-calendar-layout">
+    <div class="calendar-pane">
+      <Calendar @select-date="handleDateChange" />
+    </div>
+    <div class="meal-pane">
+      <Modal v-if="selectedMeal === 'create'" @close="resetSelection">
+        <MealForm
+          :selectedDate="selectedDate"
+          @close="resetSelection"
+          @add-meal="refreshMeals"
+        />
+      </Modal>
+      <Modal
+        v-if="selectedMeal && selectedMeal !== 'create'"
         @close="resetSelection"
-        @update-meal="refreshMeals"
+      >
+        <MealEditForm
+          :edit="selectedMeal"
+          @close="resetSelection"
+          @update-meal="refreshMeals"
+        />
+      </Modal>
+      <MealToday
+        v-if="!selectedMeal"
+        :selectedDate="selectedDate"
+        @add-meal="selectedMeal = 'create'"
+        @edit-meal="handleEditMeal"
       />
-    </Modal>
-    <MealToday
-      v-if="!selectedMeal"
-      @add-meal="selectedMeal = 'create'"
-      @edit-meal="handleEditMeal"
-    />
+    </div>
   </div>
-  <Calendar />
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
-import { useRoute } from "vue-router";
+import { ref, computed } from "vue";
+import Calendar from "@/components/diet/Calendar.vue";
 import MealToday from "@/components/diet/MealToday.vue";
 import MealForm from "@/components/diet/MealForm.vue";
 import MealEditForm from "@/components/diet/MealEditForm.vue";
 import Modal from "@/components/common2/Modal.vue";
 import { useDietStore } from "@/stores/diet";
-import Calendar from "@/components/diet/Calendar.vue";
-const selectedMeal = ref(null);
-const dietStore = useDietStore();
-const route = useRoute();
+import dayjs from "dayjs";
 
-const refreshMeals = () => {
-  selectedMeal.value = null;
-};
+const selectedDate = ref(dayjs().format("YYYY-MM-DD")); // 오늘 날짜를 기본값으로
+const selectedMeal = ref(null);
+// const selectedDateRef = ref(new Date().toISOString().slice(0, 10));
+// const selectedDate = computed(() => selectedDateRef.value); // 반응형으로 wrap
+const dietStore = useDietStore();
 
 const resetSelection = () => {
   selectedMeal.value = null;
 };
 
-const fetchDetail = async () => {
-  const dietNo = route.params.dietNo;
-  if (dietNo) {
-    await dietStore.getDietDetail(dietNo);
-    selectedMeal.value = JSON.parse(JSON.stringify(dietStore.diet));
-  }
+const refreshMeals = async () => {
+  selectedMeal.value = null;
+  await dietStore.getDietByDate(selectedDate.value, selectedDate.value);
 };
 
 const handleEditMeal = async (meal) => {
   await dietStore.getDietDetail(meal.dietNo);
-  selectedMeal.value = JSON.parse(JSON.stringify(dietStore.diet));
+  selectedMeal.value = JSON.parse(JSON.stringify(dietStore.dietDetail));
 };
 
-onMounted(fetchDetail);
-// onMounted(async () => {
-//   await getAllDiets();
-// });
-const props = defineProps({
-  edit: Object,
-});
-
-const mealDate = ref(null);
-const mealTime = ref("");
-const foods = ref([]);
-const file = ref(null);
-const previewUrl = ref(null);
-watch(
-  () => props.edit,
-  (newVal) => {
-    if (newVal) {
-      mealDate.value = new Date(newVal.mealDate);
-      mealTime.value = newVal.mealType;
-      foods.value = [...newVal.foods];
-      previewUrl.value = newVal.filePath || null;
-    }
-  },
-  { immediate: true } // mount 시 바로 실행
-);
+const handleDateChange = async (date) => {
+  console.log("📌 전달받은 날짜:", date); // 여기도 확인
+  selectedDate.value = date;
+  await dietStore.getDietByDate(date, date);
+};
 </script>
 
 <style scoped>
-.section-title {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 20px;
-}
-.meal-record {
+.meal-calendar-layout {
   display: flex;
   gap: 2rem;
-  background-color: #fcecec;
-}
-.left-panel,
-.right-panel {
-  flex: 1;
-  background: white;
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+.calendar-pane {
+  flex: 1;
+}
+.meal-pane {
+  flex: 2;
 }
 </style>

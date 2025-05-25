@@ -106,11 +106,8 @@ public class DietController {
 	    diet.setMealType(dietReq.getMealType());
 
 	    try {
-	    	// 프론트에서 보낸 형식에 따라 포맷 지정 (아래 중 택1)
-	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); 
-//	         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-	        System.out.println("날짜형식ㅁㄴㅇㅎ"+dietReq.getMealDate());
-	        diet.setMealDate(dietReq.getMealDate()); 
+	    	System.out.println("✅ 받은 날짜: " + dietReq.getMealDate());
+	    	diet.setMealDate(dietReq.getMealDate());
 	        
 	    } catch (DateTimeParseException e) {
 	        return ResponseEntity.badRequest().body("날짜 형식 오류: " + e.getMessage());

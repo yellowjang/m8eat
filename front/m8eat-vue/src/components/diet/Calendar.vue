@@ -8,33 +8,33 @@ const showWeekends = ref(true);
 const toggleWeekends = () => {
   showWeekends.value = !showWeekends.value;
 };
+const emit = defineEmits(["select-date"]);
 const diets = ref([]);
 const dietStore = useDietStore();
 const calendarEvents = ref([]);
-
+const onCellClick = (e) => {
+  const date = e.cursor?.date || e.cell?.start; // 🔍 날짜 위치에 따라 안전하게 꺼내기
+  if (date) {
+    const formattedDate = dayjs(date).format("YYYY-MM-DD");
+    console.log("✅ 선택된 날짜:", formattedDate);
+    emit("select-date", formattedDate); // 🔥 여기서 정확하게 전달!
+  }
+};
 onMounted(async () => {
   await dietStore.getAllDiets();
-  if (dietStore.dietByDateList.length === 0) {
-    console.warn("오늘 식단이 없습니다.");
-  }
-  diets.value = [...dietStore.allDietList];
-  console.log("오늘 식단:", diets.value);
-  // 🔽 dietList를 vue-cal 일정 형식으로 매핑
-  calendarEvents.value = diets.value.map((diet) => {
-    const startDate = new Date(diet.mealDate); // "2025-05-23T00:00:00" → Date 객체
-    const endDate = new Date(startDate);
-    endDate.setHours(endDate.getHours() + 1); // 한 시간짜리 일정 (필수는 아님)
-
+  calendarEvents.value = dietStore.allDietList.map((diet) => {
+    const start = new Date(diet.mealDate);
+    const end = new Date(start);
+    end.setHours(end.getHours() + 1);
     return {
-      start: startDate,
-      end: endDate,
+      start,
+      end,
       title: `${diet.mealType} - ${diet.foods
         .map((f) => f.foodName)
         .join(", ")}`,
       class: "meal-event",
     };
   });
-  await nextTick();
 });
 </script>
 
@@ -48,6 +48,7 @@ onMounted(async () => {
       locale="ko"
       :events="calendarEvents"
       @view-change="(e) => console.log('view-change', e)"
+      @cell-click="onCellClick"
     />
   </div>
 </template>

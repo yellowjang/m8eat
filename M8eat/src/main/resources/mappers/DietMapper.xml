@@ -19,7 +19,7 @@
   
   <!-- 날짜별 식단 조회 -->
   <select id="selectDietsByDate" parameterType="Map" resultType="com.prj.m8eat.model.dto.Diet">
-    SELECT * FROM diets WHERE reg_date BETWEEN #{startDate} AND #{endDate};
+    SELECT * FROM diets WHERE meal_date BETWEEN #{startDate} AND #{endDate};
   </select>
 
   <!-- 식단 상세 조회 -->

@@ -258,7 +258,7 @@ public class DietServiceImpl implements DietService {
 	public List<DietResponse> getDietsByDate(String startDate, String endDate) {
 		List<DietResponse> dietList = new ArrayList<>();
 		Map<String, String> map = new HashMap<>();
-		map.put("startDate", startDate);
+		map.put("startDate", startDate + " 00:00:00"); 
 		map.put("endDate", endDate + " 23:59:59");
 
 		List<Diet> diets = dietDao.selectDietsByDate(map);
