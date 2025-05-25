@@ -179,11 +179,25 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+import { useUserStore } from "@/stores/user";
+import router from "@/router";
 
-const user = ref({ name: "홍길동", id: "hong123", role: "user" });
+const user = ref({});
 const editableUser = ref({ ...user.value });
 const showBasicEdit = ref(false);
+
+const store = useUserStore();
+
+onMounted(() => {
+  getUserInfo();
+});
+
+const getUserInfo = () => {
+  console.log("mypageeee", store.loginUser);
+  const loginUser = store.loginUser;
+  user.value = { name: loginUser.name, id: loginUser.id, role: loginUser.role };
+};
 
 const saveBasicEdit = () => {
   user.value = { ...editableUser.value };
@@ -199,7 +213,9 @@ const labelMap = {
 };
 
 const logout = () => {
-  alert("로그아웃 처리");
+  store.logout();
+  alert("로그아웃 되었습니다.");
+  router.push({ name: "login" });
 };
 const withdraw = () => {
   alert("회원탈퇴 처리");
@@ -253,7 +269,7 @@ const editHealth = () => {
 const partnerName = ref(user.value.role === "coach" ? "회원들과" : "담당 코치와");
 
 const goToChat = () => {
-  router.push("/chat");
+  router.push({ name: "ChatView", params: { targetId: "bbb" } });
 };
 </script>
 
