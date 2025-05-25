@@ -262,8 +262,10 @@ const goToChat = () => {
   padding: 2rem;
   background-color: #fdeeee;
   font-family: "Noto Sans KR", sans-serif;
-  min-height: 100vh;
+  // min-height: 100vh;
   text-align: center;
+  flex: 1;
+  min-height: unset;
 
   .mypage-header {
     display: flex;

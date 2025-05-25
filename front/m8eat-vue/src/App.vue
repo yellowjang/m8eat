@@ -1,6 +1,7 @@
 <script setup>
 import { RouterLink, RouterView } from "vue-router";
 import Header from "@/components/common2/Header.vue";
+import Footer from "./components/common2/Footer.vue";
 import "@/style/global.scss";
 import { onMounted } from "vue";
 import { useUserStore } from "@/stores/user";
@@ -18,25 +19,43 @@ const store = useUserStore();
 //     }
 //   }
 // });
-
 </script>
 
 <template>
-  <Header></Header>
-  <div class="view">
-    <RouterView />
+  <div id="app">
+    <Header></Header>
+    <div class="view">
+      <RouterView />
+    </div>
+    <Footer></Footer>
   </div>
 </template>
 
 <style scoped>
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.view {
+  flex: 1;
+  padding: 3rem 1rem 2rem; /* ✅ 아래 padding 줄이기 */
+}
 header {
   line-height: 1.5;
   max-height: 100vh;
 }
 
-.view {
+/* .view {
   padding: 5rem;
-}
+} */
 .logo {
   display: block;
   margin: 0 auto 2rem;
