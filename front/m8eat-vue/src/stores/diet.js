@@ -79,9 +79,9 @@ export const useDietStore = defineStore("diets", () => {
   };
 
   /** 식단 수정 */
-  const updateDiet = async (dietNo, payload) => {
+  const updateDiet = async (dietNo, formData) => {
     try {
-      await axios.put(`${REST_API_URL}/${dietNo}`, payload, tokenHeader());
+      await axios.put(`${REST_API_URL}/${dietNo}`, formData, tokenHeader());
     } catch (err) {
       console.error("식단 수정 실패", err);
     }

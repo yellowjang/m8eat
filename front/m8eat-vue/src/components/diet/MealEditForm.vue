@@ -47,7 +47,13 @@
         <ul class="food-list">
           <li v-for="(food, index) in foods" :key="index" class="food-item">
             {{ food.foodName }} / {{ food.amount }}g / {{ food.calorie }} kcal
-            <button class="remove-button" type="button" @click="removeFood(index)">x</button>
+            <button
+              class="remove-button"
+              type="button"
+              @click="removeFood(index)"
+            >
+              x
+            </button>
           </li>
         </ul>
       </div>
@@ -68,13 +74,15 @@ import { useDietStore } from "@/stores/diet";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import deleteIcon from "@/assets/icon/deleteIcon.png";
+import dayjs from "dayjs";
 
 const route = useRoute();
 const dietStore = useDietStore();
-const dietNo = route.params.dietNo;
 const props = defineProps({
   edit: Object,
 });
+const dietNo = props.edit?.dietNo;
+const mealType = ref("");
 const mealDate = ref(new Date());
 const mealTime = ref("");
 const foods = ref([]);
@@ -106,19 +114,21 @@ const removeFood = (index) => {
   foods.value.splice(index, 1);
 };
 
-const totalCalories = computed(() => foods.value.reduce((sum, food) => sum + food.calorie, 0));
+const totalCalories = computed(() =>
+  foods.value.reduce((sum, food) => sum + food.calorie, 0)
+);
 
 const handleSubmit = async () => {
   const formData = new FormData();
   formData.append("dietNo", dietNo);
-  formData.append("mealType", mealTime.value);
-  formData.append("mealDate", mealDate.value.toISOString().slice(0, 10));
+  formData.append("mealType", mealType.value);
+  formData.append("mealDate", dayjs(mealDate.value).format("YYYY-MM-DD HH:mm"));
   formData.append("foods", JSON.stringify(foods.value));
   if (file.value) formData.append("file", file.value);
 
-  await dietStore.updateDiet(formData);
+  await dietStore.updateDiet(dietNo, formData);
   alert("식단이 성공적으로 수정되었습니다.");
-  location.href = "/";
+  // location.href = "/";
 };
 </script>
 

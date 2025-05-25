@@ -13,6 +13,24 @@ import "vue-cal/style.css";
 </template>
 
 <style>
+.vuecal__title-bar {
+  display: flex;
+  /* justify-content: center; */
+  margin: auto;
+}
+.vuecal__weekdays-headings {
+  background-color: #fddede !important; /* 상단 배경색 */
+  color: #a13a3a !important; /* 요일 글자색 */
+  font-weight: bold;
+}
+.vuecal__header {
+  background-color: #de9c9c !important;
+}
+.vuecal__heading {
+  background-color: #ffe6e6 !important; /* 월 이름이 있는 헤더 */
+  /* color: #c94e4e !important; */
+  font-size: 16px;
+}
 .vuecal__body {
   height: 500px;
 }
