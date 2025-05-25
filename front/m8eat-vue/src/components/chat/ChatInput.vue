@@ -1,7 +1,7 @@
 <!-- ChatInput.vue -->
-<template>
+<!-- <template>
   <form class="chat-input" @submit.prevent="submit">
-    <input v-model="text" type="text" placeholder="메시지를 입력하세요" />
+    <input v-model.trim="text" type="text" placeholder="메시지를 입력하세요" />
     <button type="submit">전송</button>
   </form>
 </template>
@@ -13,7 +13,29 @@ const emit = defineEmits(["send"]);
 const text = ref("");
 
 const submit = () => {
-  if (text.value.trim()) {
+  if (text.value) {
+    console.log("chatinput text: ", text.value);
+    emit("send", text.value);
+    text.value = "";
+  }
+};
+</script> -->
+
+<template>
+  <form class="chat-input" @submit.prevent="submit">
+    <input v-model.trim="text" type="text" placeholder="메시지를 입력하세요" />
+    <button type="submit">전송</button>
+  </form>
+</template>
+
+<script setup>
+import { ref } from "vue";
+const emit = defineEmits(["send"]);
+const text = ref("");
+
+const submit = () => {
+  console.log("textttt", text.value);
+  if (text?.value) {
     emit("send", text.value);
     text.value = "";
   }
