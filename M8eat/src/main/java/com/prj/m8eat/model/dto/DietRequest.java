@@ -12,7 +12,7 @@ public class DietRequest {
     private MultipartFile file;
     private String filePath;
     private String foods; // JSON 문자열 (프론트에서 stringify 해서 넘김)
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime mealDate;
 	
 	
