@@ -33,7 +33,7 @@ export const useUserStore = defineStore("user", () => {
         name: user.name,
         id: user.id,
         password: user.password,
-        role: "user",
+        role: user.role,
       },
       healthInfo: {
         height: 0,
