@@ -67,8 +67,8 @@ export const useDietStore = defineStore("diets", () => {
   const getDietDetail = async (dietNo) => {
     try {
       const res = await axios.get(`${REST_API_URL}/${dietNo}`, tokenHeader());
-      if (res.data && res.data.length > 0) {
-        dietDetail.value = res.data[0];
+      if (res.data) {
+        dietDetail.value = Array.isArray(res.data) ? res.data[0] : res.data;
       } else {
         dietDetail.value = null;
       }
