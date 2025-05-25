@@ -11,7 +11,7 @@
         {{ formatTime(diet.regDate) }}
       </p>
       <div class="image-box" v-if="diet.filePath">
-        <img :src="`http://localhost:8080${diet.filePath}`" alt="식단 이미지" class="diet-image" />
+        <img :src="diet.filePath" alt="식단 이미지" class="diet-image" />
       </div>
 
       <h3>음식 목록</h3>
@@ -22,7 +22,10 @@
           </p>
           <p>섭취량: {{ food.amount }}g</p>
           <p>열량: {{ food.calorie }} kcal</p>
-          <p>탄수화물: {{ food.carbohydrate }}g | 단백질: {{ food.protein }}g | 지방: {{ food.fat }}g</p>
+          <p>
+            탄수화물: {{ food.carbohydrate }}g | 단백질: {{ food.protein }}g |
+            지방: {{ food.fat }}g
+          </p>
           <p>당: {{ food.sugar }}g | 콜레스테롤: {{ food.cholesterol }}mg</p>
         </li>
       </ul>

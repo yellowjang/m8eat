@@ -54,7 +54,7 @@ drop table diets_food;
 CREATE TABLE if not exists diets (
     diet_no INT PRIMARY KEY AUTO_INCREMENT,
     user_no INT not null,
-    meal_date DATE ,
+    meal_date datetime,
     reg_date TIMESTAMP default now(),
     meal_type VARCHAR(10) not null,
     file_path VARCHAR(255),
@@ -207,24 +207,9 @@ CREATE TABLE if not exists boards_comment (
         ON UPDATE CASCADE
 );
 
-LOAD DATA LOCAL INFILE '/Users/jang-ayoung/Downloads/Cleaned_Food_Data.csv'
-INTO TABLE food
-CHARACTER SET utf8
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES;
+
 
 LOAD DATA LOCAL INFILE '/Users/jang-ayoung/Downloads/Cleaned_Food_Data.csv'
-INTO TABLE food
-CHARACTER SET utf8mb4
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES
-(food_id, calories, name_ko, protein, fat, carbohydrate, sugar, cholesterol);
-
-LOAD DATA LOCAL INFILE '/Users/your_path/Cleaned_Food_Data.csv'
 REPLACE INTO TABLE food
 CHARACTER SET utf8mb4
 FIELDS TERMINATED BY ',' 
