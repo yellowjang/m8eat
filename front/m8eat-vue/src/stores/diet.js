@@ -21,11 +21,11 @@ export const useDietStore = defineStore("diets", () => {
   /** 식단 등록 (이미지 포함 멀티파트 전송) */
   const createDiet = async (formData) => {
     try {
-      console.log("createDiet", formData)
+      console.log("createDiet", formData);
       await api.post(`${REST_API_URL}`, formData, {
         headers: {
-          "Content-Type": "multipart/form-data"
-        }
+          "Content-Type": "multipart/form-data",
+        },
       });
     } catch (err) {
       console.error("식단 등록 실패", err);
@@ -46,10 +46,7 @@ export const useDietStore = defineStore("diets", () => {
   /** 날짜별 식단 조회 */
   const getDietByDate = async (start, end) => {
     try {
-      const res = await api.get(
-        `${REST_API_URL}/date?start=${start}&end=${end}`,
-        tokenHeader()
-      );
+      const res = await api.get(`${REST_API_URL}/date?start=${start}&end=${end}`, tokenHeader());
       dietByDateList.value = res.data;
     } catch (err) {
       console.error("날짜별 식단 조회 실패", err);
@@ -59,10 +56,7 @@ export const useDietStore = defineStore("diets", () => {
   /** 유저별 식단 조회 */
   const getDietByUser = async (userNo) => {
     try {
-      const res = await api.get(
-        `${REST_API_URL}/user/${userNo}`,
-        tokenHeader()
-      );
+      const res = await api.get(`${REST_API_URL}/user/${userNo}`, tokenHeader());
       dietByUserList.value = res.data;
     } catch (err) {
       console.error("유저별 식단 조회 실패", err);
@@ -87,7 +81,11 @@ export const useDietStore = defineStore("diets", () => {
   /** 식단 수정 */
   const updateDiet = async (dietNo, formData) => {
     try {
-      await api.put(`${REST_API_URL}/${dietNo}`, formData, tokenHeader());
+      await api.put(`${REST_API_URL}/${dietNo}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
     } catch (err) {
       console.error("식단 수정 실패", err);
     }

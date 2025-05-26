@@ -5,17 +5,18 @@ import Footer from "./components/common2/Footer.vue";
 import "@/style/global.scss";
 import { onMounted } from "vue";
 import { useUserStore } from "@/stores/user";
+import Alert from "@mui/material/Alert";
 
 const store = useUserStore();
 
 onMounted(async () => {
   try {
     await store.checkLogin(); // ✅ 로그인 상태 복구 시도
-    console.log("✅ 로그인 상태 복구됨")
+    console.log("✅ 로그인 상태 복구됨");
   } catch (err) {
-    console.log("❌ 로그인 아님")
+    console.log("❌ 로그인 아님");
   }
-})
+});
 import "vue-cal/style.css";
 </script>
 
@@ -90,7 +91,7 @@ body {
   height: auto !important;
   min-height: 20px !important;
   padding: 4px 6px;
-  background-color:#fff5f5 !important ;
+  background-color: #fff5f5 !important ;
   border: 1px solid #de9c9c;
   font-size: 12px;
   color: #333;
