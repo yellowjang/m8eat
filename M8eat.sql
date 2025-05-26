@@ -64,6 +64,7 @@ INSERT INTO coach_user_map (coach_no, user_no) VALUES (1, 3);
 -- 최코치 (4번)가 정회원(5번)을 담당
 INSERT INTO coach_user_map (coach_no, user_no) VALUES (4, 5);
 
+select * from coach_user_map;
 
 
 
@@ -83,14 +84,16 @@ CREATE TABLE if not exists users_health_info (
         ON UPDATE CASCADE
 );
 
+select * from users_health_info;
+
 -- 코치 선호 태그
-CREATE TABLE if not exists coach_prefer (
-    user_no INT PRIMARY KEY,
-    tags TEXT,
-    FOREIGN KEY (user_no) REFERENCES users(user_no)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
+-- CREATE TABLE if not exists coach_prefer (
+--     user_no INT PRIMARY KEY,
+--     tags TEXT,
+--     FOREIGN KEY (user_no) REFERENCES users(user_no)
+--         ON DELETE CASCADE
+--         ON UPDATE CASCADE
+-- );
 
 -- 식단
 
@@ -149,6 +152,9 @@ select * from users;
 select * from food where name_ko LIKE '%샐러드%';
 select * from food; 
 
+		INSERT INTO users_health_info (user_no, height, weight, illness, allergy, purpose)
+ 		 values (2, 0, 0, "", "", "");
+
 
 -- 식단 음식 구성
 CREATE TABLE IF NOT EXISTS diets_food (
@@ -172,41 +178,34 @@ CREATE TABLE IF NOT EXISTS diets_food (
 );
 select * from diets_food;
 
--- 채팅방
-CREATE TABLE if not exists chat_room (
-    room_no INT PRIMARY KEY AUTO_INCREMENT,
-    room_type TEXT not null,
-    created_at TIMESTAMP default now()
+select * from users;
+
+select coach_no
+ from users;
+
+
+CREATE TABLE chat_room (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user1 VARCHAR(50) NOT NULL,
+  user2 VARCHAR(50) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY unique_user_pair (user1, user2) -- 정렬된 순서로 삽입해야 함!
 );
 
--- 채팅방 참여자
-CREATE TABLE if not exists chat_room_user (
-    room_no INT not null,
-    user_no INT not null,
-    PRIMARY KEY (room_no, user_no),
-    FOREIGN KEY (room_no) REFERENCES chat_room(room_no)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    FOREIGN KEY (user_no) REFERENCES users(user_no)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+CREATE TABLE chat_message (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  room_id BIGINT NOT NULL,
+  sender VARCHAR(50) NOT NULL,
+  content TEXT NOT NULL,
+  sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (room_id) REFERENCES chat_room(id)
 );
 
--- 채팅 메시지
-CREATE TABLE if not exists chat_msg (
-    msg_no INT PRIMARY KEY AUTO_INCREMENT,
-    room_no INT not null,
-    sender_no INT not null,
-    content VARCHAR(1000) not null,
-    msg_type TEXT not null,
-    created_at TIMESTAMP default now(),
-    FOREIGN KEY (room_no) REFERENCES chat_room(room_no)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    FOREIGN KEY (sender_no) REFERENCES users(user_no)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
+select * from chat_message;
+
+select * from users;
+
+
 
 -- 게시판
 CREATE TABLE if not exists board (
