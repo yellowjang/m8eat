@@ -64,6 +64,7 @@
       </div>
     </div>
 
+    <!-- 기본 정보 수정 모달 -->
     <div v-if="showBasicEdit" class="modal-backdrop">
       <div class="modal-content">
         <div class="modal-header">
@@ -72,13 +73,13 @@
         </div>
         <form @submit.prevent="saveBasicEdit">
           <label>이름</label>
-          <input type="text" v-model="editableUser.name" />
+          <input type="text" v-model="updateUser.name" />
 
           <label>아이디</label>
-          <input type="text" v-model="editableUser.id" disabled />
+          <input type="text" v-model="updateUser.id" disabled />
 
           <label>회원 유형</label>
-          <select v-model="editableUser.role">
+          <select v-model="updateUser.role">
             <option value="user">일반 회원</option>
             <option value="coach">코치</option>
           </select>
@@ -89,34 +90,7 @@
           </div>
         </form>
       </div>
-    </div>
-
-    <div v-if="showBasicEdit" class="modal-backdrop">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>기본 정보 수정</h3>
-          <span class="close-btn" @click="showBasicEdit = false">&times;</span>
-        </div>
-        <form @submit.prevent="saveBasicEdit">
-          <label>이름</label>
-          <input type="text" v-model="editableUser.name" />
-
-          <label>아이디</label>
-          <input type="text" v-model="editableUser.id" disabled />
-
-          <label>회원 유형</label>
-          <select v-model="editableUser.role">
-            <option value="user">일반 회원</option>
-            <option value="coach">코치</option>
-          </select>
-
-          <div class="modal-actions">
-            <button type="submit" class="save-btn">저장</button>
-            <button type="button" @click="showBasicEdit = false" class="cancel-btn">취소</button>
-          </div>
-        </form>
-      </div>
-    </div>
+    </div> 
 
     <!-- 건강 정보 수정 모달 -->
     <div v-if="showHealthEdit" class="modal-backdrop">
@@ -184,7 +158,7 @@ import { useUserStore } from "@/stores/user";
 import router from "@/router";
 
 const user = ref({});
-const editableUser = ref({ ...user.value });
+const updateUser = ref({ ...user.value });
 const showBasicEdit = ref(false);
 
 const store = useUserStore();
@@ -197,11 +171,15 @@ const getUserInfo = () => {
   console.log("mypageeee", store.loginUser);
   const loginUser = store.loginUser;
   user.value = { name: loginUser.name, id: loginUser.id, role: loginUser.role };
+  updateUser.value = { name: loginUser.name, id: loginUser.id, role: loginUser.role };
+  console.log(updateUser.value)
 };
 
 const saveBasicEdit = () => {
-  user.value = { ...editableUser.value };
+  user.value = { ...updateUser.value };
+  console.log("saveBasicEdit ", user.value)
   showBasicEdit.value = false;
+  store.udpateUser(updateUser.value)
 };
 
 const labelMap = {

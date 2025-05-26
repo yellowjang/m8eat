@@ -4,7 +4,11 @@ public class SignupRequestDTO {
     private User user;
     private UserHealthInfo healthInfo;
 
-    public User getUser() {
+    
+    
+    public SignupRequestDTO() {
+	}
+	public User getUser() {
         return user;
     }
     public void setUser(User user) {

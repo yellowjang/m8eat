@@ -24,7 +24,7 @@ import { RouterLink } from "vue-router";
 <style lang="scss" scoped>
 .app-footer {
   background-color: #f5f5f5;
-  height: 100px;
+  height: 70px;
   border-top: 1px solid #ddd;
   font-size: 0.85rem;
   color: #555;

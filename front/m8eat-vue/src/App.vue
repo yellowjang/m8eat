@@ -8,17 +8,14 @@ import { useUserStore } from "@/stores/user";
 
 const store = useUserStore();
 
-// onMounted(async () => {
-//   console.log('checkLogin 호출')
-//   if (!store.loginUser) {
-//     try {
-//       await store.checkLogin(); // ✅ OAuth 후에도 자동 동기화
-//       console.log("✅ 로그인 상태 복구됨");
-//     } catch {
-//       console.log("❌ 로그인 아님");
-//     }
-//   }
-// });
+onMounted(async () => {
+  try {
+    await store.checkLogin(); // ✅ 로그인 상태 복구 시도
+    console.log("✅ 로그인 상태 복구됨")
+  } catch (err) {
+    console.log("❌ 로그인 아님")
+  }
+})
 </script>
 
 <template>

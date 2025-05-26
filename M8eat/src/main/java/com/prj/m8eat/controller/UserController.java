@@ -1,10 +1,14 @@
 package com.prj.m8eat.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -16,7 +20,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.prj.m8eat.jwt.JwtUtil;
 import com.prj.m8eat.model.dto.LoginResponse;
@@ -40,12 +46,39 @@ public class UserController {
 		this.util = util;
 	}
 	
-	@PostMapping("/auth/signup")
-	public ResponseEntity<Void> signup(@RequestBody SignupRequestDTO reqDto) {
+	@Value("${file.upload.dir}")
+	private String uploadDirPath;
+	
+	@PostMapping(value = "/auth/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> signup(@RequestPart("user") User user,
+		    						   @RequestPart("healthInfo") UserHealthInfo healthInfo,
+		    						   @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
 		System.out.println("Controller signuppppppppppppppppppppppp");
-		User user = reqDto.getUser();
-		UserHealthInfo healthInfo = reqDto.getHealthInfo();
-		System.out.println(user);
+		System.out.println("👤 user: " + user);
+	    System.out.println("💪 healthInfo: " + healthInfo);
+	    System.out.println("🖼️ profileImage: " + (profileImage != null ? profileImage.getOriginalFilename() : "없음"));
+	    System.out.println(profileImage);
+		
+		// 예: 프로필 이미지 경로 출력
+		if (profileImage != null && !profileImage.isEmpty()) {
+			System.out.println("🖼️ 프로필 이미지: " + profileImage);
+			String originalFilename = profileImage.getOriginalFilename();
+//			String uploadDirPath = "/Users/jang-ayoung/Desktop/m8eat/data";
+
+			File uploadDir = new File(uploadDirPath);
+			if (!uploadDir.exists()) {
+				uploadDir.mkdirs();
+			}
+
+			try {
+				File saveFile = new File(uploadDir, originalFilename);
+				profileImage.transferTo(saveFile);
+				user.setProfileImagePath("/upload/" + originalFilename); // 웹에서 접근 가능한 경로로 구성 (정적 리소스 매핑 필요)
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 저장 실패");
+			}
+		}
+		System.out.println("userrrr " + user);
 		if (userService.signup(user, healthInfo) == 1) {
 			return new ResponseEntity<Void>(HttpStatus.CREATED);
 		} else {
@@ -58,6 +91,7 @@ public class UserController {
 		System.out.println("controller login " + user);
 		LoginResponse result = userService.login(user);
 		
+		System.out.println("JWTTTTTTTT" + result);
 		// 로그인 성공
 		if (result.isLogin()) { 
 	        // 1. JWT 생성
@@ -87,11 +121,13 @@ public class UserController {
 	public ResponseEntity<User> checkLogin(@CookieValue("access-token") String token) {
 	    if (util.validate(token)) {
 	        Claims claims = util.getClaims(token);
+	        System.out.println("checkkkk" + claims);
 	        User user = new User();
 	        user.setUserNo((Integer) claims.get("userNo"));
 	        user.setName((String) claims.get("name"));
 	        user.setId((String) claims.get("id"));
 	        user.setRole((String) claims.get("role"));
+	        user.setProfileImagePath((String) claims.get("profileImagePath"));
 	        return ResponseEntity.ok(user);
 	    } else {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
