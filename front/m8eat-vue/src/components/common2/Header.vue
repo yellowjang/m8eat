@@ -6,6 +6,7 @@
     <div class="header-left">
       <RouterLink to="/">Home</RouterLink>
       <RouterLink to="/boards">자유게시판</RouterLink>
+      <RouterLink to="/manage">회원관리</RouterLink>
     </div>
     <div class="header-right">
       <template v-if="isLoggedIn">
