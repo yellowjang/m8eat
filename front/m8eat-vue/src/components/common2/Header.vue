@@ -12,7 +12,9 @@
         <span class="greeting">{{ userName }}님, 건강한 하루 되세요!</span>
 
         <div class="profile-dropdown" @click="toggleDropdown">
-          <img class="profile-img" :src="profileImageUrl" alt="프로필" />
+          <img class="profile-img" 
+               :src="imageUrl(profile)"
+               alt="프로필" />
           <ul v-if="dropdownOpen" class="dropdown-menu">
             <li @click="goToMyPage">마이페이지</li>
             <li @click="logout">로그아웃</li>
@@ -36,10 +38,16 @@ import { useUserStore } from "@/stores/user";
 const store = useUserStore();
 
 // 로그인 여부 및 사용자 정보
-const isLoggedIn = computed(() => store.loginUser !== null); // 실제론 store 또는 auth composable 사용
-const userName = computed(() => store.loginUser?.name ?? "");
+const loginUser = computed(() => store.loginUser)
+const isLoggedIn = computed(() => loginUser.value !== null); // 실제론 store 또는 auth composable 사용
+const userName = computed(() => loginUser.value?.name ?? "");
+const profile = computed(() => loginUser.value?.profileImagePath ?? "");
 
 const profileImageUrl = ref("https://via.placeholder.com/40");
+const imageUrl = (path) => {
+  if (!path) return "";
+  return `http://localhost:8080${path}`; // ✅ 경로 앞에 백엔드 서버 주소 추가
+};
 
 const dropdownOpen = ref(false);
 const toggleDropdown = () => {

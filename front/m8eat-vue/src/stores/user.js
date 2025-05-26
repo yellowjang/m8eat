@@ -23,28 +23,49 @@ function base64UrlDecode(str) {
 }
 
 export const useUserStore = defineStore("user", () => {
-  const loginUser = ref(null);
+  const loginUser = ref({});
   const sessionExpiredNotified = ref(false);
 
   const signup = (user) => {
-    console.log("userStore signuppppppppppp");
-    const requestBody = {
-      user: {
+    console.log("userStore signuppppppppppp", user.profileImage);
+
+    const formData = new FormData();
+
+    // 🔸 1. user 객체를 JSON 문자열로 변환해서 Blob으로 추가
+    formData.append(
+      "user",
+      new Blob([JSON.stringify({
         name: user.name,
         id: user.id,
         password: user.password,
         role: user.role,
-      },
-      healthInfo: {
-        height: 0,
-        weight: 0,
+      })], { type: "application/json" })
+    );
+
+    // 🔸 2. healthInfo 객체도 JSON으로 Blob 추가
+    formData.append(
+      "healthInfo",
+      new Blob([JSON.stringify({
+        height: 170,
+        weight: 60,
         illness: "",
         allergy: "",
-        purpose: "",
-      },
-    };
+        purpose: "다이어트"
+      })], { type: "application/json" })
+    );
+
+    // 🔸 3. 이미지 파일 추가 (선택적으로)
+    console.log("profileImage", user.profileImage)
+    if (user.profileImage) {
+      formData.append("profileImage", user.profileImage); // File 객체
+    }
+
     api
-      .post(`${REST_API_URL}/auth/signup`, requestBody)
+      .post(`${REST_API_URL}/auth/signup`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      })
       .then((response) => {
         console.log(response.data);
         alert("회원가입 되었습니다.");
@@ -67,6 +88,7 @@ export const useUserStore = defineStore("user", () => {
 
       console.log(res.data);
       loginUser.value = res.data;
+      console.log("qqqqqqq", loginUser.value);
       sessionExpiredNotified.value = false;
 
       return { success: true, message: "로그인 성공" };
@@ -104,5 +126,15 @@ export const useUserStore = defineStore("user", () => {
     }
   };
 
-  return { signup, login, loginUser, checkLogin, logout, sessionExpiredNotified };
+  const udpateUser = async (updateUser) => {
+    console.log("store ", updateUser)
+    console.log("store ", loginUser)
+    try {
+      await api.put(`${REST_API_URL}/mypage/${loginUser.userNo}`, updateUser)
+    } catch (error) {
+      
+    }
+  }
+
+  return { signup, login, loginUser, checkLogin, logout, sessionExpiredNotified, udpateUser };
 });

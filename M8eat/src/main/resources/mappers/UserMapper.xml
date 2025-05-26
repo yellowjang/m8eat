@@ -6,8 +6,8 @@
 	
 	<!-- 회원가입 -->
 	<insert id="insertUser" parameterType="User" keyProperty="userNo" useGeneratedKeys="true">
-		INSERT INTO users (name, id, password, role)
- 		 values (#{name}, #{id}, #{password}, #{role});
+		INSERT INTO users (name, id, password, role, profile_image_path)
+ 		 values (#{name}, #{id}, #{password}, #{role}, #{profileImagePath});
 	</insert>
 	
 	<insert id="insertUserHealthInfo" parameterType="UserHealthInfo">

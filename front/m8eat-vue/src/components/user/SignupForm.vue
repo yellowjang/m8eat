@@ -3,6 +3,21 @@
     <!-- <h3>회원가입</h3> -->
     <h3>회원가입 ({{ userType === "coach" ? "코치" : "일반 회원" }})</h3>
     <div class="signup-box">
+      <!-- <form class="signup-form" @submit.prevent="signup">
+        <label for="name">이름</label>
+        <input id="name" type="text" placeholder="이름을 입력해주세요." v-model.trim="name" />
+
+        <label for="userId">아이디</label>
+        <input id="userId" type="text" placeholder="아이디를 입력해주세요." v-model.trim="id" />
+
+        <label for="password">비밀번호</label>
+        <input id="password" type="password" placeholder="비밀번호를 입력해주세요." v-model.trim="password" />
+
+        <label for="passwordConfirm">비밀번호 확인</label>
+        <input id="passwordConfirm" type="password" placeholder="비밀번호를 한 번 더 입력해주세요." v-model.trim="passwordConfirm" />
+
+        <button type="submit" class="signup-button">회원가입</button>
+      </form> -->
       <form class="signup-form" @submit.prevent="signup">
         <label for="name">이름</label>
         <input id="name" type="text" placeholder="이름을 입력해주세요." v-model.trim="name" />
@@ -15,6 +30,27 @@
 
         <label for="passwordConfirm">비밀번호 확인</label>
         <input id="passwordConfirm" type="password" placeholder="비밀번호를 한 번 더 입력해주세요." v-model.trim="passwordConfirm" />
+
+        <label for="profileImage">프로필 이미지</label>
+        <div class="image-upload-container">
+          <!-- 🔽 미리보기 영역: 기본 + or 선택 이미지 -->
+          <div class="image-preview">
+            <img
+              :src="previewUrl || defaultImage"
+              alt="미리보기"
+              class="preview-img"
+            />
+          </div>
+
+          <!-- 🔽 파일 선택 버튼 -->
+          <input
+            id="profileImage"
+            type="file"
+            accept="image/*"
+            @change="handleImageUpload"
+          />
+        </div>
+
 
         <button type="submit" class="signup-button">회원가입</button>
       </form>
@@ -43,6 +79,7 @@
 <script setup>
 import { ref } from "vue";
 import { useUserStore } from "@/stores/user";
+import defaultImg from "@/assets/icon/plus.png"; 
 
 const store = useUserStore();
 
@@ -58,7 +95,21 @@ const id = ref("");
 const password = ref("");
 const passwordConfirm = ref("");
 
-const signup = () => {
+const profileImage = ref(null);
+const previewUrl = ref("");
+
+const defaultImage = defaultImg;
+
+
+const handleImageUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    profileImage.value = file;
+    previewUrl.value = URL.createObjectURL(file);
+  }
+};
+
+const signup = async () => {
   if (!name.value || !id.value || !password.value || !passwordConfirm.value) {
     alert("모든 항목을 입력해주세요");
     return;
@@ -74,12 +125,26 @@ const signup = () => {
   console.log(id.value);
   console.log(password.value);
   console.log(props.userType);
+  console.log(profileImage.value)
+
+  // const formData = new FormData();
+  // formData.append("name", name.value);
+  // formData.append("id", id.value);
+  // formData.append("password", password.value);
+  // formData.append("role", props.userType);
+
+  // if (file.value) {
+  //   formData.append("profileImage", profileImage.value);
+  // }
+
+  // await store.signup(formData)
 
   store.signup({
     name: name.value,
     id: id.value,
     password: password.value,
     role: props.userType,
+    profileImage: profileImage.value,
   });
 };
 </script>
@@ -202,4 +267,34 @@ const signup = () => {
     }
   }
 }
+.image-upload-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.5rem 0;
+
+  // input[type="file"] {
+  //   flex-shrink: 0;
+  // }
+}
+
+.image-preview {
+  width: 80px;
+  // height: 100px;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+}
+
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+
 </style>
