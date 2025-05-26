@@ -50,6 +50,11 @@ public class UserServiceImpl implements UserService {
 	public User getMyInfo(String id) {
 		return userDao.selectUser(id);
 	}
+	
+	@Override
+	public UserHealthInfo getMyHealthInfo(int userNo) {
+		return userDao.selectHealthInfo(userNo);
+	}
 
 	@Override
 	public int updateMyInfo(User user) {
@@ -72,6 +77,11 @@ public class UserServiceImpl implements UserService {
 		} else {
 			return existUser;
 		}
+	}
+
+	@Override
+	public String getCoachId(int userNo) {
+		return userDao.selectCoachId(userNo);
 	}
 
 }

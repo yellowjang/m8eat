@@ -21,4 +21,8 @@ public interface UserService {
 
 	public int updateHealthInfo(UserHealthInfo userHealthInfo);
 
+	public UserHealthInfo getMyHealthInfo(int userNo);
+
+	public String getCoachId(int userNo);
+
 }

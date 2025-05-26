@@ -28,7 +28,7 @@
     <div class="section">
       <h2>나의 건강 정보</h2>
       <div class="info-cards">
-        <div class="card" v-for="(value, key) in health" :key="key">
+        <div class="card" v-for="(value, key) in filteredHealthInfo" :key="key">
           <div class="card-title">{{ labelMap[key] }}</div>
           <div class="card-content">
             <template v-if="Array.isArray(value)">
@@ -38,7 +38,7 @@
               </span>
             </template>
             <template v-else>
-              {{ value || "입력되지 않음" }}
+              {{ value ? value : "입력되지 않음" }}
             </template>
           </div>
         </div>
@@ -67,7 +67,7 @@
           <h3>기본 정보 수정</h3>
           <span class="close-btn" @click="showBasicEdit = false">&times;</span>
         </div>
-        <form @submit.prevent="saveBasicEdit">
+        <form @submit.prevent="saveBasicUpdate">
           <label>이름</label>
           <input type="text" v-model="updateUser.name" />
 
@@ -81,7 +81,7 @@
           </select>
 
           <div class="modal-actions">
-            <button type="submit" class="save-btn">저장</button>
+            <button type="submit" class="save-btn" @click="">저장</button>
             <button type="button" @click="showBasicEdit = false" class="cancel-btn">취소</button>
           </div>
         </form>
@@ -160,8 +160,10 @@ const showBasicEdit = ref(false);
 
 const store = useUserStore();
 
-onMounted(() => {
+onMounted(async () => {
+  await store.checkLogin();
   getUserInfo();
+  await getHealthInfo();
 });
 // const loginUser = computed(() => store.loginUser)
 
@@ -169,15 +171,33 @@ const getUserInfo = () => {
   console.log("mypageeee", store.loginUser);
   // console.log(store.loginUser)
   user.value = { name: store.loginUser.name, id: store.loginUser.id, role: store.loginUser.role };
-  // updateUser.value = { name: loginUser.name, id: loginUser.id, role: loginUser.role };
+  updateUser.value = { name: store.loginUser.name, id: store.loginUser.id, role: store.loginUser.role };
   // console.log(updateUser.value)
 };
 
-const saveBasicEdit = () => {
+const healthInfo = ref({})
+
+const getHealthInfo = async () => {
+  await store.getHealthInfo();
+  console.log("1111111", store.loginUserHealthInfo)
+  healthInfo.value = store.loginUserHealthInfo;
+  // healthInfo.value = computed(() => store.loginUserHealthInfo.value);
+  console.log("sdfsdfdsf", healthInfo.value)
+}
+
+const filteredHealthInfo = computed(() => {
+  if (!store.loginUserHealthInfo) return {};
+
+  const { infoNo, userNo, ...rest } = store.loginUserHealthInfo;
+  return rest;
+});
+
+
+const saveBasicUpdate = () => {
   user.value = { ...updateUser.value };
   console.log("saveBasicEdit ", user.value)
   showBasicEdit.value = false;
-  store.udpateUser(updateUser.value)
+  store.updateUser(updateUser.value)
 };
 
 const labelMap = {
@@ -199,22 +219,19 @@ const withdraw = () => {
 
 const showHealthEdit = ref(false);
 
+
 const health = ref({
-  height: 170,
-  weight: 60,
-  illness: ["천식"],
-  allergy: ["견과류"],
-  purpose: "다이어트",
+...store.loginUserHealthInfo
 });
 const illnessOptions = ["고혈압", "당뇨병", "심장병", "천식", "관절염"];
 const allergyOptions = ["견과류", "우유", "계란", "갑각류", "밀"];
 
 const editableHealth = ref({
-  height: health.value.height,
-  weight: health.value.weight,
-  illness: [...health.value.illness],
-  allergy: [...health.value.allergy],
-  purpose: health.value.purpose,
+  // height: health.value.height,
+  // weight: health.value.weight,
+  // illness: [...health.value.illness],
+  // allergy: [...health.value.allergy],
+  // purpose: health.value.purpose,
 });
 
 const toggleSelection = (targetList, item) => {
@@ -233,19 +250,20 @@ const saveHealthEdit = () => {
 };
 
 const editHealth = () => {
-  editableHealth.value = {
-    height: health.value.height,
-    weight: health.value.weight,
-    illness: [...health.value.illness],
-    allergy: [...health.value.allergy],
-    purpose: health.value.purpose,
-  };
   showHealthEdit.value = true;
+  // editableHealth.value = {
+  //   height: health.value.height,
+  //   weight: health.value.weight,
+  //   illness: [...health.value.illness],
+  //   allergy: [...health.value.allergy],
+  //   purpose: health.value.purpose,
+  // };
 };
 const partnerName = ref(user.value.role === "coach" ? "회원들과" : "담당 코치와");
 
-const goToChat = () => {
-  router.push({ name: "ChatView", params: { targetId: "bbb" } });
+const goToChat = async () => {
+  const coachId = await store.getCoachId();
+  router.push({ name: "ChatView", params: { targetId: coachId } });
 };
 </script>
 

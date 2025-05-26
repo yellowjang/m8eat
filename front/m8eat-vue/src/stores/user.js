@@ -24,6 +24,7 @@ function base64UrlDecode(str) {
 
 export const useUserStore = defineStore("user", () => {
   const loginUser = ref({});
+  const loginUserHealthInfo = ref({});
   const sessionExpiredNotified = ref(false);
 
   const signup = (user) => {
@@ -46,11 +47,11 @@ export const useUserStore = defineStore("user", () => {
     formData.append(
       "healthInfo",
       new Blob([JSON.stringify({
-        height: 170,
-        weight: 60,
-        illness: "",
-        allergy: "",
-        purpose: "다이어트"
+        height: null,
+        weight: null,
+        illness: null,
+        allergy: null,
+        purpose: null
       })], { type: "application/json" })
     );
 
@@ -90,13 +91,19 @@ export const useUserStore = defineStore("user", () => {
       loginUser.value = res.data;
       console.log("qqqqqqq", loginUser.value);
       sessionExpiredNotified.value = false;
-
+      
       return { success: true, message: "로그인 성공" };
     } catch (err) {
       console.log(err);
       return { success: false, message: err.response?.data?.message || "로그인 실패" };
     }
   };
+
+  const getHealthInfo = async () => {
+    const healthInfo = await api.get(`${REST_API_URL}/user/mypage/healthInfo`);
+    loginUserHealthInfo.value  = healthInfo.data
+    console.log(loginUserHealthInfo.value)
+  }
 
   const checkLogin = async () => {
     try {
@@ -119,22 +126,28 @@ export const useUserStore = defineStore("user", () => {
 
       loginUser.value = null;
       // ✅ DOM 반영까지 기다림
-      await nextTick();
+      // await nextTick();
     } catch (err) {
       console.error("로그아웃 실패", err);
       throw err; // 필요 시 헤더에서 처리할 수 있게
     }
   };
 
-  const udpateUser = async (updateUser) => {
+  const updateUser = async (updateUser) => {
     console.log("store ", updateUser)
     console.log("store ", loginUser)
     try {
-      await api.put(`${REST_API_URL}/mypage/${loginUser.userNo}`, updateUser)
+      await api.put(`${REST_API_URL}/user/mypage/${loginUser.userNo}`, updateUser)
     } catch (error) {
       
     }
   }
 
-  return { signup, login, loginUser, checkLogin, logout, sessionExpiredNotified, udpateUser };
+  const getCoachId = async () => {
+    const response = await api.get(`${REST_API_URL}/user/mypage/coachId`);
+    return response.data;
+  }
+
+  return { signup, login, loginUser, checkLogin, logout, sessionExpiredNotified, 
+    updateUser, getHealthInfo, loginUserHealthInfo, getCoachId };
 });
