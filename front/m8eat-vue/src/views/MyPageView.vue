@@ -6,22 +6,18 @@
       <p>내 건강 정보와 계정 정보를 한눈에 확인하고 관리해보세요.</p>
     </div>
 
-    <div class="section">
-      <h2>기본 정보</h2>
-      <div class="basic-info">
+    <div class="basic-info">
+      <!-- 왼쪽: 프로필 이미지 -->
+      <div class="profile-img-wrapper">
+        <img :src="store.loginUser.profileImage || defaultProfile" alt="프로필 이미지" class="profile-img" />
+      </div>
+
+      <!-- 오른쪽: 사용자 정보 + 수정 버튼 -->
+      <div class="info-right">
         <div class="info-list">
-          <span>
-            <strong>이름:</strong>
-            {{ user.name }}
-          </span>
-          <span>
-            <strong>아이디:</strong>
-            {{ user.id }}
-          </span>
-          <span>
-            <strong>회원 유형:</strong>
-            {{ user.role === "coach" ? "코치" : "일반 회원" }}
-          </span>
+          <span><strong>이름:</strong> {{ user.name }}</span>
+          <span><strong>아이디:</strong> {{ user.id }}</span>
+          <span><strong>회원 유형:</strong> {{ user.role === 'coach' ? '코치' : '일반 회원' }}</span>
         </div>
         <div class="edit-btn-wrapper">
           <button class="edit-btn" @click="showBasicEdit = true">수정</button>
@@ -153,9 +149,10 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useUserStore } from "@/stores/user";
 import router from "@/router";
+import defaultProfile from '@/assets/icon/default-profile.png';
 
 const user = ref({});
 const updateUser = ref({ ...user.value });
@@ -166,13 +163,14 @@ const store = useUserStore();
 onMounted(() => {
   getUserInfo();
 });
+// const loginUser = computed(() => store.loginUser)
 
 const getUserInfo = () => {
   console.log("mypageeee", store.loginUser);
-  const loginUser = store.loginUser;
-  user.value = { name: loginUser.name, id: loginUser.id, role: loginUser.role };
-  updateUser.value = { name: loginUser.name, id: loginUser.id, role: loginUser.role };
-  console.log(updateUser.value)
+  // console.log(store.loginUser)
+  user.value = { name: store.loginUser.name, id: store.loginUser.id, role: store.loginUser.role };
+  // updateUser.value = { name: loginUser.name, id: loginUser.id, role: loginUser.role };
+  // console.log(updateUser.value)
 };
 
 const saveBasicEdit = () => {
@@ -252,6 +250,9 @@ const goToChat = () => {
 </script>
 
 <style lang="scss" scoped>
+
+
+
 .mypage-container {
   padding: 2rem;
   background-color: #fdeeee;
@@ -260,6 +261,8 @@ const goToChat = () => {
   text-align: center;
   flex: 1;
   min-height: unset;
+
+  
 
   .mypage-header {
     display: flex;
@@ -295,48 +298,70 @@ const goToChat = () => {
     }
   }
 
-  .basic-info {
-    background: white;
-    padding: 1.5rem 2rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+.basic-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  gap: 2rem;
+
+  .profile-img-wrapper {
+    flex-shrink: 0;
+
+    .profile-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #de9c9c;
+    }
+  }
+
+  .info-right {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    justify-content: space-between;
+    padding-top: 2rem;
+  }
 
-    .info-list {
+  .info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: 0.3rem;
+
+    span {
       display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+      align-items: center;
       font-size: 1rem;
 
-      span {
-        display: flex;
-        gap: 0.5rem;
-
-        strong {
-          width: 80px;
-          color: #555;
-        }
-      }
-    }
-
-    .edit-btn-wrapper {
-      display: flex;
-      justify-content: flex-end;
-
-      .edit-btn {
-        background-color: #de9c9c;
-        color: white;
-        border: none;
-        padding: 0.4rem 1rem;
-        font-size: 0.9rem;
-        border-radius: 6px;
-        font-weight: bold;
-        cursor: pointer;
+      strong {
+        width: 90px;
+        color: #555;
       }
     }
   }
+
+  .edit-btn-wrapper {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+
+    .edit-btn {
+      background-color: #de9c9c;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  }
+}
 
   .info-cards {
     display: grid;
