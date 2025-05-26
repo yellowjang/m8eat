@@ -10,7 +10,7 @@ import LoginView from "@/views/LoginView.vue";
 import SignupView from "@/views/SignupView.vue";
 import DietView2 from "@/views/DietView2.vue";
 import ApiTest from "@/components/board/ApiTest.vue";
-
+import ManageMemberView from "@/views/ManageMemberView.vue";
 import { useUserStore } from "@/stores/user";
 import BoardUpdate from "@/components/board/BoardUpdate.vue";
 import ChatView from "@/views/ChatView.vue";
@@ -36,6 +36,12 @@ const router = createRouter({
       path: "/mypage",
       name: "mypage",
       component: MyPageView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/manage",
+      name: "manage",
+      component: ManageMemberView,
       meta: { requiresAuth: true },
     },
     {
