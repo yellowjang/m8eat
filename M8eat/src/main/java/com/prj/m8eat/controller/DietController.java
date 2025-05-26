@@ -35,7 +35,7 @@ import com.prj.m8eat.model.service.DietService;
 import jakarta.servlet.http.HttpSession;
 @RestController
 @RequestMapping("/diets")
-@CrossOrigin("*")
+//@CrossOrigin("*")
 public class DietController {
 
 	private final DietService dietService;
@@ -104,6 +104,8 @@ public class DietController {
 	    Diet diet = new Diet();
 	    diet.setUserNo(2); // TODO: 로그인 사용자 정보로 교체
 	    diet.setMealType(dietReq.getMealType());
+	    
+	    System.out.println("dietttt writeeeee" + dietReq);
 
 	    try {
 	    	System.out.println("✅ 받은 날짜: " + dietReq.getMealDate());

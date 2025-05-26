@@ -44,8 +44,9 @@ body {
 
 .view {
   flex: 1;
-  padding: 3rem 1rem 2rem; /* ✅ 아래 padding 줄이기 */
+  padding: 5rem 12rem 2rem; /* ✅ 아래 padding 줄이기 */
 }
+
 .vuecal__title-bar {
   display: flex;
   /* justify-content: center; */
@@ -89,7 +90,7 @@ body {
   height: auto !important;
   min-height: 20px !important;
   padding: 4px 6px;
-  background-color: #fff5f5;
+  background-color:#fff5f5 !important ;
   border: 1px solid #de9c9c;
   font-size: 12px;
   color: #333;
