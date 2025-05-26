@@ -21,6 +21,11 @@
  		 WHERE id = #{id};
 	</select>
 	
+	<select id="selectHealthInfo" parameterType="int" resultType="UserHealthInfo">
+		SELECT * FROM users_health_info
+ 		 WHERE user_no = #{userNo};
+	</select>
+	
 	<!-- 회원탈퇴 -->
 	<delete id="deleteUser" parameterType="int">
 		DELETE from users
@@ -40,5 +45,13 @@
 		 SET height=#{height}, weight=#{weight}, illness=#{illness}, allergy=#{allergy}, purpose=#{purpose}
 		 WHERE user_no=#{userNo};
 	</update>
+	
+	<!-- 코치 아이디 찾기 -->
+	<select id="selectCoachId" parameterType="int" resultType="String">
+		SELECT coach.id
+		FROM users AS user
+		JOIN users AS coach ON user.coach_no = coach.user_no
+		WHERE user.user_no = #{userNo};
+	</select>
 	
  </mapper>

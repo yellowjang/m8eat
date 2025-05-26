@@ -14,6 +14,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Component
 public class JwtUtil {
@@ -60,6 +62,8 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
+
 	
 	
 //	//유효성 검증 (실제로 내용물을 확인하기 위함은 아님 / 에러나면 유효기간 지난것)

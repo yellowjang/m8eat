@@ -16,6 +16,8 @@ export const useChatStore = defineStore("chat", () => {
 
   const loadRoomAndMessages = async (user1, user2) => {
     try {
+      currentUser.value = user1;
+      console.log("lodadddd", user1, user2)
       const roomRes = await api.get(`${REST_API_URL}/room`, {
         params: { user1, user2 },
       });

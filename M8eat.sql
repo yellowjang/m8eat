@@ -64,6 +64,7 @@ INSERT INTO coach_user_map (coach_no, user_no) VALUES (1, 3);
 -- 최코치 (4번)가 정회원(5번)을 담당
 INSERT INTO coach_user_map (coach_no, user_no) VALUES (4, 5);
 
+select * from coach_user_map;
 
 
 
@@ -82,6 +83,8 @@ CREATE TABLE if not exists users_health_info (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
+
+select * from users_health_info;
 
 -- 코치 선호 태그
 CREATE TABLE if not exists coach_prefer (
@@ -149,6 +152,9 @@ select * from users;
 select * from food where name_ko LIKE '%샐러드%';
 select * from food; 
 
+		INSERT INTO users_health_info (user_no, height, weight, illness, allergy, purpose)
+ 		 values (2, 0, 0, "", "", "");
+
 
 -- 식단 음식 구성
 CREATE TABLE IF NOT EXISTS diets_food (
@@ -171,6 +177,33 @@ CREATE TABLE IF NOT EXISTS diets_food (
         ON UPDATE CASCADE
 );
 select * from diets_food;
+
+select * from users;
+
+select coach_no
+ from users;
+
+
+CREATE TABLE chat_room (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user1 VARCHAR(50) NOT NULL,
+  user2 VARCHAR(50) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY unique_user_pair (user1, user2) -- 정렬된 순서로 삽입해야 함!
+);
+
+CREATE TABLE chat_message (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  room_id BIGINT NOT NULL,
+  sender VARCHAR(50) NOT NULL,
+  content TEXT NOT NULL,
+  sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (room_id) REFERENCES chat_room(id)
+);
+
+select * from chat_message;
+
+select * from users;
 
 -- 채팅방
 CREATE TABLE if not exists chat_room (
