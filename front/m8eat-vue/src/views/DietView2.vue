@@ -71,7 +71,7 @@ const handleDateChange = async (date) => {
 <style scoped>
 .meal-calendar-layout {
   display: flex;
-  gap: 2rem;
+  gap: 5rem;
   padding: 2rem;
 }
 .calendar-pane {

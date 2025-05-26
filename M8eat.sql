@@ -1,69 +1,71 @@
+drop database m8eat;
 create database if not exists m8eat;
 
 use m8eat;
 
-<<<<<<< HEAD
+
 drop table IF EXISTS users_health_info; 
 drop table IF EXISTS users; 
-=======
+
 drop database m8eat;
 
->>>>>>> d0a9c0514aec37fe596da79675549d3ec0c2ddfe
--- 사용자 정보
--- CREATE TABLE if not exists users (
---     user_no INT PRIMARY KEY AUTO_INCREMENT,
---     name VARCHAR(100) not null,
---     id VARCHAR(100) UNIQUE not null,
---     password VARCHAR(255) ,
---     role VARCHAR(20) not null DEFAULT 'user'
--- );
+drop table users_health_info;
+drop table coach_user_map;
+drop table diets_food;
+drop table diets;
+drop table users;
 
+-- 사용자 정보
 CREATE TABLE IF NOT EXISTS users (
     user_no INT PRIMARY KEY AUTO_INCREMENT,
-<<<<<<< HEAD
     name VARCHAR(100) NOT NULL,
     id VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255),
     role VARCHAR(20) NOT NULL DEFAULT 'user',
-    profile_image VARCHAR(255), -- 프로필 이미지 경로
-
-    coach_no INT, -- 일반 회원인 경우: 담당 코치의 user_no (FK 가능)
-    managed_users TEXT, -- 코치인 경우: 담당하는 회원들 (user_no 리스트 형태, 예: "2,4,7")
-    
+    profile_image_path VARCHAR(255),
+    coach_no INT,
     CONSTRAINT fk_coach FOREIGN KEY (coach_no) REFERENCES users(user_no) ON DELETE SET NULL
-=======
-    name VARCHAR(100) not null,
-    id VARCHAR(100) UNIQUE not null,
-    password VARCHAR(255) not null,
-    role VARCHAR(20) not null DEFAULT 'user'
->>>>>>> d0a9c0514aec37fe596da79675549d3ec0c2ddfe
 );
 
+CREATE TABLE IF NOT EXISTS coach_user_map (
+    coach_no INT NOT NULL,
+    user_no INT NOT NULL,
+    PRIMARY KEY (coach_no, user_no),
+    FOREIGN KEY (coach_no) REFERENCES users(user_no) ON DELETE CASCADE,
+    FOREIGN KEY (user_no) REFERENCES users(user_no) ON DELETE CASCADE
+);
+
+
 -- 1. 코치 등록 (user_no = 1)
-INSERT INTO users (name, id, password, role, profile_image)
+INSERT INTO users (name, id, password, role, profile_image_path)
 VALUES ('김코치', 'coachkim', 'coach1234', 'coach', 'images/coachkim.jpg');
 
 -- 2. 일반 회원 등록 (user_no = 2)
-INSERT INTO users (name, id, password, role, profile_image, coach_no)
+INSERT INTO users (name, id, password, role, profile_image_path, coach_no)
 VALUES ('이회원', 'userlee', 'userlee123', 'user', 'images/userlee.jpg', 1);
 
 -- 3. 일반 회원 등록 (user_no = 3)
-INSERT INTO users (name, id, password, role, profile_image, coach_no)
+INSERT INTO users (name, id, password, role, profile_image_path, coach_no)
 VALUES ('박회원', 'userpark', 'userpark123', 'user', 'images/userpark.jpg', 1);
 
--- 4. 코치의 managed_users 업데이트 (user_no = 1 기준)
-UPDATE users
-SET managed_users = '2,3'
-WHERE user_no = 1;
+-- 4. 다른 코치 등록 (user_no = 4)
+INSERT INTO users (name, id, password, role, profile_image_path)
+VALUES ('최코치', 'coachchoi', 'choi1234', 'coach', 'images/coachchoi.jpg');
+
+-- 5. 일반 회원 등록 (user_no = 5)
+INSERT INTO users (name, id, password, role, profile_image_path, coach_no)
+VALUES ('정회원', 'userjung', 'userjung123', 'user', 'images/userjung.jpg', 4);
+
+-- 6. coach_user_map 관계 설정 (코치가 담당하는 회원 등록)
+-- 김코치 (1번)가 이회원(2번), 박회원(3번)을 담당
+INSERT INTO coach_user_map (coach_no, user_no) VALUES (1, 2);
+INSERT INTO coach_user_map (coach_no, user_no) VALUES (1, 3);
+
+-- 최코치 (4번)가 정회원(5번)을 담당
+INSERT INTO coach_user_map (coach_no, user_no) VALUES (4, 5);
 
 
--- INSERT INTO users (name, id, password, role)
--- VALUES
--- ('홍길동', 'hong123', 'password1!', 'user'),
--- ('김철수', 'kimcs', 'passw0rd!', 'user'),
--- ('이영희', 'lee01', 'myp@ssword', 'admin'),
--- ('박민수', 'parkms', 'qwer1234', 'user'),
--- ('최지은', 'choi_je', 'abcd!1234', 'user');
+
 
 select * from users;
 
@@ -142,14 +144,12 @@ CREATE TABLE food (
 
 drop table food;
 select * from food;
-<<<<<<< HEAD
+select * from users;
+
 select * from food where name_ko LIKE '%샐러드%';
 select * from food; 
 
 
-
-
-=======
 -- 식단 음식 구성
 CREATE TABLE IF NOT EXISTS diets_food (
     no INT PRIMARY KEY AUTO_INCREMENT,
@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS diets_food (
         ON UPDATE CASCADE
 );
 select * from diets_food;
->>>>>>> d0a9c0514aec37fe596da79675549d3ec0c2ddfe
+
 -- 채팅방
 CREATE TABLE if not exists chat_room (
     room_no INT PRIMARY KEY AUTO_INCREMENT,
@@ -222,15 +222,15 @@ CREATE TABLE if not exists board (
         ON UPDATE CASCADE
 );
 
-<<<<<<< HEAD
+
         SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
         reg_date as regDate, file_path as filePath
         FROM board;
-=======
+
 SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
 reg_date as regDate, file_path as filePath
 FROM board;
->>>>>>> d0a9c0514aec37fe596da79675549d3ec0c2ddfe
+
 
 
 INSERT INTO board (user_no, title, content, file_path)

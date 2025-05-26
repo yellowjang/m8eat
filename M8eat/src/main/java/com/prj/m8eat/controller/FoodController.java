@@ -13,7 +13,7 @@ import com.prj.m8eat.model.service.FoodService;
 
 @RestController
 @RequestMapping("/foods")
-@CrossOrigin("*")
+//@CrossOrigin("*")
 public class FoodController {
 		private final FoodService foodService;
 
