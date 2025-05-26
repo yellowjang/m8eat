@@ -90,7 +90,7 @@
           </select>
 
           <div class="modal-actions">
-            <button type="submit" class="save-btn" @click="">저장</button>
+            <button type="submit" class="save-btn" @click="saveBasicUpdate">저장</button>
             <button type="button" @click="showBasicEdit = false" class="cancel-btn">취소</button>
           </div>
         </form>
@@ -265,14 +265,16 @@ const saveHealthEdit = () => {
 
 const editHealth = () => {
   showHealthEdit.value = true;
-  // editableHealth.value = {
-  //   height: health.value.height,
-  //   weight: health.value.weight,
-  //   illness: [...health.value.illness],
-  //   allergy: [...health.value.allergy],
-  //   purpose: health.value.purpose,
-  // };
+
+  editableHealth.value = {
+    height: health.value.height ?? null,
+    weight: health.value.weight ?? null,
+    illness: Array.isArray(health.value.illness) ? [...health.value.illness] : [],
+    allergy: Array.isArray(health.value.allergy) ? [...health.value.allergy] : [],
+    purpose: health.value.purpose ?? "",
+  };
 };
+
 const partnerName = ref(user.value.role === "coach" ? "회원들과" : "담당 코치와");
 
 const goToChat = async () => {
