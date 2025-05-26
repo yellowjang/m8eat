@@ -28,12 +28,28 @@
 
           <div v-if="loading">⏳ 분석 중입니다...</div>
           <div v-else-if="results.length === 0">분석한 결과가 여기에 나올 거예요.</div>
-          <ul v-else>
+          <!-- <ul v-else>
             <li v-for="(item, idx) in results" :key="idx">
               🍽️ 라벨: {{ item.label }}
               <br />
               🇰🇷 번역: {{ item.translated }}
               <br />
+              🔍 매칭: {{ item.matched }}
+              <br />
+              <span v-if="item.nutrition">🔥 칼로리: {{ item.nutrition.calories }} kcal</span>
+              <span v-else>⚠️ 영양 정보 없음</span>
+            </li>
+          </ul> -->
+          <!-- <ul v-else>
+            <li v-for="(item, idx) in results" :key="idx" @click="selectAnalyzedItem(item)" class="analysis-result-item" style="cursor: pointer; padding: 0.5rem; border-radius: 6px">
+              🔍 매칭: {{ item.matched }}
+              <br />
+              <span v-if="item.nutrition">🔥 칼로리: {{ item.nutrition.calories }} kcal</span>
+              <span v-else>⚠️ 영양 정보 없음</span>
+            </li>
+          </ul> -->
+          <ul v-else>
+            <li v-for="(item, idx) in results" :key="idx" @click="selectAnalyzedItem(item)" class="analysis-result-item" style="cursor: pointer; padding: 0.5rem; border-radius: 6px">
               🔍 매칭: {{ item.matched }}
               <br />
               <span v-if="item.nutrition">🔥 칼로리: {{ item.nutrition.calories }} kcal</span>
@@ -66,6 +82,7 @@
       <!-- 음식 입력 -->
       <div class="food-table">
         <p class="input-title">음식 입력</p>
+
         <div class="food-row">
           <input type="text" placeholder="음식명" v-model="foodInput" @input="filterFoodList" @blur="confirmSelectedFood" list="food-suggestions" />
           <datalist id="food-suggestions">
@@ -105,6 +122,7 @@ import { useDietStore } from "@/stores/diet";
 import { useFoodStore } from "@/stores/food";
 import dayjs from "dayjs";
 
+import api from "@/api";
 import axios from "axios";
 
 const results = ref([]); // 분석 결과 저장
@@ -158,8 +176,10 @@ const handleFileChange = async (e) => {
     formData.append("file", selected);
     loading.value = true;
 
+    console.log("handlefilechangeeeeeeeeeeee", selected);
+
     try {
-      const res = await axios.post("http://localhost:8080/diets/ai/vision-gpt", formData, {
+      const res = await api.post("http://localhost:8080/diets/ai/vision-gpt", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -173,6 +193,44 @@ const handleFileChange = async (e) => {
     }
   }
 };
+
+// const selectAnalyzedItem = (item) => {
+//   foodInput.value = item.matched;
+//   foodCalories.value = item.nutrition?.calories ?? null;
+//   foodAmount.value = null; // 사용자 직접 입력 유도
+//   selectedFood.value = null; // 자동 매핑 X
+// };
+
+const selectAnalyzedItem = (item) => {
+  foodInput.value = item.matched;
+
+  const matchedFood = foodStore.foods.find((f) => f.nameKo === item.matched);
+
+  if (matchedFood && item.nutrition?.calories) {
+    selectedFood.value = matchedFood;
+
+    // 100g당 kcal 정보가 있는 경우 → g 역산해서 넣기
+    const caloriesPer100g = matchedFood.calories;
+    const targetCalories = item.nutrition.calories;
+    const estimatedGrams = Math.round((targetCalories / caloriesPer100g) * 100);
+
+    foodAmount.value = estimatedGrams;
+    foodCalories.value = targetCalories;
+  } else {
+    // 영양 정보 없거나 매칭 안 되는 경우 수동 입력 유도
+    selectedFood.value = null;
+    foodAmount.value = null;
+    foodCalories.value = item.nutrition?.calories ?? null;
+  }
+};
+
+// const calculateCalories = () => {
+//   if (!foodAmount.value) return;
+//   if (selectedFood.value) {
+//     const ratio = foodAmount.value / 100;
+//     foodCalories.value = Math.round(selectedFood.value.calories * ratio);
+//   }
+// };
 
 const removeImage = () => {
   file.value = null;
@@ -271,6 +329,9 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
+.analysis-result-item:hover {
+  background-color: #f1f1f1;
+}
 .meal-type {
   margin-top: 15px;
 }
