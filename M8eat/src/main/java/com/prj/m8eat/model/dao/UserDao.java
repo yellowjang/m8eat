@@ -20,4 +20,8 @@ public interface UserDao {
 
 	public int updateUserHealthInfo(UserHealthInfo userHealthInfo);
 
+	public UserHealthInfo selectHealthInfo(int userNo);
+
+	public String selectCoachId(int userNo);
+
 }

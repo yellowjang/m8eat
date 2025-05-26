@@ -29,9 +29,11 @@ public class GoogleLoginController {
     private GoogleOauthService googleOauthService = new GoogleOauthService();
 
 	private final JwtUtil util;
-    public GoogleLoginController(GoogleOauthService googleOauthService, JwtUtil util) {
+	private final UserService userService;
+    public GoogleLoginController(GoogleOauthService googleOauthService, JwtUtil util, UserService userService) {
 		this.googleOauthService = googleOauthService;
 		this.util = util;
+		this.userService = userService;
 	}
     
     @Value("${frontend.url}")
@@ -64,6 +66,7 @@ public class GoogleLoginController {
                 .build();
             
             response.setHeader("Set-Cookie", cookie.toString());
+            
             
             response.sendRedirect(frontendUrl);
         } else {

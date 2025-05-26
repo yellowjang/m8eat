@@ -24,6 +24,7 @@ function base64UrlDecode(str) {
 
 export const useUserStore = defineStore("user", () => {
   const loginUser = ref({});
+  const loginUserHealthInfo = ref({});
   const sessionExpiredNotified = ref(false);
 
   const signup = (user) => {
@@ -34,28 +35,38 @@ export const useUserStore = defineStore("user", () => {
     // 🔸 1. user 객체를 JSON 문자열로 변환해서 Blob으로 추가
     formData.append(
       "user",
-      new Blob([JSON.stringify({
-        name: user.name,
-        id: user.id,
-        password: user.password,
-        role: user.role,
-      })], { type: "application/json" })
+      new Blob(
+        [
+          JSON.stringify({
+            name: user.name,
+            id: user.id,
+            password: user.password,
+            role: user.role,
+          }),
+        ],
+        { type: "application/json" }
+      )
     );
 
     // 🔸 2. healthInfo 객체도 JSON으로 Blob 추가
     formData.append(
       "healthInfo",
-      new Blob([JSON.stringify({
-        height: 170,
-        weight: 60,
-        illness: "",
-        allergy: "",
-        purpose: "다이어트"
-      })], { type: "application/json" })
+      new Blob(
+        [
+          JSON.stringify({
+            height: null,
+            weight: null,
+            illness: null,
+            allergy: null,
+            purpose: null,
+          }),
+        ],
+        { type: "application/json" }
+      )
     );
 
     // 🔸 3. 이미지 파일 추가 (선택적으로)
-    console.log("profileImage", user.profileImage)
+    console.log("profileImage", user.profileImage);
     if (user.profileImage) {
       formData.append("profileImage", user.profileImage); // File 객체
     }
@@ -63,8 +74,8 @@ export const useUserStore = defineStore("user", () => {
     api
       .post(`${REST_API_URL}/auth/signup`, formData, {
         headers: {
-          "Content-Type": "multipart/form-data"
-        }
+          "Content-Type": "multipart/form-data",
+        },
       })
       .then((response) => {
         console.log(response.data);
@@ -98,6 +109,12 @@ export const useUserStore = defineStore("user", () => {
     }
   };
 
+  const getHealthInfo = async () => {
+    const healthInfo = await api.get(`${REST_API_URL}/user/mypage/healthInfo`);
+    loginUserHealthInfo.value = healthInfo.data;
+    console.log(loginUserHealthInfo.value);
+  };
+
   const checkLogin = async () => {
     try {
       console.log("checklogin 호출ㄹㄹㄹㄹ");
@@ -119,22 +136,33 @@ export const useUserStore = defineStore("user", () => {
 
       loginUser.value = null;
       // ✅ DOM 반영까지 기다림
-      await nextTick();
+      // await nextTick();
     } catch (err) {
       console.error("로그아웃 실패", err);
       throw err; // 필요 시 헤더에서 처리할 수 있게
     }
   };
 
-  const udpateUser = async (updateUser) => {
-    console.log("store ", updateUser)
-    console.log("store ", loginUser)
+  const updateUser = async (updateUser) => {
+    console.log("store ", updateUser);
+    console.log("store ", loginUser);
     try {
-      await api.put(`${REST_API_URL}/mypage/${loginUser.userNo}`, updateUser)
-    } catch (error) {
-      
-    }
-  }
+      await api.put(`${REST_API_URL}/user/mypage/${loginUser.value.userNo}`, updateUser);
+    } catch (error) {}
+  };
 
-  return { signup, login, loginUser, checkLogin, logout, sessionExpiredNotified, udpateUser };
+  const getCoachId = async () => {
+    const response = await api.get(`${REST_API_URL}/user/mypage/coachId`);
+    return response.data;
+  };
+
+  const userDel = async (userNo) => {
+    try {
+      const response = await api.delete(`${REST_API_URL}/auth/quit/${userNo}`);
+      loginUser.value = null;
+      return response.data;
+    } catch (error) {}
+  };
+
+  return { signup, login, loginUser, checkLogin, logout, sessionExpiredNotified, updateUser, getHealthInfo, loginUserHealthInfo, getCoachId, userDel };
 });

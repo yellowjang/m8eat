@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,12 +27,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prj.m8eat.jwt.JwtUtil;
 import com.prj.m8eat.model.dto.Diet;
 import com.prj.m8eat.model.dto.DietRequest;
 import com.prj.m8eat.model.dto.DietResponse;
 import com.prj.m8eat.model.dto.DietsFood;
 import com.prj.m8eat.model.service.DietService;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpSession;
 @RestController
 @RequestMapping("/diets")
@@ -39,9 +42,11 @@ import jakarta.servlet.http.HttpSession;
 public class DietController {
 
 	private final DietService dietService;
+	private final JwtUtil util;
 
-	public DietController(DietService dietService) {
+	public DietController(DietService dietService, JwtUtil util) {
 		this.dietService = dietService;
+		this.util = util;
 	}
 
 	@Value("${file.upload.dir}")
@@ -100,9 +105,18 @@ public class DietController {
 	}
 	// 식단 등록 
 	@PostMapping
-	public ResponseEntity<String> writeDiets(@ModelAttribute DietRequest dietReq, HttpSession session) {
-	    Diet diet = new Diet();
-	    diet.setUserNo(2); // TODO: 로그인 사용자 정보로 교체
+	public ResponseEntity<String> writeDiets(@ModelAttribute DietRequest dietReq, @CookieValue("access-token") String token) {
+		
+		int userNo;
+	    if (util.validate(token)) {
+	        Claims claims = util.getClaims(token);
+	        userNo = (int) claims.get("userNo");
+	    } else {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+	    }
+		
+		Diet diet = new Diet();
+	    diet.setUserNo(userNo); 
 	    diet.setMealType(dietReq.getMealType());
 	    
 	    System.out.println("dietttt writeeeee" + dietReq);
@@ -215,8 +229,15 @@ public class DietController {
 
 
 	@PostMapping("/ai/vision-gpt")
-	public ResponseEntity<?> analyzeByVisionGpt(@RequestParam("file") MultipartFile file) {
-	    try {
+	public ResponseEntity<?> analyzeByVisionGpt(@RequestParam("file") MultipartFile file,
+												@CookieValue("access-token") String token) {
+		try {
+	    	
+	        // 인증 처리
+	        if (!util.validate(token)) {
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
+	        }
+	        
 	        List<Map<String, Object>> result = dietService.analyzeImageWithVisionAndGpt(file);
 	        return ResponseEntity.ok(result);
 	    } catch (Exception e) {

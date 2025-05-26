@@ -15,9 +15,18 @@
       <!-- 오른쪽: 사용자 정보 + 수정 버튼 -->
       <div class="info-right">
         <div class="info-list">
-          <span><strong>이름:</strong> {{ user.name }}</span>
-          <span><strong>아이디:</strong> {{ user.id }}</span>
-          <span><strong>회원 유형:</strong> {{ user.role === 'coach' ? '코치' : '일반 회원' }}</span>
+          <span>
+            <strong>이름:</strong>
+            {{ user.name }}
+          </span>
+          <span>
+            <strong>아이디:</strong>
+            {{ user.id }}
+          </span>
+          <span>
+            <strong>회원 유형:</strong>
+            {{ user.role === "coach" ? "코치" : "일반 회원" }}
+          </span>
         </div>
         <div class="edit-btn-wrapper">
           <button class="edit-btn" @click="showBasicEdit = true">수정</button>
@@ -28,7 +37,7 @@
     <div class="section">
       <h2>나의 건강 정보</h2>
       <div class="info-cards">
-        <div class="card" v-for="(value, key) in health" :key="key">
+        <div class="card" v-for="(value, key) in filteredHealthInfo" :key="key">
           <div class="card-title">{{ labelMap[key] }}</div>
           <div class="card-content">
             <template v-if="Array.isArray(value)">
@@ -38,7 +47,7 @@
               </span>
             </template>
             <template v-else>
-              {{ value || "입력되지 않음" }}
+              {{ value ? value : "입력되지 않음" }}
             </template>
           </div>
         </div>
@@ -67,7 +76,7 @@
           <h3>기본 정보 수정</h3>
           <span class="close-btn" @click="showBasicEdit = false">&times;</span>
         </div>
-        <form @submit.prevent="saveBasicEdit">
+        <form @submit.prevent="saveBasicUpdate">
           <label>이름</label>
           <input type="text" v-model="updateUser.name" />
 
@@ -81,12 +90,12 @@
           </select>
 
           <div class="modal-actions">
-            <button type="submit" class="save-btn">저장</button>
+            <button type="submit" class="save-btn" @click="saveBasicUpdate">저장</button>
             <button type="button" @click="showBasicEdit = false" class="cancel-btn">취소</button>
           </div>
         </form>
       </div>
-    </div> 
+    </div>
 
     <!-- 건강 정보 수정 모달 -->
     <div v-if="showHealthEdit" class="modal-backdrop">
@@ -152,7 +161,7 @@
 import { onMounted, ref, computed } from "vue";
 import { useUserStore } from "@/stores/user";
 import router from "@/router";
-import defaultProfile from '@/assets/icon/default-profile.png';
+import defaultProfile from "@/assets/icon/default-profile.png";
 
 const user = ref({});
 const updateUser = ref({ ...user.value });
@@ -160,8 +169,10 @@ const showBasicEdit = ref(false);
 
 const store = useUserStore();
 
-onMounted(() => {
+onMounted(async () => {
+  await store.checkLogin();
   getUserInfo();
+  await getHealthInfo();
 });
 // const loginUser = computed(() => store.loginUser)
 
@@ -169,15 +180,32 @@ const getUserInfo = () => {
   console.log("mypageeee", store.loginUser);
   // console.log(store.loginUser)
   user.value = { name: store.loginUser.name, id: store.loginUser.id, role: store.loginUser.role };
-  // updateUser.value = { name: loginUser.name, id: loginUser.id, role: loginUser.role };
+  updateUser.value = { name: store.loginUser.name, id: store.loginUser.id, role: store.loginUser.role };
   // console.log(updateUser.value)
 };
 
-const saveBasicEdit = () => {
+const healthInfo = ref({});
+
+const getHealthInfo = async () => {
+  await store.getHealthInfo();
+  console.log("1111111", store.loginUserHealthInfo);
+  healthInfo.value = store.loginUserHealthInfo;
+  // healthInfo.value = computed(() => store.loginUserHealthInfo.value);
+  console.log("sdfsdfdsf", healthInfo.value);
+};
+
+const filteredHealthInfo = computed(() => {
+  if (!store.loginUserHealthInfo) return {};
+
+  const { infoNo, userNo, ...rest } = store.loginUserHealthInfo;
+  return rest;
+});
+
+const saveBasicUpdate = () => {
   user.value = { ...updateUser.value };
-  console.log("saveBasicEdit ", user.value)
+  console.log("saveBasicEdit ", user.value);
   showBasicEdit.value = false;
-  store.udpateUser(updateUser.value)
+  store.updateUser(updateUser.value);
 };
 
 const labelMap = {
@@ -193,28 +221,31 @@ const logout = () => {
   alert("로그아웃 되었습니다.");
   router.push({ name: "login" });
 };
-const withdraw = () => {
-  alert("회원탈퇴 처리");
+const withdraw = async () => {
+  if (confirm("정말 탈퇴하시겠습니까?")) {
+    console.log("탈퇴");
+    await store.userDel(store.loginUser.userNo);
+    alert("정상적으로 탈퇴되었습니다.");
+    router.push({ name: "signup" });
+  } else {
+    console.log("취소");
+  }
 };
 
 const showHealthEdit = ref(false);
 
 const health = ref({
-  height: 170,
-  weight: 60,
-  illness: ["천식"],
-  allergy: ["견과류"],
-  purpose: "다이어트",
+  ...store.loginUserHealthInfo,
 });
 const illnessOptions = ["고혈압", "당뇨병", "심장병", "천식", "관절염"];
 const allergyOptions = ["견과류", "우유", "계란", "갑각류", "밀"];
 
 const editableHealth = ref({
-  height: health.value.height,
-  weight: health.value.weight,
-  illness: [...health.value.illness],
-  allergy: [...health.value.allergy],
-  purpose: health.value.purpose,
+  // height: health.value.height,
+  // weight: health.value.weight,
+  // illness: [...health.value.illness],
+  // allergy: [...health.value.allergy],
+  // purpose: health.value.purpose,
 });
 
 const toggleSelection = (targetList, item) => {
@@ -233,26 +264,26 @@ const saveHealthEdit = () => {
 };
 
 const editHealth = () => {
-  editableHealth.value = {
-    height: health.value.height,
-    weight: health.value.weight,
-    illness: [...health.value.illness],
-    allergy: [...health.value.allergy],
-    purpose: health.value.purpose,
-  };
   showHealthEdit.value = true;
+
+  editableHealth.value = {
+    height: health.value.height ?? null,
+    weight: health.value.weight ?? null,
+    illness: Array.isArray(health.value.illness) ? [...health.value.illness] : [],
+    allergy: Array.isArray(health.value.allergy) ? [...health.value.allergy] : [],
+    purpose: health.value.purpose ?? "",
+  };
 };
+
 const partnerName = ref(user.value.role === "coach" ? "회원들과" : "담당 코치와");
 
-const goToChat = () => {
-  router.push({ name: "ChatView", params: { targetId: "bbb" } });
+const goToChat = async () => {
+  const coachId = await store.getCoachId();
+  router.push({ name: "ChatView", params: { targetId: coachId } });
 };
 </script>
 
 <style lang="scss" scoped>
-
-
-
 .mypage-container {
   padding: 2rem;
   background-color: #fdeeee;
@@ -261,8 +292,6 @@ const goToChat = () => {
   text-align: center;
   flex: 1;
   min-height: unset;
-
-  
 
   .mypage-header {
     display: flex;
@@ -298,70 +327,72 @@ const goToChat = () => {
     }
   }
 
-.basic-info {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  gap: 2rem;
+  .basic-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    gap: 2rem;
+    max-width: 1000px; /* ✅ 건강정보 칸과 비슷한 폭으로 제한 */
+    margin: 0 auto; /* 가운데 정렬 */
 
-  .profile-img-wrapper {
-    flex-shrink: 0;
+    .profile-img-wrapper {
+      flex-shrink: 0;
 
-    .profile-img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #de9c9c;
+      .profile-img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #de9c9c;
+      }
     }
-  }
 
-  .info-right {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding-top: 2rem;
-  }
-
-  .info-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-    margin-top: 0.3rem;
-
-    span {
+    .info-right {
+      flex: 1;
       display: flex;
-      align-items: center;
-      font-size: 1rem;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-top: 2rem;
+    }
 
-      strong {
-        width: 90px;
-        color: #555;
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-top: 0.3rem;
+
+      span {
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+
+        strong {
+          width: 90px;
+          color: #555;
+        }
+      }
+    }
+
+    .edit-btn-wrapper {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: flex-end;
+
+      .edit-btn {
+        background-color: #de9c9c;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
       }
     }
   }
-
-  .edit-btn-wrapper {
-    margin-top: 1rem;
-    display: flex;
-    justify-content: flex-end;
-
-    .edit-btn {
-      background-color: #de9c9c;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-  }
-}
 
   .info-cards {
     display: grid;

@@ -13,31 +13,56 @@
             </label>
             <div v-else class="image-preview">
               <img :src="previewUrl" alt="미리보기" />
-              <button
-                type="button"
-                class="remove-image-button"
-                @click="removeImage"
-              >
+              <button type="button" class="remove-image-button" @click="removeImage">
                 <img class="remove" :src="deleteIcon" alt="제거" />
               </button>
             </div>
           </div>
         </div>
-        <div class="analysis-result-box">
+        <!-- <div class="analysis-result-box">
           <p class="input-title">분석 결과</p>
           <p>분석한 결과가 여기에 나올 거예요.</p>
+        </div> -->
+        <div class="analysis-result-box">
+          <p class="input-title">분석 결과</p>
+
+          <div v-if="loading">⏳ 분석 중입니다...</div>
+          <div v-else-if="results.length === 0">분석한 결과가 여기에 나올 거예요.</div>
+          <!-- <ul v-else>
+            <li v-for="(item, idx) in results" :key="idx">
+              🍽️ 라벨: {{ item.label }}
+              <br />
+              🇰🇷 번역: {{ item.translated }}
+              <br />
+              🔍 매칭: {{ item.matched }}
+              <br />
+              <span v-if="item.nutrition">🔥 칼로리: {{ item.nutrition.calories }} kcal</span>
+              <span v-else>⚠️ 영양 정보 없음</span>
+            </li>
+          </ul> -->
+          <!-- <ul v-else>
+            <li v-for="(item, idx) in results" :key="idx" @click="selectAnalyzedItem(item)" class="analysis-result-item" style="cursor: pointer; padding: 0.5rem; border-radius: 6px">
+              🔍 매칭: {{ item.matched }}
+              <br />
+              <span v-if="item.nutrition">🔥 칼로리: {{ item.nutrition.calories }} kcal</span>
+              <span v-else>⚠️ 영양 정보 없음</span>
+            </li>
+          </ul> -->
+          <ul v-else>
+            <li v-for="(item, idx) in results" :key="idx" @click="selectAnalyzedItem(item)" class="analysis-result-item" style="cursor: pointer; padding: 0.5rem; border-radius: 6px">
+              🔍 매칭: {{ item.matched }}
+              <br />
+              <span v-if="item.nutrition">🔥 칼로리: {{ item.nutrition.calories }} kcal</span>
+              <span v-else>⚠️ 영양 정보 없음</span>
+            </li>
+          </ul>
         </div>
       </div>
 
       <!-- 상세 시간 -->
       <div class="food-info">
         <p class="input-title">상세 시간</p>
-        <VueDatePicker
-          v-model="mealDate"
-          :enable-time-picker="true"
-          format="yyyy-MM-dd HH:mm"
-          :minute-increment="5"
-        />
+        <VueDatePicker v-model="mealDate" :enable-time-picker="true" format="yyyy-MM-dd HH:mm" :minute-increment="5" />
         <div class="meal-type">
           <label>
             <input type="radio" name="meal" value="아침" v-model="mealTime" />
@@ -57,37 +82,15 @@
       <!-- 음식 입력 -->
       <div class="food-table">
         <p class="input-title">음식 입력</p>
+
         <div class="food-row">
-          <input
-            type="text"
-            placeholder="음식명"
-            v-model="foodInput"
-            @input="filterFoodList"
-            @blur="confirmSelectedFood"
-            list="food-suggestions"
-          />
+          <input type="text" placeholder="음식명" v-model="foodInput" @input="filterFoodList" @blur="confirmSelectedFood" list="food-suggestions" />
           <datalist id="food-suggestions">
-            <option
-              v-for="food in filteredFoods"
-              :key="food.foodId"
-              :value="food.nameKo"
-            />
+            <option v-for="food in filteredFoods" :key="food.foodId" :value="food.nameKo" />
           </datalist>
-          <input
-            type="number"
-            placeholder="g"
-            v-model.number="foodAmount"
-            @input="calculateCalories"
-          />
-          <input
-            type="number"
-            placeholder="kcal"
-            v-model.number="foodCalories"
-            :readonly="!!selectedFood"
-          />
-          <button class="add-button" type="button" @click="addFood">
-            추가
-          </button>
+          <input type="number" placeholder="g" v-model.number="foodAmount" @input="calculateCalories" />
+          <input type="number" placeholder="kcal" v-model.number="foodCalories" :readonly="!!selectedFood" />
+          <button class="add-button" type="button" @click="addFood">추가</button>
         </div>
 
         <!-- 음식 리스트 -->
@@ -119,6 +122,12 @@ import { useDietStore } from "@/stores/diet";
 import { useFoodStore } from "@/stores/food";
 import dayjs from "dayjs";
 
+import api from "@/api";
+import axios from "axios";
+
+const results = ref([]); // 분석 결과 저장
+const loading = ref(false); // 로딩 상태
+
 const emit = defineEmits(["close"]);
 
 const dietStore = useDietStore();
@@ -149,13 +158,79 @@ onMounted(() => {
 if (props.edit && props.edit.filePath) {
   previewUrl.value = props.edit.filePath;
 }
-const handleFileChange = (e) => {
-  const selectedFile = e.target.files[0];
-  if (selectedFile) {
-    file.value = selectedFile;
-    previewUrl.value = URL.createObjectURL(selectedFile);
+// const handleFileChange = (e) => {
+//   const selectedFile = e.target.files[0];
+//   if (selectedFile) {
+//     file.value = selectedFile;
+//     previewUrl.value = URL.createObjectURL(selectedFile);
+//   }
+// };
+const handleFileChange = async (e) => {
+  const selected = e.target.files[0];
+  if (selected) {
+    file.value = selected;
+    previewUrl.value = URL.createObjectURL(selected);
+
+    // 이미지 분석 요청
+    const formData = new FormData();
+    formData.append("file", selected);
+    loading.value = true;
+
+    console.log("handlefilechangeeeeeeeeeeee", selected);
+
+    try {
+      const res = await api.post("http://localhost:8080/diets/ai/vision-gpt", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      results.value = res.data;
+    } catch (err) {
+      console.error("분석 실패:", err);
+      // alert("분석 실패: " + err.message);
+    } finally {
+      loading.value = false;
+    }
   }
 };
+
+// const selectAnalyzedItem = (item) => {
+//   foodInput.value = item.matched;
+//   foodCalories.value = item.nutrition?.calories ?? null;
+//   foodAmount.value = null; // 사용자 직접 입력 유도
+//   selectedFood.value = null; // 자동 매핑 X
+// };
+
+const selectAnalyzedItem = (item) => {
+  foodInput.value = item.matched;
+
+  const matchedFood = foodStore.foods.find((f) => f.nameKo === item.matched);
+
+  if (matchedFood && item.nutrition?.calories) {
+    selectedFood.value = matchedFood;
+
+    // 100g당 kcal 정보가 있는 경우 → g 역산해서 넣기
+    const caloriesPer100g = matchedFood.calories;
+    const targetCalories = item.nutrition.calories;
+    const estimatedGrams = Math.round((targetCalories / caloriesPer100g) * 100);
+
+    foodAmount.value = estimatedGrams;
+    foodCalories.value = targetCalories;
+  } else {
+    // 영양 정보 없거나 매칭 안 되는 경우 수동 입력 유도
+    selectedFood.value = null;
+    foodAmount.value = null;
+    foodCalories.value = item.nutrition?.calories ?? null;
+  }
+};
+
+// const calculateCalories = () => {
+//   if (!foodAmount.value) return;
+//   if (selectedFood.value) {
+//     const ratio = foodAmount.value / 100;
+//     foodCalories.value = Math.round(selectedFood.value.calories * ratio);
+//   }
+// };
 
 const removeImage = () => {
   file.value = null;
@@ -164,15 +239,11 @@ const removeImage = () => {
 
 const filterFoodList = () => {
   const query = foodInput.value.trim().toLowerCase();
-  filteredFoods.value = foodStore.foods.filter((food) =>
-    food.nameKo.toLowerCase().includes(query)
-  );
+  filteredFoods.value = foodStore.foods.filter((food) => food.nameKo.toLowerCase().includes(query));
 };
 
 const confirmSelectedFood = () => {
-  selectedFood.value =
-    foodStore.foods.find((f) => f.nameKo.trim() === foodInput.value.trim()) ||
-    null;
+  selectedFood.value = foodStore.foods.find((f) => f.nameKo.trim() === foodInput.value.trim()) || null;
   calculateCalories();
 };
 
@@ -192,25 +263,15 @@ const addFood = () => {
     foodName: foodInput.value,
     amount: foodAmount.value,
     calorie: foodCalories.value,
-    protein: selectedFood.value
-      ? selectedFood.value.protein * (foodAmount.value / 100)
-      : 0,
-    fat: selectedFood.value
-      ? selectedFood.value.fat * (foodAmount.value / 100)
-      : 0,
-    carbohydrate: selectedFood.value
-      ? selectedFood.value.carbohydrate * (foodAmount.value / 100)
-      : 0,
-    sugar: selectedFood.value
-      ? selectedFood.value.sugar * (foodAmount.value / 100)
-      : 0,
-    cholesterol: selectedFood.value
-      ? selectedFood.value.cholesterol * (foodAmount.value / 100)
-      : 0,
+    protein: selectedFood.value ? selectedFood.value.protein * (foodAmount.value / 100) : 0,
+    fat: selectedFood.value ? selectedFood.value.fat * (foodAmount.value / 100) : 0,
+    carbohydrate: selectedFood.value ? selectedFood.value.carbohydrate * (foodAmount.value / 100) : 0,
+    sugar: selectedFood.value ? selectedFood.value.sugar * (foodAmount.value / 100) : 0,
+    cholesterol: selectedFood.value ? selectedFood.value.cholesterol * (foodAmount.value / 100) : 0,
   };
 
   foods.value.push(food);
-  console.log("addddd", foods.value)
+  console.log("addddd", foods.value);
 
   foodInput.value = "";
   foodAmount.value = null;
@@ -222,9 +283,7 @@ const removeFood = (index) => {
   foods.value.splice(index, 1);
 };
 
-const totalCalories = computed(() =>
-  foods.value.reduce((sum, food) => sum + food.calorie, 0)
-);
+const totalCalories = computed(() => foods.value.reduce((sum, food) => sum + food.calorie, 0));
 
 // const handleSubmit = async () => {
 //   const formData = new FormData();
@@ -245,7 +304,7 @@ const totalCalories = computed(() =>
 const handleSubmit = async () => {
   const formData = new FormData();
   formData.append("mealType", mealTime.value);
-  console.log("1231213123", formData.get("mealType"))
+  console.log("1231213123", formData.get("mealType"));
 
   const formattedDate = dayjs(mealDate.value).format("YYYY-MM-DD HH:mm");
   formData.append("mealDate", formattedDate);
@@ -261,7 +320,7 @@ const handleSubmit = async () => {
 
     emit("update-meal");
   } else {
-    console.log("handleee", formData)
+    console.log("handleee", formData);
     await dietStore.createDiet(formData);
     alert("식단이 성공적으로 등록되었습니다.");
     emit("add-meal");
@@ -270,6 +329,9 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
+.analysis-result-item:hover {
+  background-color: #f1f1f1;
+}
 .meal-type {
   margin-top: 15px;
 }
