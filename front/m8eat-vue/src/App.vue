@@ -5,7 +5,6 @@ import Footer from "./components/common2/Footer.vue";
 import "@/style/global.scss";
 import { onMounted } from "vue";
 import { useUserStore } from "@/stores/user";
-import Alert from "@mui/material/Alert";
 
 const store = useUserStore();
 
