@@ -213,8 +213,15 @@ const logout = () => {
   alert("로그아웃 되었습니다.");
   router.push({ name: "login" });
 };
-const withdraw = () => {
-  alert("회원탈퇴 처리");
+const withdraw = async () => {
+  if (confirm("정말 탈퇴하시겠습니까?")) {
+    console.log("탈퇴")
+    await store.userDel(store.loginUser.userNo);
+    alert("정상적으로 탈퇴되었습니다.")
+    router.push({name:'signup'})
+  } else {
+    console.log("취소")
+  }
 };
 
 const showHealthEdit = ref(false);

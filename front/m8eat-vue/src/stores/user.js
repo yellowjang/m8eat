@@ -148,6 +148,16 @@ export const useUserStore = defineStore("user", () => {
     return response.data;
   }
 
+  const userDel = async (userNo) => {
+    try {
+      const response = await api.delete(`${REST_API_URL}/auth/quit/${userNo}`)
+      loginUser.value = null;
+      return response.data;
+    } catch (error) {
+      
+    }
+  }
+
   return { signup, login, loginUser, checkLogin, logout, sessionExpiredNotified, 
-    updateUser, getHealthInfo, loginUserHealthInfo, getCoachId };
+    updateUser, getHealthInfo, loginUserHealthInfo, getCoachId, userDel };
 });

@@ -157,9 +157,21 @@ public class UserController {
 	
 	
 	@DeleteMapping("/auth/quit/{userNo}")
-	public ResponseEntity<String> quit(@PathVariable("userNo") int userNo) {
+	public ResponseEntity<String> quit(@PathVariable("userNo") int userNo, HttpServletResponse response) {
+		System.out.println(userNo);
 		int result = userService.quit(userNo);
 		if (result == 1) {
+		    // ✅ access-token 쿠키를 빈 값 + 만료로 설정
+		    ResponseCookie expiredCookie = ResponseCookie.from("access-token", "")
+		        .httpOnly(true)
+		        .secure(false)
+		        .sameSite("Lax")
+		        .path("/")
+		        .maxAge(0) // ⛔ 즉시 만료
+		        .build();
+		    
+		    // ✅ 쿠키 헤더 설정
+		    response.setHeader("Set-Cookie", expiredCookie.toString());
 			return ResponseEntity.status(HttpStatus.OK).body("정상적으로 탈퇴되었습니다.");
 		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("요청이 정상적으로 처리되지 않았습니다.");
