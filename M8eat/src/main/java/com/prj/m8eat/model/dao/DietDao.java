@@ -39,8 +39,6 @@ public interface DietDao {
 
 	public FoodInfo getDietByName(String name);
 	
-
-
 	public Food selectFoodById(int foodId);
 
 }
