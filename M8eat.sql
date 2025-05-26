@@ -1,14 +1,15 @@
-drop database m8eat;
-create database IF NOT EXISTS m8eat;
+create database if not exists m8eat;
+
 use m8eat;
 
+drop database m8eat;
 
 -- 사용자 정보
 CREATE TABLE if not exists users (
     user_no INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) not null,
     id VARCHAR(100) UNIQUE not null,
-    password VARCHAR(255) ,
+    password VARCHAR(255) not null,
     role VARCHAR(20) not null DEFAULT 'user'
 );
 INSERT INTO users (name, id, password, role)
@@ -45,9 +46,15 @@ CREATE TABLE if not exists coach_prefer (
 );
 
 -- 식단
+
+
+
+drop table diets; 
+drop table diets_food;
 CREATE TABLE if not exists diets (
     diet_no INT PRIMARY KEY AUTO_INCREMENT,
     user_no INT not null,
+    meal_date datetime,
     reg_date TIMESTAMP default now(),
     meal_type VARCHAR(10) not null,
     file_path VARCHAR(255),
@@ -55,6 +62,18 @@ CREATE TABLE if not exists diets (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
+
+INSERT INTO diets (user_no, reg_date, meal_type, file_path) VALUES
+(1, '2024-05-01 08:00:00', '아침', 'uploads/breakfast_1.jpg'),
+(1, '2024-05-01 12:30:00', '점심', 'uploads/lunch_1.jpg'),
+(1, '2024-05-01 19:00:00', '저녁', 'uploads/dinner_1.jpg'),
+(2, '2024-05-02 08:15:00', '아침', 'uploads/breakfast_2.jpg'),
+(2, '2024-05-02 13:00:00', '점심', 'uploads/lunch_2.jpg'),
+(2, '2024-05-02 19:10:00', '저녁', 'uploads/dinner_2.jpg'),
+(3, '2024-05-03 07:50:00', '아침', 'uploads/breakfast_3.jpg'),
+(3, '2024-05-03 12:40:00', '점심', 'uploads/lunch_3.jpg'),
+(3, '2024-05-03 18:55:00', '저녁', 'uploads/dinner_3.jpg'),
+(1, '2024-05-04 08:20:00', '아침', 'uploads/breakfast_4.jpg');
 
 select * from users;
 select * from diets;
@@ -64,43 +83,41 @@ drop table diets_food;
 drop table diets;
 
 
--- 식단 음식 구성
-CREATE TABLE if not exists diets_food (
-    no INT PRIMARY KEY AUTO_INCREMENT,
-    diet_no INT not null,
-    food_name VARCHAR(255) not null,
-    calorie INT not null,
-    FOREIGN KEY (diet_no) REFERENCES diets(diet_no)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
-
 -- 음식 데이터
 CREATE TABLE food (
     food_id INT PRIMARY KEY,
     calories INT,
     name_ko VARCHAR(100) NOT NULL,
-    moisture DOUBLE,
     protein DOUBLE,
     fat DOUBLE,
     carbohydrate DOUBLE,
     sugar DOUBLE,
-    fiber DOUBLE,
-    calcium DOUBLE,
-    sodium DOUBLE,
     cholesterol DOUBLE
 );
 
 drop table food;
 select * from food;
-select * from food where name_ko='채소밥' ;
-select * from food;
- 
-
-
-
-
+-- 식단 음식 구성
+CREATE TABLE IF NOT EXISTS diets_food (
+    no INT PRIMARY KEY AUTO_INCREMENT,
+    diet_no INT NOT NULL,
+    food_id INT NOT NULL,
+    food_name VARCHAR(255) NOT NULL,
+    amount DOUBLE NOT NULL, -- 섭취량 (g)
+    calorie INT NOT NULL, -- 계산된 kcal
+    protein DOUBLE NOT NULL,
+    fat DOUBLE NOT NULL,
+    carbohydrate DOUBLE NOT NULL,
+    sugar DOUBLE NOT NULL,
+    cholesterol DOUBLE NOT NULL,
+    FOREIGN KEY (diet_no) REFERENCES diets(diet_no)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (food_id) REFERENCES food(food_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+select * from diets_food;
 -- 채팅방
 CREATE TABLE if not exists chat_room (
     room_no INT PRIMARY KEY AUTO_INCREMENT,
@@ -151,29 +168,9 @@ CREATE TABLE if not exists board (
         ON UPDATE CASCADE
 );
 
-<<<<<<< HEAD
-        SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
-        reg_date as regDate, file_path as filePath
-        FROM board;
-=======
-INSERT INTO board (user_no, title, content, view_cnt, file_path)
-VALUES
-(1, '첫 번째 게시글', '안녕하세요, 첫 글입니다!', 15, '/uploads/file1.png'),
-(2, '두 번째 게시글', '테스트용 게시글입니다.', 8, '/uploads/file2.png'),
-(3, '세 번째 게시글', '게시판 기능 구현 중입니다.', 20, NULL),
-(1, '네 번째 게시글', '파일 첨부 없는 게시글입니다.', 5, NULL),
-(2, '다섯 번째 게시글', '이미지 업로드 테스트', 0, '/uploads/image1.jpg'),
-(3, '여섯 번째 게시글', '좋아요 기능도 구현할 예정입니다.', 12, NULL),
-(1, '일곱 번째 게시글', '조회수 증가 테스트', 30, '/uploads/test7.pdf'),
-(2, '여덟 번째 게시글', '세션 기반 로그인 완료', 4, NULL),
-(3, '아홉 번째 게시글', 'MyBatis로 DB 연동 성공', 17, '/uploads/test9.docx'),
-(1, '열 번째 게시글', 'Spring과 연동 중입니다.', 25, '/uploads/test10.zip');
-
-
-		SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
-		reg_date as regDate, file_path as filePath
-		FROM board;
->>>>>>> 42a85e11f70a674d12c5abf3d6f51f214a4483f7
+SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
+reg_date as regDate, file_path as filePath
+FROM board;
 
 
 INSERT INTO board (user_no, title, content, file_path)
@@ -202,7 +199,7 @@ CREATE TABLE if not exists boards_comment (
     content VARCHAR(1000) not null,
     created_at TIMESTAMP default now(),
     updated_at TIMESTAMP,
-    FOREIGN KEY (board_no) REFERENCES boards(board_no)
+    FOREIGN KEY (board_no) REFERENCES board(board_no)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     FOREIGN KEY (user_no) REFERENCES users(user_no)
@@ -210,4 +207,16 @@ CREATE TABLE if not exists boards_comment (
         ON UPDATE CASCADE
 );
 
-drop table boards_comment;
+
+
+LOAD DATA LOCAL INFILE '/Users/jang-ayoung/Downloads/Cleaned_Food_Data.csv'
+REPLACE INTO TABLE food
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(food_id, calories, name_ko, protein, fat, carbohydrate, sugar, cholesterol);
+
+
+SHOW VARIABLES LIKE 'local_infile';

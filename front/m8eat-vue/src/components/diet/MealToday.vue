@@ -1,232 +1,251 @@
 <template>
   <section class="meal-today">
-    <h2 class="title">오늘의 식단</h2>
-    <!-- showForm이 false일 때만 기존 박스 보여줌 -->
-    <template v-if="!showForm">
-      <div class="meal-boxes">
-        <div v-for="meal in meals" :key="meal.type" class="meal-box">
-          <p class="meal-title">{{ meal.label }}</p>
-          <ul class="food-list">
-            <li v-for="(food, idx) in meal.foods" :key="idx" class="food-name">
-              {{ food.name }}
-            </li>
-          </ul>
-          <div>
+    <h2 class="title">{{ formattedDate }} 식단</h2>
+    <div class="add-meal-box">
+      <button class="add-meal" @click="$emit('add-meal')">
+        + 식단 등록하기
+      </button>
+    </div>
+    <div class="meal-boxes">
+      <div
+        class="meal-box"
+        v-for="type in ['아침', '점심', '저녁']"
+        :key="type"
+      >
+        <p class="meal-title">{{ type }}</p>
+
+        <div v-if="mealsByType(type).length > 0">
+          <button
+            class="edit-meal"
+            @click="$emit('edit-meal', mealsByType(type)[0])"
+          >
+            수정
+          </button>
+          <div
+            class="meal-item"
+            v-for="meal in mealsByType(type)"
+            :key="meal.dietNo"
+          >
+            <router-link class="view-detail" :to="`/diet/${meal.dietNo}`">
+              상세보기
+            </router-link>
+            <button class="delete-meal" @click="deleteMeal(meal.dietNo)">
+              삭제
+            </button>
+            <ul class="food-list">
+              <li
+                v-for="(food, idx) in meal.foods"
+                :key="idx"
+                class="food-name"
+              >
+                {{ food.foodName }}
+              </li>
+            </ul>
             <p class="calorie">{{ totalCalories(meal.foods) }} kcal</p>
           </div>
         </div>
-      </div>
-      <p class="summary">총 섭취 칼로리: {{ overallCalories }} kcal</p>
-      <div>
-        <p>식단 분석</p>
-        <div>
-          <!-- 영양성분 분석 그래프 들어감. -->
-          <!-- 막대 그래프에는 하루 권장 섭취량이 전체 섭취량이 되고, 현재 섭취한 영양성분은
-              비율로 현재까지의 섭취율을 표기한다. 이건 탄수화물, 단백질, 지방, 당류로 구분하여
-              4개의 원형 그래프로 나타내려고 함.-->
-        </div>
-      </div>
-      <div class="add-meal-box">
-        <button class="add-meal" @click="showForm = true">+ 식단 등록하기</button>
-      </div>
-    </template>
 
-    <!-- showForm이 true일 때는 MealForm만 표시 -->
-    <MealForm v-else @close="showForm = false" @add-meal="addMeal" />
+        <div v-else class="empty-meal">등록된 식단이 없습니다.</div>
+      </div>
+    </div>
+    <p class="summary">총 섭취 칼로리: {{ overallCalories }} kcal</p>
+    <div class="divide-line"></div>
+    <div class="meal-analysis">
+      <p class="title nutri">영양 성분 분석</p>
+      <NutrientGraph :data="totalNutrients" :max="recommendedIntake" />
+    </div>
   </section>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import MealForm from "./MealForm.vue";
+import { ref, computed, watch } from "vue";
+import { useDietStore } from "@/stores/diet";
+import NutrientGraph from "@/components/diet/NutrientGraph.vue";
+import dayjs from "dayjs";
 
-const meals = ref([
-  {
-    type: "breakfast",
-    label: "아침",
-    foods: [
-      { name: "계란후라이", calorie: 80 },
-      { name: "토스트", calorie: 150 },
-    ],
-  },
-  {
-    type: "lunch",
-    label: "점심",
-    foods: [
-      { name: "비빔밥", calorie: 500 },
-      { name: "김치", calorie: 50 },
-    ],
-  },
-  {
-    type: "dinner",
-    label: "저녁",
-    foods: [
-      { name: "닭가슴살", calorie: 180 },
-      { name: "고구마", calorie: 100 },
-    ],
-  },
-]);
+const props = defineProps({
+  selectedDate: String,
+});
 
-const showForm = ref(false);
+const dietStore = useDietStore();
+const meals = ref([]);
 
-const totalCalories = (foods) => foods.reduce((sum, food) => sum + food.calorie, 0);
-
-const overallCalories = computed(() => meals.value.reduce((total, meal) => total + totalCalories(meal.foods), 0));
-
-const addMeal = (newMeal) => {
-  const target = meals.value.find((m) => m.type === newMeal.type);
-  if (target) {
-    target.foods.push(...newMeal.foods);
+const fetchDiets = async (date) => {
+  try {
+    const start = `${date} 00:00:00`;
+    const end = `${date} 23:59:59`;
+    await dietStore.getDietByDate(start, end);
+    console.log("📦 dietByDateList:", dietStore.dietByDateList); // 여기도 확인
+    meals.value = [...dietStore.dietByDateList];
+  } catch (e) {
+    console.error("식단 불러오기 실패", e);
+    meals.value = [];
   }
-  showForm.value = false;
 };
+
+watch(
+  () => props.selectedDate,
+  (newDate) => {
+    console.log("📦 selectedDate 변경 감지:", newDate);
+    if (newDate) fetchDiets(newDate);
+  },
+  { immediate: true }
+);
+
+const mealsByType = (type) => {
+  return meals.value.filter((meal) => meal.mealType === type);
+};
+
+const totalCalories = (foods) =>
+  foods.reduce((sum, food) => sum + (food.calorie || 0), 0);
+const overallCalories = computed(() =>
+  meals.value.reduce((total, meal) => total + totalCalories(meal.foods), 0)
+);
+const totalNutrients = computed(() => {
+  return meals.value.reduce(
+    (acc, meal) => {
+      for (const food of meal.foods || []) {
+        acc.carbohydrate += food.carbohydrate || 0;
+        acc.protein += food.protein || 0;
+        acc.fat += food.fat || 0;
+        acc.sugar += food.sugar || 0;
+      }
+      return acc;
+    },
+    { carbohydrate: 0, protein: 0, fat: 0, sugar: 0 }
+  );
+});
+const deleteMeal = async (dietNo) => {
+  if (confirm("정말로 이 식단을 삭제하시겠습니까?")) {
+    try {
+      await dietStore.deleteDiet(dietNo);
+      alert("식단이 삭제되었습니다.");
+      await fetchDiets(props.selectedDate);
+    } catch (e) {
+      console.error("삭제 중 오류 발생:", e);
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  }
+};
+const recommendedIntake = {
+  carbohydrate: 324,
+  protein: 55,
+  fat: 54,
+  sugar: 50,
+};
+
+const formattedDate = computed(() =>
+  dayjs(props.selectedDate).format("YYYY년 MM월 DD일")
+);
 </script>
+
 <style lang="scss" scoped>
+.view-detail {
+  color: #de9c9c;
+  border: none;
+  font-size: 12px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.view-detail:hover {
+  color: #c94e4e;
+}
+
+.divide-line {
+  border-bottom: solid 0.3px #f1caca;
+  margin: 10px 0px;
+}
+
 .title {
   font-size: 20px;
   font-weight: 700;
+  margin-bottom: 15px;
 }
 
-.meal-record {
+.meal-boxes {
   display: flex;
-  gap: 2rem;
-  padding: 2rem;
-  background-color: #fcecec;
-
-  .left-panel,
-  .right-panel {
+  gap: 1rem;
+  .meal-box {
     flex: 1;
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  }
-
-  h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .meal-boxes {
-    display: flex;
-    gap: 1rem;
-
-    .meal-box {
-      flex: 1;
-      background: #fff5f5;
-      padding: 1rem;
-      border-radius: 8px;
-      text-align: center;
-      font-weight: bold;
-    }
-  }
-  .meal-title {
-    font-size: 16px;
-    font-weight: 700;
-  }
-  .food-list {
-    margin: 15px 10px;
-  }
-  .food-name {
-    font-size: 12px;
-    font-weight: 400;
-    list-style: none;
-  }
-  .calorie {
-    font-size: 12px;
-    font-weight: 500;
-    color: #d26767;
-  }
-  .summary {
-    margin-top: 1rem;
-    font-weight: 700;
-    font-size: 16px;
-    color: #4e4949;
-  }
-
-  .add-meal {
-    text-align: right;
-    margin-left: auto;
-    margin-top: 0.5rem;
-    font-size: 14px;
-    color: #de9c9c;
-    font-weight: 600;
-    border: none;
-  }
-  .add-meal-box {
-    display: flex;
-  }
-  .meal-analysis {
-    margin-top: 3rem;
-
-    .circle {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: 10px solid #de9c9c;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      margin: auto;
-
-      .left-kcal {
-        font-size: 1.5rem;
-        font-weight: bold;
-      }
-    }
-
-    .nutrient-bars {
-      margin-top: 2rem;
-
-      .bar {
-        height: 20px;
-        background: #ffe6e6;
-        margin-bottom: 0.5rem;
-        border-radius: 4px;
-        padding-left: 0.5rem;
-      }
-    }
-
-    .calorie-summary {
-      margin-top: 1.5rem;
-
-      strong {
-        font-weight: bold;
-      }
-    }
-  }
-
-  .calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    .greeting {
-      font-size: 0.9rem;
-      color: #999;
-    }
-  }
-
-  .calendar {
-    margin-top: 1.5rem;
-    background: #fff8f8;
-    border-radius: 8px;
-    height: 500px;
+    background: #fff5f5;
     padding: 1rem;
+    border-radius: 8px;
     text-align: center;
+    font-weight: bold;
   }
+}
 
-  .calendar-summary {
-    margin-top: 2rem;
+.meal-title {
+  font-size: 16px;
+  font-weight: 700;
+}
 
-    .min {
-      color: green;
-    }
+.food-list {
+  margin: 15px 10px;
+}
 
-    .max {
-      color: red;
-    }
-  }
+.food-name {
+  font-size: 12px;
+  font-weight: 400;
+  list-style: none;
+}
+
+.calorie {
+  font-size: 12px;
+  font-weight: 500;
+  color: #d26767;
+}
+
+.summary {
+  margin-top: 1rem;
+  font-weight: 700;
+  font-size: 16px;
+  color: #4e4949;
+  background-color: #ececec 70%;
+  border-radius: 3px;
+  width: 200px;
+  text-align: center;
+  margin-left: auto;
+}
+
+.add-meal {
+  text-align: right;
+  background-color: transparent;
+  margin-left: auto;
+  margin-top: 0.5rem;
+  font-size: 14px;
+  color: #de9c9c;
+  font-weight: 600;
+  border: none;
+}
+
+.add-meal-box {
+  display: flex;
+}
+
+.nutrient-graph {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.delete-meal {
+  background: none;
+  border: none;
+  color: #c94e4e;
+  font-size: 12px;
+  margin-left: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.delete-meal:hover {
+  color: #de9c9c;
+  border: none;
+  font-size: 12px;
+  font-weight: bold;
+  text-decoration: none;
 }
 </style>
