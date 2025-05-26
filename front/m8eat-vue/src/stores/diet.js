@@ -1,11 +1,15 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 import { ref } from "vue";
+
 const REST_API_URL = `http://localhost:8080/diets`;
 
 export const useDietStore = defineStore("diets", () => {
-  const dietList = ref([]);
-  const diet = ref(null);
+  // ✅ 목적별 리스트 구분
+  const dietByDateList = ref([]); // 날짜별 조회용
+  const dietByUserList = ref([]); // 유저별 조회용
+  const allDietList = ref([]); // 전체 조회용
+  const dietDetail = ref(null); // 단일 상세 조회용
 
   const tokenHeader = () => ({
     headers: {
@@ -23,11 +27,24 @@ export const useDietStore = defineStore("diets", () => {
     }
   };
 
+  /** 전체 식단 조회 */
+  const getAllDiets = async () => {
+    try {
+      const res = await axios.get(`${REST_API_URL}`, tokenHeader());
+      allDietList.value = res.data;
+    } catch (err) {
+      console.error("전체 식단 조회 실패", err);
+    }
+  };
+
   /** 날짜별 식단 조회 */
   const getDietByDate = async (start, end) => {
     try {
-      const res = await axios.get(`${REST_API_URL}/date?start=${start}&end=${end}`, tokenHeader());
-      dietList.value = res.data;
+      const res = await axios.get(
+        `${REST_API_URL}/date?start=${start}&end=${end}`,
+        tokenHeader()
+      );
+      dietByDateList.value = res.data;
     } catch (err) {
       console.error("날짜별 식단 조회 실패", err);
     }
@@ -36,8 +53,11 @@ export const useDietStore = defineStore("diets", () => {
   /** 유저별 식단 조회 */
   const getDietByUser = async (userNo) => {
     try {
-      const res = await axios.get(`${REST_API_URL}/user/${userNo}`, tokenHeader());
-      dietList.value = res.data;
+      const res = await axios.get(
+        `${REST_API_URL}/user/${userNo}`,
+        tokenHeader()
+      );
+      dietByUserList.value = res.data;
     } catch (err) {
       console.error("유저별 식단 조회 실패", err);
     }
@@ -47,16 +67,21 @@ export const useDietStore = defineStore("diets", () => {
   const getDietDetail = async (dietNo) => {
     try {
       const res = await axios.get(`${REST_API_URL}/${dietNo}`, tokenHeader());
-      diet.value = res.data;
+      if (res.data) {
+        dietDetail.value = Array.isArray(res.data) ? res.data[0] : res.data;
+      } else {
+        dietDetail.value = null;
+      }
     } catch (err) {
       console.error("식단 상세 조회 실패", err);
+      dietDetail.value = null;
     }
   };
 
   /** 식단 수정 */
-  const updateDiet = async (dietNo, payload) => {
+  const updateDiet = async (dietNo, formData) => {
     try {
-      await axios.put(`${REST_API_URL}/${dietNo}`, payload, tokenHeader());
+      await axios.put(`${REST_API_URL}/${dietNo}`, formData, tokenHeader());
     } catch (err) {
       console.error("식단 수정 실패", err);
     }
@@ -72,9 +97,15 @@ export const useDietStore = defineStore("diets", () => {
   };
 
   return {
-    dietList,
-    diet,
+    // 🔽 export 되는 state
+    allDietList,
+    dietByDateList,
+    dietByUserList,
+    dietDetail,
+
+    // 🔽 export 되는 actions
     createDiet,
+    getAllDiets,
     getDietByDate,
     getDietByUser,
     getDietDetail,
