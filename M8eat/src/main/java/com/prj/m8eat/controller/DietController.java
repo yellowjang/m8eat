@@ -43,16 +43,7 @@ public class DietController {
 
 	private final DietService dietService;
 	private final JwtUtil util;
-<<<<<<< M8eat/src/main/java/com/prj/m8eat/controller/DietController.java
-	
-=======
 
-	public DietController(DietService dietService, JwtUtil util) {
-		this.dietService = dietService;
-		this.util = util;
-	}
-
->>>>>>> M8eat/src/main/java/com/prj/m8eat/controller/DietController.java
 	@Value("${file.upload.dir}")
 	private String baseDir;
 
@@ -178,63 +169,6 @@ public class DietController {
 	    }
 	}
 
-	// 식단 등록
-	@PostMapping
-	public ResponseEntity<String> writeDiets(@ModelAttribute DietRequest dietReq, HttpSession session,
-			@CookieValue("access-token") String token) {
-		Diet diet = new Diet();
-		int userNo;
-		if (util.validate(token)) {
-			Claims claims = util.getClaims(token);
-			userNo = (int) claims.get("userNo");
-			diet.setUserNo(userNo); // TODO: 로그인 사용자 정보로 교체
-		}
-		diet.setMealType(dietReq.getMealType());
-
-		System.out.println("dietttt writeeeee" + dietReq);
-
-		try {
-			System.out.println("✅ 받은 날짜: " + dietReq.getMealDate());
-			diet.setMealDate(dietReq.getMealDate());
-
-		} catch (DateTimeParseException e) {
-			return ResponseEntity.badRequest().body("날짜 형식 오류: " + e.getMessage());
-		}
-
-		// 이미지 파일 저장 처리
-		MultipartFile file = dietReq.getFile();
-		if (file != null && !file.isEmpty()) {
-			String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-			File uploadDir = new File(baseDir);
-			if (!uploadDir.exists())
-				uploadDir.mkdirs();
-			try {
-				File saveFile = new File(uploadDir, fileName);
-				file.transferTo(saveFile);
-				diet.setFilePath("/upload/" + fileName); // URL 경로
-			} catch (IOException e) {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 저장 실패");
-			}
-		}
-
-		// 음식 리스트 파싱
-		ObjectMapper objectMapper = new ObjectMapper();
-		List<DietsFood> foodList;
-		try {
-			foodList = objectMapper.readValue(dietReq.getFoods(), new TypeReference<List<DietsFood>>() {
-			});
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("음식 정보 파싱 실패: " + e.getMessage());
-		}
-
-		// 트랜잭션 서비스 호출
-		try {
-			int dietNo = dietService.createDietWithFoods(diet, foodList);
-			return ResponseEntity.ok("식단이 성공적으로 등록되었습니다. (dietNo=" + dietNo + ")");
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("식단 등록에 실패했습니다: " + e.getMessage());
-		}
-	}
 
 	// 식단 삭제
 	@DeleteMapping("/{dietNo}")
@@ -263,6 +197,7 @@ public class DietController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("분석 실패: " + e.getMessage());
+			}
 		}
 	public ResponseEntity<?> analyzeByVisionGpt(@RequestParam("file") MultipartFile file,
 												@CookieValue("access-token") String token) {
