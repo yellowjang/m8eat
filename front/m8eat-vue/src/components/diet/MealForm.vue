@@ -23,10 +23,33 @@
             </div>
           </div>
         </div>
-        <div class="analysis-result-box">
+        <!-- <div class="analysis-result-box">
           <p class="input-title">분석 결과</p>
           <p>분석한 결과가 여기에 나올 거예요.</p>
+        </div> -->
+        <div class="analysis-result-box">
+          <p class="input-title">분석 결과</p>
+
+          <div v-if="loading">⏳ 분석 중입니다...</div>
+          <div v-else-if="results.length === 0">
+            분석한 결과가 여기에 나올 거예요.
+          </div>
+          <ul v-else>
+            <li v-for="(item, idx) in results" :key="idx">
+              🍽️ 라벨: {{ item.label }}<br />
+              🇰🇷 번역: {{ item.translated }}<br />
+              🔍 매칭: {{ item.matched }}<br />
+              <span v-if="item.nutrition">
+                🔥 칼로리: {{ item.nutrition.calories }} kcal
+              </span>
+              <span v-else>
+                ⚠️ 영양 정보 없음
+              </span>
+            </li>
+          </ul>
         </div>
+
+        
       </div>
 
       <!-- 상세 시간 -->
@@ -119,6 +142,11 @@ import { useDietStore } from "@/stores/diet";
 import { useFoodStore } from "@/stores/food";
 import dayjs from "dayjs";
 
+import axios from 'axios'
+
+const results = ref([]); // 분석 결과 저장
+const loading = ref(false); // 로딩 상태
+
 const emit = defineEmits(["close"]);
 
 const dietStore = useDietStore();
@@ -149,13 +177,36 @@ onMounted(() => {
 if (props.edit && props.edit.filePath) {
   previewUrl.value = props.edit.filePath;
 }
-const handleFileChange = (e) => {
-  const selectedFile = e.target.files[0];
-  if (selectedFile) {
-    file.value = selectedFile;
-    previewUrl.value = URL.createObjectURL(selectedFile);
+// const handleFileChange = (e) => {
+//   const selectedFile = e.target.files[0];
+//   if (selectedFile) {
+//     file.value = selectedFile;
+//     previewUrl.value = URL.createObjectURL(selectedFile);
+//   }
+// };
+const handleFileChange = async (e) => {
+  const selected = e.target.files[0];
+  if (selected) {
+    file.value = selected;
+    previewUrl.value = URL.createObjectURL(selected);
+
+    // 이미지 분석 요청
+    const formData = new FormData();
+    formData.append("file", selected);
+    loading.value = true;
+
+    try {
+      const res = await axios.post("http://localhost:8080/diets/ai/vision-gpt", formData);
+      results.value = res.data;
+    } catch (err) {
+      console.error("분석 실패:", err);
+      // alert("분석 실패: " + err.message);
+    } finally {
+      loading.value = false;
+    }
   }
 };
+
 
 const removeImage = () => {
   file.value = null;
