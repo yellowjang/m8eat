@@ -39,7 +39,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
+  <div class="calendar-box">
     <button @click="toggleWeekends">Toggle Weekends</button>
     <vue-cal
       :hide-weekends="!showWeekends"
@@ -58,6 +58,7 @@ onMounted(async () => {
 .vuecal {
   height: 100%;
 }
+
 
 .meal-event {
   background-color: #f8caca;
