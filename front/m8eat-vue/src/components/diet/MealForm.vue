@@ -118,7 +118,9 @@ import deleteIcon from "@/assets/icon/deleteIcon.png";
 import { useDietStore } from "@/stores/diet";
 import { useFoodStore } from "@/stores/food";
 import dayjs from "dayjs";
+
 const emit = defineEmits(["close"]);
+
 const dietStore = useDietStore();
 const foodStore = useFoodStore();
 
@@ -208,6 +210,7 @@ const addFood = () => {
   };
 
   foods.value.push(food);
+  console.log("addddd", foods.value)
 
   foodInput.value = "";
   foodAmount.value = null;
@@ -242,6 +245,7 @@ const totalCalories = computed(() =>
 const handleSubmit = async () => {
   const formData = new FormData();
   formData.append("mealType", mealTime.value);
+  console.log("1231213123", formData.get("mealType"))
 
   const formattedDate = dayjs(mealDate.value).format("YYYY-MM-DD HH:mm");
   formData.append("mealDate", formattedDate);
@@ -257,6 +261,7 @@ const handleSubmit = async () => {
 
     emit("update-meal");
   } else {
+    console.log("handleee", formData)
     await dietStore.createDiet(formData);
     alert("식단이 성공적으로 등록되었습니다.");
     emit("add-meal");
