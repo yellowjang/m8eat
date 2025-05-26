@@ -9,7 +9,8 @@
     <div class="basic-info">
       <!-- 왼쪽: 프로필 이미지 -->
       <div class="profile-img-wrapper">
-        <img :src="store.loginUser.profileImage || defaultProfile" alt="프로필 이미지" class="profile-img" />
+        <!-- <img :src="store.loginUser.profileImage || defaultProfile" alt="프로필 이미지" class="profile-img" /> -->
+        <img :src="getProfileImage()" alt="프로필 이미지" class="profile-img" />
       </div>
 
       <!-- 오른쪽: 사용자 정보 + 수정 버튼 -->
@@ -173,6 +174,7 @@ onMounted(async () => {
   await store.checkLogin();
   getUserInfo();
   await getHealthInfo();
+  // getProfileImage();
 });
 // const loginUser = computed(() => store.loginUser)
 
@@ -201,6 +203,14 @@ const filteredHealthInfo = computed(() => {
   return rest;
 });
 
+const getProfileImage = () => {
+  const filePath = store.loginUser?.profileImagePath;
+  console.log("profile", filePath);
+  const img = `http://localhost:8080${filePath}`;
+  // console.log("getProfileImage", store.loginUser?.profileImagePath);
+  return filePath && filePath.trim() !== "" ? img : defaultProfile;
+};
+
 const saveBasicUpdate = () => {
   user.value = { ...updateUser.value };
   console.log("saveBasicEdit ", user.value);
@@ -221,6 +231,7 @@ const logout = () => {
   alert("로그아웃 되었습니다.");
   router.push({ name: "login" });
 };
+
 const withdraw = async () => {
   if (confirm("정말 탈퇴하시겠습니까?")) {
     console.log("탈퇴");
