@@ -6,7 +6,9 @@
     <div class="header-left">
       <RouterLink to="/">Home</RouterLink>
       <RouterLink to="/boards">자유게시판</RouterLink>
-      <RouterLink to="/manage">회원관리</RouterLink>
+      <span v-if="isCoach">
+        <RouterLink to="/manage">회원관리</RouterLink>
+      </span>
     </div>
     <div class="header-right">
       <template v-if="isLoggedIn">
@@ -55,6 +57,9 @@ const toggleDropdown = () => {
 
 const router = useRouter();
 
+// const isCoach = ref(false);
+const isCoach = computed(() => store.loginUser?.role === "coach");
+
 const goToMyPage = () => {
   router.push("/mypage");
 };
@@ -74,14 +79,20 @@ const logout = async () => {
   // dropdownOpen.value = false;
 };
 
-// // ✅ 처음 마운트될 때 로그인 상태 확인
-// onMounted(() => {
-//   store.checkLogin().catch(() => {
-//     // 실패해도 무시 가능 (로그인 안 된 경우)
-//   });
-// });
+// ✅ 처음 마운트될 때 로그인 상태 확인
+onMounted(() => {
+  store
+    .checkLogin()
+    .then(() => {
+      isCoach.value = store.loginUser.role === "coach" ? true : false;
+    })
+    .catch(() => {
+      // 실패해도 무시 가능 (로그인 안 된 경우)
+    });
+});
 
 import "@/style/header.scss";
+import { storeToRefs } from "pinia";
 </script>
 <style scoped>
 li {
