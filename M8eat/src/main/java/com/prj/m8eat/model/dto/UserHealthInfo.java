@@ -9,6 +9,14 @@ public class UserHealthInfo {
 	private String allergy = "";
 	private String purpose = "";
 	
+	public UserHealthInfo(int userNo, double height, double weight, String illness, String allergy, String purpose) {
+		this.userNo = userNo;
+		this.height = height;
+		this.weight = weight;
+		this.illness = illness;
+		this.allergy = allergy;
+		this.purpose = purpose;
+	}
 	
 	public int getInfoNo() {
 		return infoNo;
