@@ -1,5 +1,8 @@
 package com.prj.m8eat.model.dto;
 
+import java.time.LocalDateTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 public class DietRequest {
@@ -9,9 +12,11 @@ public class DietRequest {
     private MultipartFile file;
     private String filePath;
     private String foods; // JSON 문자열 (프론트에서 stringify 해서 넘김)
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime mealDate;
+	
+	
 
-	
-	
 	public int getDietNo() {
 		return dietNo;
 	}
@@ -66,5 +71,14 @@ public class DietRequest {
 		return "DietRequest [dietNo=" + dietNo + ", userNo=" + userNo + ", mealType=" + mealType + ", file=" + file
 				+ ", filePath=" + filePath + ", foods=" + foods + "]";
 	}
+	
+	public LocalDateTime getMealDate() {
+		return mealDate;
+	}
+	
+	public void setMealDate(LocalDateTime mealDate) {
+		this.mealDate = mealDate;
+	}
+
 	
 }

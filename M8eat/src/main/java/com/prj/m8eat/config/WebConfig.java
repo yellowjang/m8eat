@@ -1,5 +1,6 @@
 package com.prj.m8eat.config;
 
+<<<<<<< HEAD
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -42,4 +43,18 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/upload/**")
                 .addResourceLocations("file:///" + uploadPath + "/");
     }
+=======
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	    registry.addResourceHandler("/upload/**")
+	    .addResourceLocations("file:/Users/jang-ayoung/Desktop/m8eat/M8eat/upload/");
+	}
+>>>>>>> d0a9c0514aec37fe596da79675549d3ec0c2ddfe
 }
