@@ -32,6 +32,8 @@ import com.prj.m8eat.model.dto.UserHealthInfo;
 import com.prj.m8eat.model.service.UserService;
 
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
@@ -155,9 +157,21 @@ public class UserController {
 	
 	
 	@DeleteMapping("/auth/quit/{userNo}")
-	public ResponseEntity<String> quit(@PathVariable("userNo") int userNo) {
+	public ResponseEntity<String> quit(@PathVariable("userNo") int userNo, HttpServletResponse response) {
+		System.out.println(userNo);
 		int result = userService.quit(userNo);
 		if (result == 1) {
+		    // ✅ access-token 쿠키를 빈 값 + 만료로 설정
+		    ResponseCookie expiredCookie = ResponseCookie.from("access-token", "")
+		        .httpOnly(true)
+		        .secure(false)
+		        .sameSite("Lax")
+		        .path("/")
+		        .maxAge(0) // ⛔ 즉시 만료
+		        .build();
+		    
+		    // ✅ 쿠키 헤더 설정
+		    response.setHeader("Set-Cookie", expiredCookie.toString());
 			return ResponseEntity.status(HttpStatus.OK).body("정상적으로 탈퇴되었습니다.");
 		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("요청이 정상적으로 처리되지 않았습니다.");
@@ -173,9 +187,31 @@ public class UserController {
 		}
 		return ResponseEntity.notFound().build();
 	}
+
+	@GetMapping("/user/mypage/healthInfo")
+	public ResponseEntity<?> getMyHealthInfo(@CookieValue("access-token") String token) {
+		System.out.println("healthhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+		int userNo;
+	    if (util.validate(token)) {
+	        Claims claims = util.getClaims(token);
+	        userNo = (int) claims.get("userNo");
+	    } else {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+	    }
+	    
+	    System.out.println("healthhhh" + userNo);
+
+		UserHealthInfo healthInfo = userService.getMyHealthInfo(userNo);
+		if (healthInfo != null) {
+			return ResponseEntity.ok(healthInfo);
+		}
+		return ResponseEntity.notFound().build();
+	}
 	
 	@PutMapping("/user/mypage/{userNo}")
-	public ResponseEntity<String> updateMyInfo(@PathVariable("userNo") int userNo, @ModelAttribute User user) {
+	public ResponseEntity<String> updateMyInfo(@PathVariable("userNo") int userNo, @RequestBody User user) {
+		System.out.println("infouupdateeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+		System.out.println("updateeeee" + user);
 		user.setUserNo(userNo);
 		if (userService.updateMyInfo(user) == 1) {
 			return ResponseEntity.ok().body("정상적으로 수정되었습니다.");
@@ -192,6 +228,24 @@ public class UserController {
 		}
 		
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("요청이 정상적으로 처리되지 않았습니다.");
+	}
+	
+	@GetMapping("/user/mypage/coachId")
+	public ResponseEntity<?> getCoachId(@CookieValue("access-token") String token) {
+		int userNo;
+	    if (util.validate(token)) {
+	        Claims claims = util.getClaims(token);
+	        userNo = (int) claims.get("userNo");
+	    } else {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+	    }
+
+	    String coachId = userService.getCoachId(userNo);
+		System.out.println("coachhhhhh" + coachId);
+		if (coachId != null) {
+			return ResponseEntity.ok(coachId);
+		}
+		return ResponseEntity.notFound().build();
 	}
 	
 }

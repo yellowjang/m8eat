@@ -13,6 +13,8 @@ import javax.imageio.ImageIO;
 
 import com.prj.m8eat.model.dto.CropBox;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,8 +30,10 @@ public class GoogleVisionUtil {
 
     // 1. 클라이언트 생성
     public ImageAnnotatorClient createClient() throws IOException {
+    	Resource resource = new ClassPathResource("braided-gravity-460410-r6-1e7c33f2eb8a.json");
         GoogleCredentials credentials = GoogleCredentials
-                .fromStream(new FileInputStream(credentialsPath))
+//                .fromStream(new FileInputStream(credentialsPath))
+                .fromStream(resource.getInputStream())
                 .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
 
         ImageAnnotatorSettings settings = ImageAnnotatorSettings.newBuilder()

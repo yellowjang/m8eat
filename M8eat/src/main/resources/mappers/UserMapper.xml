@@ -15,10 +15,20 @@
  		 values (#{userNo}, #{height}, #{weight}, #{illness}, #{allergy}, #{purpose});
 	</insert>
 	
+	<insert id="insertHealthInfo">
+		INSERT INTO users_health_info (user_no, height, weight, illness, allergy, purpose)
+ 		 values (#{userNo}, #{height}, #{weight}, #{illness}, #{allergy}, #{purpose});
+	</insert>
+	
 	<!-- 로그인, 내 정보 조회 -->
 	<select id="selectUser" parameterType="String" resultType="User">
 		SELECT * FROM users
  		 WHERE id = #{id};
+	</select>
+	
+	<select id="selectHealthInfo" parameterType="int" resultType="UserHealthInfo">
+		SELECT * FROM users_health_info
+ 		 WHERE user_no = #{userNo};
 	</select>
 	
 	<!-- 회원탈퇴 -->
@@ -40,5 +50,13 @@
 		 SET height=#{height}, weight=#{weight}, illness=#{illness}, allergy=#{allergy}, purpose=#{purpose}
 		 WHERE user_no=#{userNo};
 	</update>
+	
+	<!-- 코치 아이디 찾기 -->
+	<select id="selectCoachId" parameterType="int" resultType="String">
+		SELECT coach.id
+		FROM users AS user
+		JOIN users AS coach ON user.coach_no = coach.user_no
+		WHERE user.user_no = #{userNo};
+	</select>
 	
  </mapper>
