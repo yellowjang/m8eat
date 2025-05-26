@@ -68,11 +68,14 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User socialLogin(User user) {
+		System.out.println("socialLOginnnnnnnnnnn" + user);
 		User existUser = userDao.selectUser(user.getId());
 		if (existUser == null) {
 			user.setPassword(null); // 소셜 로그인은 비밀번호 없음
-			user.setRole("USER");
+			user.setRole("user");
 			userDao.insertUser(user);
+			UserHealthInfo healthInfo = new UserHealthInfo(user.getUserNo(), 0, 0, "", "", "");
+			userDao.insertUserHealthInfo(healthInfo);
 			return user;
 		} else {
 			return existUser;
