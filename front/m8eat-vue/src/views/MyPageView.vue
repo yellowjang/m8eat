@@ -9,7 +9,8 @@
     <div class="basic-info">
       <!-- 왼쪽: 프로필 이미지 -->
       <div class="profile-img-wrapper">
-        <img :src="store.loginUser.profileImage || defaultProfile" alt="프로필 이미지" class="profile-img" />
+        <!-- <img :src="store.loginUser.profileImage || defaultProfile" alt="프로필 이미지" class="profile-img" /> -->
+        <img :src="getProfileImage()" alt="프로필 이미지" class="profile-img" />
       </div>
 
       <!-- 오른쪽: 사용자 정보 + 수정 버튼 -->
@@ -47,7 +48,7 @@
               </span>
             </template>
             <template v-else>
-              {{ value ? value : "입력되지 않음" }}
+              {{ value ? value : "없음" }}
             </template>
           </div>
         </div>
@@ -57,11 +58,14 @@
       </div>
 
       <!-- 채팅방 이동 버튼 -->
-      <div class="chat-entry">
+      <div class="chat-entry" v-if="loginUserRole === 'user'">
         <p>{{ partnerName }}의 채팅방으로 이동할 수 있어요.</p>
         <button class="chat-btn" @click="goToChat">채팅방 이동</button>
       </div>
-      <div class="chat-spacing"></div>
+      <div class="chat-entry" v-if="loginUserRole === 'coach'">
+        <p>회원관리 페이지로 이동할 수 있어요.</p>
+        <button class="chat-btn" @click="goToMembers">회원관리</button>
+      </div>
 
       <div class="health-action-buttons">
         <button class="btn outline" @click="logout">로그아웃</button>
@@ -77,6 +81,13 @@
           <span class="close-btn" @click="showBasicEdit = false">&times;</span>
         </div>
         <form @submit.prevent="saveBasicUpdate">
+          <label>프로필 이미지</label>
+          <div class="image-upload-container">
+            <div class="image-preview">
+              <img :src="previewUrl || getProfileImage()" alt="미리보기" class="preview-img" />
+            </div>
+            <input type="file" @change="handleProfileImageChange" accept="image/*" />
+          </div>
           <label>이름</label>
           <input type="text" v-model="updateUser.name" />
 
@@ -173,8 +184,9 @@ onMounted(async () => {
   await store.checkLogin();
   getUserInfo();
   await getHealthInfo();
+  // getProfileImage();
 });
-// const loginUser = computed(() => store.loginUser)
+const loginUserRole = computed(() => store.loginUser.role);
 
 const getUserInfo = () => {
   console.log("mypageeee", store.loginUser);
@@ -201,12 +213,43 @@ const filteredHealthInfo = computed(() => {
   return rest;
 });
 
-const saveBasicUpdate = () => {
-  user.value = { ...updateUser.value };
-  console.log("saveBasicEdit ", user.value);
-  showBasicEdit.value = false;
-  store.updateUser(updateUser.value);
+const getProfileImage = () => {
+  const filePath = store.loginUser?.profileImagePath;
+  console.log("profile", filePath);
+  const img = `http://localhost:8080${filePath}`;
+  console.log("getProfileImage", store.loginUser?.profileImagePath);
+  return filePath && filePath.trim() !== "" ? img : defaultProfile;
 };
+
+const previewUrl = ref("");
+const newProfileImage = ref(null);
+
+const handleProfileImageChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    newProfileImage.value = file;
+    previewUrl.value = URL.createObjectURL(file);
+  }
+};
+
+const saveBasicUpdate = async () => {
+  user.value = { ...updateUser.value };
+
+  const formData = new FormData();
+  formData.append("name", updateUser.value.name);
+  formData.append("id", updateUser.value.id);
+  formData.append("role", updateUser.value.role);
+
+  if (newProfileImage.value) {
+    formData.append("profileImage", newProfileImage.value);
+  }
+
+  await store.updateUser(formData); 
+  await store.checkLogin();
+  await getProfileImage();
+  showBasicEdit.value = false;
+};
+
 
 const labelMap = {
   height: "키 (cm)",
@@ -221,6 +264,7 @@ const logout = () => {
   alert("로그아웃 되었습니다.");
   router.push({ name: "login" });
 };
+
 const withdraw = async () => {
   if (confirm("정말 탈퇴하시겠습니까?")) {
     console.log("탈퇴");
@@ -280,6 +324,10 @@ const partnerName = ref(user.value.role === "coach" ? "회원들과" : "담당 �
 const goToChat = async () => {
   const coachId = await store.getCoachId();
   router.push({ name: "ChatView", params: { targetId: coachId } });
+};
+
+const goToMembers = () => {
+  router.push({ name: "manage" });
 };
 </script>
 
@@ -548,6 +596,7 @@ const goToChat = async () => {
 .chat-entry {
   margin-top: 3rem;
   text-align: center;
+  margin-bottom: 2.5rem;
 
   p {
     margin-bottom: 0.8rem;
@@ -569,7 +618,35 @@ const goToChat = async () => {
     background-color: #d67b7b;
   }
 }
-.chat-spacing {
-  margin-bottom: 2.5rem;
+// .chat-spacing {
+//   margin-bottom: 2.5rem;
+// }
+
+.image-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem; // ✅ 요소들 사이 간격 한 번에 적용
+  margin-bottom: 1rem; // ✅ 아래쪽 간격도 띄우기
+  margin-top: 0.5rem; // ✅ 아래쪽 간격도 띄우기
+}
+
+.image-preview {
+  width: 150px;
+  height: 150px;
+  border: 1px dashed #ccc;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  margin: 0 auto; // 가운데 정렬
+}
+
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 </style>

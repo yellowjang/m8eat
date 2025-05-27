@@ -1,12 +1,12 @@
 <template>
   <div>
-    <h2>게시글 상세</h2>
     <div class="detail-container">
       <div class="detail-header">
         <h1 class="detail-title">{{ board.title }}</h1>
         <div class="detail-info">
           <!-- TODO : 작성자, 조회수, 작성일 출력 필요 -->
           <!-- <h2>제목 : {{ board.title }}</h2> -->
+          <span>{{ board.userName }}</span>
           <span>{{ board.viewCnt }}</span>
           <span>{{ board.regDate }}</span>
           <!-- <span>{{ board.userNo }}</span> -->
@@ -33,6 +33,7 @@
         <button class="btn btn-secondary" @click="requestBoardUpdateForm" v-if="board.userNo === userStore.loginUser?.userNo">수정</button>
       </div>
     </div>
+    <Comment :comments="boardStore.commentsList" />
   </div>
 </template>
 
@@ -42,6 +43,7 @@ import { useRoute, useRouter } from "vue-router";
 import { getBoardDetail, removeBoard } from "@/api/board";
 import { useBoardStore } from "@/stores/board";
 import { useUserStore } from "@/stores/user";
+import Comment from "@/components/board/Comment.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -55,6 +57,7 @@ const requestBoardDetail = async () => {
   try {
     const boardNo = route.params.boardNo;
     board.value = await boardStore.getBoardDetail(boardNo);
+    await boardStore.getComments(boardNo);
     console.log(board.value);
   } catch {
     alert("요청을 처리하지 못했습니다.");

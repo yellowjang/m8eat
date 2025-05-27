@@ -2,42 +2,38 @@
   <section class="meal-today">
     <h2 class="title">{{ formattedDate }} 식단</h2>
     <div class="add-meal-box">
-      <button class="add-meal" @click="$emit('add-meal')">
-        + 식단 등록하기
-      </button>
+      <button class="add-meal" @click="$emit('add-meal')">+ 식단 등록하기</button>
     </div>
     <div class="meal-boxes">
-      <div
-        class="meal-box"
-        v-for="type in ['아침', '점심', '저녁']"
-        :key="type"
-      >
+      <div class="meal-box" v-for="type in ['아침', '점심', '저녁']" :key="type">
         <p class="meal-title">{{ type }}</p>
+        <div v-if="mealsByTypeMap[type].length > 0">
+          <div class="meal-item" v-for="meal in mealsByTypeMap[type]" :key="meal.dietNo">
+            <router-link class="view-detail" :to="`/diet/${meal.dietNo}`">상세보기</router-link>
+            <!-- <button class="delete-meal" @click="$emit('edit-meal', mealsByType(type)[0])">수정</button> -->
+            <button class="delete-meal" @click="$emit('edit-meal', meal)">수정</button>
 
-        <div v-if="mealsByType(type).length > 0">
-          <button
-            class="edit-meal"
-            @click="$emit('edit-meal', mealsByType(type)[0])"
-          >
-            수정
-          </button>
-          <div
-            class="meal-item"
-            v-for="meal in mealsByType(type)"
-            :key="meal.dietNo"
-          >
-            <router-link class="view-detail" :to="`/diet/${meal.dietNo}`">
-              상세보기
-            </router-link>
-            <button class="delete-meal" @click="deleteMeal(meal.dietNo)">
-              삭제
-            </button>
+            <button class="delete-meal" @click="deleteMeal(meal.dietNo)">삭제</button>
             <ul class="food-list">
-              <li
-                v-for="(food, idx) in meal.foods"
-                :key="idx"
-                class="food-name"
-              >
+              <li v-for="(food, idx) in meal.foods" :key="idx" class="food-name">
+                {{ food.foodName }}
+              </li>
+            </ul>
+            <p class="calorie">{{ totalCalories(meal.foods) }} kcal</p>
+          </div>
+        </div>
+        <div v-else class="empty-meal">등록된 식단이 없습니다.</div>
+      </div>
+
+      <!-- <div class="meal-box" v-for="type in ['아침', '점심', '저녁']" :key="type">
+        <p class="meal-title">{{ type }}</p>
+        <div v-if="mealsByType(type).length > 0">
+          <div class="meal-item" v-for="meal in mealsByType(type)" :key="meal.dietNo">
+            <router-link class="view-detail" :to="`/diet/${meal.dietNo}`">상세보기</router-link>
+            <button class="delete-meal" @click="$emit('edit-meal', mealsByType(type)[0])">수정</button>
+            <button class="delete-meal" @click="deleteMeal(meal.dietNo)">삭제</button>
+            <ul class="food-list">
+              <li v-for="(food, idx) in meal.foods" :key="idx" class="food-name">
                 {{ food.foodName }}
               </li>
             </ul>
@@ -46,7 +42,7 @@
         </div>
 
         <div v-else class="empty-meal">등록된 식단이 없습니다.</div>
-      </div>
+      </div> -->
     </div>
     <p class="summary">총 섭취 칼로리: {{ overallCalories }} kcal</p>
     <div class="divide-line"></div>
@@ -75,8 +71,9 @@ const fetchDiets = async (date) => {
     const start = `${date} 00:00:00`;
     const end = `${date} 23:59:59`;
     await dietStore.getDietByDate(start, end);
-    console.log("📦 dietByDateList:", dietStore.dietByDateList); // 여기도 확인
-    meals.value = [...dietStore.dietByDateList];
+    console.log("📦 dietByDateList:", dietStore.dietByDateList);
+    meals.value = [...dietStore.dietByDateList]; // ✅ 핵심 변경
+    console.log("meals.value", meals.value);
   } catch (e) {
     console.error("식단 불러오기 실패", e);
     meals.value = [];
@@ -96,11 +93,22 @@ const mealsByType = (type) => {
   return meals.value.filter((meal) => meal.mealType === type);
 };
 
-const totalCalories = (foods) =>
-  foods.reduce((sum, food) => sum + (food.calorie || 0), 0);
-const overallCalories = computed(() =>
-  meals.value.reduce((total, meal) => total + totalCalories(meal.foods), 0)
-);
+const mealsByTypeMap = computed(() => {
+  const map = {
+    아침: [],
+    점심: [],
+    저녁: [],
+  };
+  for (const meal of meals.value) {
+    if (map[meal.mealType]) {
+      map[meal.mealType].push(meal);
+    }
+  }
+  return map;
+});
+
+const totalCalories = (foods) => foods.reduce((sum, food) => sum + (food.calorie || 0), 0);
+const overallCalories = computed(() => meals.value.reduce((total, meal) => total + totalCalories(meal.foods), 0));
 const totalNutrients = computed(() => {
   return meals.value.reduce(
     (acc, meal) => {
@@ -134,9 +142,7 @@ const recommendedIntake = {
   sugar: 50,
 };
 
-const formattedDate = computed(() =>
-  dayjs(props.selectedDate).format("YYYY년 MM월 DD일")
-);
+const formattedDate = computed(() => dayjs(props.selectedDate).format("YYYY년 MM월 DD일"));
 </script>
 
 <style lang="scss" scoped>
@@ -146,8 +152,12 @@ const formattedDate = computed(() =>
   font-size: 12px;
   font-weight: bold;
   text-decoration: none;
+  margin-right: 5px;
 }
-
+button.view-detail {
+  border: none;
+  background-color: none !important;
+}
 .view-detail:hover {
   color: #c94e4e;
 }
@@ -236,7 +246,7 @@ const formattedDate = computed(() =>
   border: none;
   color: #c94e4e;
   font-size: 12px;
-  margin-left: 5px;
+  // margin: 0 5px;
   cursor: pointer;
   font-weight: bold;
 }
