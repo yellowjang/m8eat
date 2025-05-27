@@ -47,13 +47,7 @@
         <ul class="food-list">
           <li v-for="(food, index) in foods" :key="index" class="food-item">
             {{ food.foodName }} / {{ food.amount }}g / {{ food.calorie }} kcal
-            <button
-              class="remove-button"
-              type="button"
-              @click="removeFood(index)"
-            >
-              x
-            </button>
+            <button class="remove-button" type="button" @click="removeFood(index)">x</button>
           </li>
         </ul>
       </div>
@@ -89,6 +83,8 @@ const foods = ref([]);
 const file = ref(null);
 const previewUrl = ref(null);
 
+const emit = defineEmits(["close"]);
+
 onMounted(() => {
   if (props.edit) {
     mealDate.value = new Date(props.edit.mealDate);
@@ -114,9 +110,7 @@ const removeFood = (index) => {
   foods.value.splice(index, 1);
 };
 
-const totalCalories = computed(() =>
-  foods.value.reduce((sum, food) => sum + food.calorie, 0)
-);
+const totalCalories = computed(() => foods.value.reduce((sum, food) => sum + food.calorie, 0));
 
 const handleSubmit = async () => {
   const formData = new FormData();
@@ -128,6 +122,13 @@ const handleSubmit = async () => {
 
   await dietStore.updateDiet(dietNo, formData);
   alert("식단이 성공적으로 수정되었습니다.");
+  const start = `${mealDate.value} 00:00:00`;
+  const end = `${mealDate.value} 23:59:59`;
+  await dietStore.getDietByDate(start, end);
+
+  // await dietStore.getAllDiets();
+
+  emit("close");
   // location.href = "/";
 };
 </script>

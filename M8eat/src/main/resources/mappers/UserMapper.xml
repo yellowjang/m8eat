@@ -40,7 +40,7 @@
 	<!-- 내 정보 수정 -->
 	<update id="updateUserInfo" parameterType="User">
 		UPDATE users
-		 SET name=#{name}, id=#{id}, password=#{password}, role=#{role}
+		 SET name=#{name}, role=#{role}, profile_image_path=#{profileImagePath}
 		 WHERE user_no=#{userNo};
 	</update>
 	

@@ -132,7 +132,7 @@ export const useUserStore = defineStore("user", () => {
 
   const logout = async () => {
     try {
-      await api.post(`${REST_API_URL}/auth/logout`, null);
+      await api.get(`${REST_API_URL}/auth/logout`);
 
       loginUser.value = null;
       // ✅ DOM 반영까지 기다림
@@ -143,12 +143,42 @@ export const useUserStore = defineStore("user", () => {
     }
   };
 
-  const updateUser = async (updateUser) => {
-    console.log("store ", updateUser);
-    console.log("store ", loginUser);
+  // const updateUser = async (updateUser) => {
+  //   console.log("store ", updateUser);
+  //   console.log("store ", loginUser);
+  //   try {
+  //     await api.put(`${REST_API_URL}/user/mypage/${loginUser.value.userNo}`, updateUser);
+  //   } catch (error) {}
+  // };
+
+  const updateUser = async (updateData) => {
     try {
-      await api.put(`${REST_API_URL}/user/mypage/${loginUser.value.userNo}`, updateUser);
-    } catch (error) {}
+      const userNo = loginUser.value.userNo;
+
+      let formData;
+
+      // FormData인 경우 그대로 사용, 아닌 경우 변환
+      if (updateData instanceof FormData) {
+        formData = updateData;
+      } else {
+        formData = new FormData();
+        for (const key in updateData) {
+          formData.append(key, updateData[key]);
+        }
+      }
+
+      await api.put(`${REST_API_URL}/user/mypage/${userNo}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      // 성공 후 사용자 정보 다시 가져오기 (선택)
+      
+      await checkLogin();
+    } catch (error) {
+      console.error("업데이트 실패", error);
+    }
   };
 
   const getCoachId = async () => {
