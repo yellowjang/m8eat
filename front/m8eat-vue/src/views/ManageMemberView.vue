@@ -18,10 +18,10 @@
       <div class="profile-boxes">
         <div v-for="member in members" :key="member.userNo" class="profile-box">
           <div class="img-info">
-            <img alt="프로필" class="" />
+            <img alt="프로필" :src="getProfileImage(member.profileImagePath)" class="profile-img" />
             <div class="flex-1">
               <p class="name">{{ member.name }}</p>
-              <p class="text-sm text-gray-500">26세 / 여</p>
+              <!-- <p class="text-sm text-gray-500">26세 / 여</p> -->
             </div>
           </div>
           <div class="button-box">
@@ -66,7 +66,7 @@
         </p>
 
         <div class="image-box" v-if="dietDetail.filePath">
-          <img :src="dietDetail.filePath" alt="식단 이미지" class="diet-image" />
+          <img :src="getImage(dietDetail.filePath)" alt="식단 이미지" class="diet-image" />
         </div>
 
         <h3 class="text-lg font-semibold mt-4">음식 목록</h3>
@@ -98,6 +98,8 @@ import NutrientBarChart from "@/components/diet/NutrientBarChart.vue";
 import { RouterLink } from "vue-router";
 import { parseClassNames } from "@fullcalendar/core/internal";
 import router from "@/router";
+import defaultProfile from "@/assets/icon/default-profile.png";
+
 const members = ref([]);
 const selectedMember = ref(null);
 const selectedMemberName = ref("");
@@ -130,9 +132,20 @@ const totalNutrients = computed(() => {
 const fetchMembers = async () => {
   try {
     members.value = await coachStore.fetchMembers();
+
+    console.log("memmmmm", members.value);
   } catch (err) {
     alert("회원 목록 불러오기 실패");
   }
+};
+
+const getProfileImage = (filePath) => {
+  const img = `http://localhost:8080${filePath}`;
+  return filePath && filePath.trim() !== "" ? img : defaultProfile;
+};
+
+const getImage = (filePath) => {
+  return `http://localhost:8080${filePath}`;
 };
 
 const selectMember = async (userNo) => {
@@ -201,8 +214,9 @@ img {
 }
 .img-info {
   display: flex;
-  gap: 20px;
+  gap: 30px;
   flex-direction: row;
+  align-items: center;
 }
 .diets-list {
   display: flex;
@@ -257,7 +271,8 @@ img {
   margin-top: 1rem;
 }
 .diet-image {
-  max-width: 100%;
+  width: 300px;
+  height: 200px;
   border-radius: 8px;
 }
 .food-list {
