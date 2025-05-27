@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.prj.m8eat.model.dao.DietDao">
+	
+	<!-- 식단 전체 조회 -->
+	<select id="selectAllDiets" resultType="Diet">
+		SELECT * 
+		 FROM diets;
+	</select>
+	
+	<!-- 식단 기록 -->
+	<insert id="insertDiet" parameterType="Diet" keyProperty="dietNo" useGeneratedKeys="true">
+		INSERT INTO diets (user_no, file_path)
+		 VALUES (#{userNo}, #{filePath})
+	</insert>
+	
+	<insert id="insertDietsFood" parameterType="DietsFood">
+		INSERT INTO diets_food (diet_no, food_name, calorie)
+		 VALUES (#{dietNo}, #{foodName}, #{calorie})
+	</insert>
+
+
+</mapper>
