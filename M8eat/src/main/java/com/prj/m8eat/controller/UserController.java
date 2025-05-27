@@ -209,7 +209,9 @@ public class UserController {
 	}
 	
 	@PutMapping("/user/mypage/{userNo}")
-	public ResponseEntity<String> updateMyInfo(@PathVariable("userNo") int userNo, @ModelAttribute User user) {
+	public ResponseEntity<String> updateMyInfo(@PathVariable("userNo") int userNo, @RequestBody User user) {
+		System.out.println("infouupdateeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+		System.out.println("updateeeee" + user);
 		user.setUserNo(userNo);
 		if (userService.updateMyInfo(user) == 1) {
 			return ResponseEntity.ok().body("정상적으로 수정되었습니다.");

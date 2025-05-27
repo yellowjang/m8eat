@@ -81,6 +81,7 @@ public class GoogleOauthService {
 		User user = new User();
 		user.setId(email);
 		user.setName(name);
+		System.out.println("serviceeeeeeeeeeeeeeeeee" + user);
 		User loginUser = userService.socialLogin(user);
 //		System.out.println((String)googleUser.get("picture"));
 //		System.out.println((String)googleUser.get(googleUser));
