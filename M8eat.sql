@@ -205,41 +205,7 @@ select * from chat_message;
 
 select * from users;
 
--- 채팅방
-CREATE TABLE if not exists chat_room (
-    room_no INT PRIMARY KEY AUTO_INCREMENT,
-    room_type TEXT not null,
-    created_at TIMESTAMP default now()
-);
 
--- 채팅방 참여자
-CREATE TABLE if not exists chat_room_user (
-    room_no INT not null,
-    user_no INT not null,
-    PRIMARY KEY (room_no, user_no),
-    FOREIGN KEY (room_no) REFERENCES chat_room(room_no)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    FOREIGN KEY (user_no) REFERENCES users(user_no)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
--- 채팅 메시지
-CREATE TABLE if not exists chat_msg (
-    msg_no INT PRIMARY KEY AUTO_INCREMENT,
-    room_no INT not null,
-    sender_no INT not null,
-    content VARCHAR(1000) not null,
-    msg_type TEXT not null,
-    created_at TIMESTAMP default now(),
-    FOREIGN KEY (room_no) REFERENCES chat_room(room_no)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    FOREIGN KEY (sender_no) REFERENCES users(user_no)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
 
 -- 게시판
 CREATE TABLE if not exists board (
