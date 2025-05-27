@@ -65,6 +65,10 @@ INSERT INTO coach_user_map (coach_no, user_no) VALUES (4, 5);
 
 select * from coach_user_map;
 
+INSERT INTO users (name, id, password, role, coach_no)
+VALUES ('김회원', 'kim', 'kim', 'user', 12),
+ ('박회원', 'park', 'park', 'user', 12);
+
 
 
 
