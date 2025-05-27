@@ -5,24 +5,30 @@ import org.springframework.web.multipart.MultipartFile;
 public class Board {
 	private int boardNo;
 	private int userNo;
+	public int getUserNo() {
+		return userNo;
+	}
+	public void setUserNo(int userNo) {
+		this.userNo = userNo;
+	}
+	private String userName;
 	private String title;
 	private String content;
 	private int viewCnt;
 	private String regDate;
 	private MultipartFile file; //업로드용.. Request 시 사용
 	private String filePath; //DB에서 불러올 실제 경로
-	
 	public int getBoardNo() {
 		return boardNo;
 	}
 	public void setBoardNo(int boardNo) {
 		this.boardNo = boardNo;
 	}
-	public int getUserNo() {
-		return userNo;
+	public String getUserName() {
+		return userName;
 	}
-	public void setUserNo(int userNo) {
-		this.userNo = userNo;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 	public String getTitle() {
 		return title;
@@ -62,9 +68,14 @@ public class Board {
 	}
 	@Override
 	public String toString() {
-		return "Board [boardNo=" + boardNo + ", userNo=" + userNo + ", title=" + title + ", content=" + content
-				+ ", viewCnt=" + viewCnt + ", regDate=" + regDate + ", file=" + file + ", filePath=" + filePath + "]";
+		return "Board [boardNo=" + boardNo + ", userNo=" + userNo + ", userName=" + userName + ", title=" + title
+				+ ", content=" + content + ", viewCnt=" + viewCnt + ", regDate=" + regDate + ", file=" + file
+				+ ", filePath=" + filePath + "]";
 	}
+
+	
+
+	
 	
 	
 }

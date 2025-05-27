@@ -10,8 +10,8 @@
         <strong>등록 시간:</strong>
         {{ formatTime(dietDetail.regDate) }}
       </p>
-      <div class="image-box" v-if="dietDetail.filePath">
-        <img :src="dietDetail.filePath" alt="식단 이미지" class="diet-image" />
+      <div class="image-box" v-if="dietDetail.filePath !== null">
+        <img :src="getImgPath(dietDetail.filePath)" alt="식단 이미지" class="diet-image" />
       </div>
 
       <h3>음식 목록</h3>
@@ -22,11 +22,8 @@
           </p>
           <p>섭취량: {{ food.amount }}g</p>
           <p>열량: {{ food.calorie }} kcal</p>
-          <p>
-            탄수화물: {{ food.carbohydrate }}g | 단백질: {{ food.protein }}g |
-            지방: {{ food.fat }}g
-          </p>
-          <p>당: {{ food.sugar }}g | 콜레스테롤: {{ food.cholesterol }}mg</p>
+          <p>탄수화물: {{ Number(food.carbohydrate).toFixed(3) }}g | 단백질: {{ Number(food.protein).toFixed(3) }}g | 지방: {{ Number(food.fat).toFixed(3) }}g</p>
+          <p>당: {{ Number(food.sugar).toFixed(3) }}g | 콜레스테롤: {{ Number(food.cholesterol).toFixed(3) }}mg</p>
         </li>
       </ul>
       <NutrientBarChart :data="totalNutrients" />
@@ -58,6 +55,12 @@ console.log("📦 route.params:", route.params);
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   return date.toLocaleDateString("ko-KR");
+};
+
+const getImgPath = (filePath) => {
+  // const filePath = dietDetail.filePath;
+  const img = `http://localhost:8080${filePath}`;
+  return img;
 };
 
 const formatTime = (dateStr) => {

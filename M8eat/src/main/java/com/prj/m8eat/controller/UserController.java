@@ -137,7 +137,7 @@ public class UserController {
 	}
 
 	
-	@PostMapping("/auth/logout")
+	@GetMapping("/auth/logout")
 	public ResponseEntity<Void> logout(HttpServletResponse response) {
 	    // ✅ access-token 쿠키를 빈 값 + 만료로 설정
 	    ResponseCookie expiredCookie = ResponseCookie.from("access-token", "")
@@ -208,16 +208,124 @@ public class UserController {
 		return ResponseEntity.notFound().build();
 	}
 	
-	@PutMapping("/user/mypage/{userNo}")
-	public ResponseEntity<String> updateMyInfo(@PathVariable("userNo") int userNo, @RequestBody User user) {
-		System.out.println("infouupdateeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
-		System.out.println("updateeeee" + user);
-		user.setUserNo(userNo);
-		if (userService.updateMyInfo(user) == 1) {
-			return ResponseEntity.ok().body("정상적으로 수정되었습니다.");
-		}
-		return ResponseEntity.badRequest().body("요청이 정상적으로 처리되지 않았습니다.");
+//	@PutMapping("/user/mypage/{userNo}")
+//	public ResponseEntity<String> updateMyInfo(@PathVariable("userNo") int userNo, @RequestBody User user) {
+//		System.out.println("infouupdateeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+//		System.out.println("updateeeee" + user);
+//		user.setUserNo(userNo);
+//		if (userService.updateMyInfo(user) == 1) {
+//			return ResponseEntity.ok().body("정상적으로 수정되었습니다.");
+//		}
+//		return ResponseEntity.badRequest().body("요청이 정상적으로 처리되지 않았습니다.");
+//	}
+	
+//	@PutMapping(value = "/user/mypage/{userNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//	public ResponseEntity<String> updateMyInfo(
+//	        @PathVariable("userNo") int userNo,
+//	        @ModelAttribute User user,
+//	        @CookieValue("access-token") String token
+//	) {
+//	    System.out.println("🙋‍♀️ 유저 정보 수정 요청: " + user);
+//
+//	    if (!util.validate(token)) {
+//	    	return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//	    } 
+//
+//	    user.setUserNo(userNo);
+//
+//	    MultipartFile file = user.getProfileImage();
+//
+//	    // ✅ 새 이미지가 업로드된 경우
+//	    if (file != null && !file.isEmpty()) {
+//	        String originalFilename = file.getOriginalFilename();
+////	        String uploadDirPath = "/your/upload/path"; // ✔ 실제 경로로 수정 필요
+//
+//	        File uploadDir = new File(uploadDirPath);
+//	        if (!uploadDir.exists()) {
+//	            uploadDir.mkdirs();
+//	        }
+//
+//	        try {
+//	            File saveFile = new File(uploadDir, originalFilename);
+//	            file.transferTo(saveFile);
+//	            user.setProfileImagePath("/upload/" + originalFilename); // 프론트에서 접근 가능한 경로로 저장
+//	        } catch (IOException e) {
+//	            e.printStackTrace();
+//	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("프로필 이미지 저장 실패");
+//	        }
+//	    }
+//	    
+//	    System.out.println("dfsdsfdfssffsdf" + user.getProfileImagePath());
+//	    
+//	    
+//
+//	    // 🧠 이미지가 없으면 기존 유지 or null 처리 (원하는 로직에 맞게 수정)
+//	    int result = userService.updateMyInfo(user);
+//	    if (result > 0) {
+//	        return ResponseEntity.ok("회원 정보가 성공적으로 수정되었습니다.");
+//	    } else {
+//	        return ResponseEntity.badRequest().body("회원 정보 수정에 실패하였습니다.");
+//	    }
+//	}
+	
+	@PutMapping(value = "/user/mypage/{userNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> updateMyInfo(
+	        @PathVariable("userNo") int userNo,
+	        @ModelAttribute User user,
+	        @CookieValue("access-token") String token,
+	        HttpServletResponse response
+	) {
+	    System.out.println("🙋‍♀️ 유저 정보 수정 요청: " + user);
+
+	    // ✅ JWT 유효성 검사
+	    if (!util.validate(token)) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("토큰 유효하지 않음");
+	    }
+
+	    user.setUserNo(userNo);
+
+	    MultipartFile file = user.getProfileImage();
+
+	    if (file != null && !file.isEmpty()) {
+	        String originalFilename = file.getOriginalFilename();
+//	        String uploadDirPath = "/your/upload/path"; // ✔ 실제 경로로 수정 필요
+
+	        File uploadDir = new File(uploadDirPath);
+	        if (!uploadDir.exists()) {
+	            uploadDir.mkdirs();
+	        }
+
+	        try {
+	            File saveFile = new File(uploadDir, originalFilename);
+	            file.transferTo(saveFile);
+	            user.setProfileImagePath("/upload/" + originalFilename); // 프론트에서 접근 가능한 경로로 저장
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("프로필 이미지 저장 실패");
+	        }
+	    }
+	    
+
+	    // ✅ DB 정보 수정
+	    int result = userService.updateMyInfo(user);
+	    if (result <= 0) {
+	        return ResponseEntity.badRequest().body("회원 정보 수정 실패");
+	    }
+
+	    // ✅ 토큰 재발급
+	    String newToken = util.createToken(user);
+
+	    // ✅ 쿠키 재설정
+	    Cookie cookie = new Cookie("access-token", newToken);
+	    cookie.setPath("/");
+	    cookie.setHttpOnly(true);
+	    cookie.setMaxAge(60 * 60); // 1시간
+	    response.addCookie(cookie);
+
+	    return ResponseEntity.ok("회원 정보 수정 성공 (토큰 갱신 완료)");
 	}
+
+
 	
 	@PutMapping("/user/mypage/health-info")
 	public ResponseEntity<String> updateHealthInfo(@ModelAttribute UserHealthInfo userHealthInfo, HttpSession session) {

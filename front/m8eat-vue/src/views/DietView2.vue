@@ -5,28 +5,12 @@
     </div>
     <div class="meal-pane">
       <Modal v-if="selectedMeal === 'create'" @close="resetSelection">
-        <MealForm
-          :selectedDate="selectedDate"
-          @close="resetSelection"
-          @add-meal="refreshMeals"
-        />
+        <MealForm :selectedDate="selectedDate" @close="resetSelection" @add-meal="refreshMeals" />
       </Modal>
-      <Modal
-        v-if="selectedMeal && selectedMeal !== 'create'"
-        @close="resetSelection"
-      >
-        <MealEditForm
-          :edit="selectedMeal"
-          @close="resetSelection"
-          @update-meal="refreshMeals"
-        />
+      <Modal v-if="selectedMeal && selectedMeal !== 'create'" @close="resetSelection">
+        <MealEditForm :edit="selectedMeal" @close="resetSelection" @update-meal="refreshMeals" />
       </Modal>
-      <MealToday
-        v-if="!selectedMeal"
-        :selectedDate="selectedDate"
-        @add-meal="selectedMeal = 'create'"
-        @edit-meal="handleEditMeal"
-      />
+      <MealToday v-if="!selectedMeal" :selectedDate="selectedDate" @add-meal="selectedMeal = 'create'" @edit-meal="handleEditMeal" />
     </div>
   </div>
 </template>

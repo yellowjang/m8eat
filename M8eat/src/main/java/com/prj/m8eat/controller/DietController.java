@@ -189,16 +189,17 @@ public class DietController {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("요청을 처리하지 못했습니다.");
 	}
 
+//	public ResponseEntity<?> analyzeByVisionGpt(@RequestParam("file") MultipartFile file) {
+//		try {
+//			List<Map<String, Object>> result = dietService.analyzeImageWithVisionAndGpt(file);
+//			return ResponseEntity.ok(result);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("분석 실패: " + e.getMessage());
+//			}
+//		}
+	
 	@PostMapping("/ai/vision-gpt")
-	public ResponseEntity<?> analyzeByVisionGpt(@RequestParam("file") MultipartFile file) {
-		try {
-			List<Map<String, Object>> result = dietService.analyzeImageWithVisionAndGpt(file);
-			return ResponseEntity.ok(result);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("분석 실패: " + e.getMessage());
-			}
-		}
 	public ResponseEntity<?> analyzeByVisionGpt(@RequestParam("file") MultipartFile file,
 												@CookieValue("access-token") String token) {
 		try {

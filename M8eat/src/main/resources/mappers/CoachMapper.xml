@@ -17,7 +17,7 @@
     FROM users
 </select>
 
-<select id="selectUsersByCoachNo" resultType="User">
+<select id="selectUsersByCoachNo"  parameterType="int" resultType="User">
     SELECT 
         user_no AS userNo,
         name,

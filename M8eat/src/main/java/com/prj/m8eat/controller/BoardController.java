@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -186,7 +185,8 @@ public class BoardController {
 
 	// 게시글 댓글 작성
 	@PostMapping("/{boardNo}/comments")
-	public ResponseEntity<String> commentWrite(@ModelAttribute BoardsComment comment) {
+	public ResponseEntity<String> commentWrite(@PathVariable int boardNo, @RequestBody BoardsComment comment) {
+		 comment.setBoardNo(boardNo); 
 		int result = boardService.writeComment(comment);
 		if (result == 1) {
 			return ResponseEntity.ok("댓글 성공적으로 등록되었습니다!");
