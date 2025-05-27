@@ -1,6 +1,5 @@
 drop database m8eat;
 create database if not exists m8eat;
-
 use m8eat;
 
 
@@ -66,10 +65,30 @@ INSERT INTO coach_user_map (coach_no, user_no) VALUES (4, 5);
 
 select * from coach_user_map;
 
+INSERT INTO users (name, id, password, role, coach_no)
+VALUES ('김회원', 'kim', 'kim', 'user', 12),
+ ('박회원', 'park', 'park', 'user', 12);
+
+
 
 
 select * from users;
 
+update users
+set coach_no=12
+where user_no=13;
+
+update users_health_info
+set height=170, weight=60, illness='', allergy='견과류', purpose='건강 유지'
+where user_no=12;
+
+update users_health_info
+set height=165, weight=48, illness='관절염', allergy='밀', purpose='근육 증가'
+where user_no=13;
+
+select * from users_health_info;
+
+delete from users where user_no=8;
 -- 사용자 건강 정보
 CREATE TABLE if not exists users_health_info (
     info_no INT PRIMARY KEY AUTO_INCREMENT,
@@ -85,15 +104,6 @@ CREATE TABLE if not exists users_health_info (
 );
 
 select * from users_health_info;
-
--- 코치 선호 태그
--- CREATE TABLE if not exists coach_prefer (
---     user_no INT PRIMARY KEY,
---     tags TEXT,
---     FOREIGN KEY (user_no) REFERENCES users(user_no)
---         ON DELETE CASCADE
---         ON UPDATE CASCADE
--- );
 
 -- 식단
 
@@ -114,16 +124,16 @@ CREATE TABLE if not exists diets (
 );
 
 INSERT INTO diets (user_no, reg_date, meal_type, file_path) VALUES
-(1, '2024-05-01 08:00:00', '아침', 'uploads/breakfast_1.jpg'),
-(1, '2024-05-01 12:30:00', '점심', 'uploads/lunch_1.jpg'),
-(1, '2024-05-01 19:00:00', '저녁', 'uploads/dinner_1.jpg'),
-(2, '2024-05-02 08:15:00', '아침', 'uploads/breakfast_2.jpg'),
-(2, '2024-05-02 13:00:00', '점심', 'uploads/lunch_2.jpg'),
-(2, '2024-05-02 19:10:00', '저녁', 'uploads/dinner_2.jpg'),
-(3, '2024-05-03 07:50:00', '아침', 'uploads/breakfast_3.jpg'),
-(3, '2024-05-03 12:40:00', '점심', 'uploads/lunch_3.jpg'),
-(3, '2024-05-03 18:55:00', '저녁', 'uploads/dinner_3.jpg'),
-(1, '2024-05-04 08:20:00', '아침', 'uploads/breakfast_4.jpg');
+(13, '2025-05-01 08:00:00', '아침', 'uploads/breakfast_1.jpg'),
+(13, '2025-05-01 12:30:00', '점심', 'uploads/lunch_1.jpg'),
+(13, '2025-05-01 19:00:00', '저녁', 'uploads/dinner_1.jpg'),
+(13, '2025-05-02 08:15:00', '아침', 'uploads/breakfast_2.jpg'),
+(13, '2025-05-02 13:00:00', '점심', 'uploads/lunch_2.jpg'),
+(13, '2025-05-02 19:10:00', '저녁', 'uploads/dinner_2.jpg'),
+(13, '2025-05-03 07:50:00', '아침', 'uploads/breakfast_3.jpg'),
+(13, '2025-05-03 12:40:00', '점심', 'uploads/lunch_3.jpg'),
+(13, '2025-05-03 18:55:00', '저녁', 'uploads/dinner_3.jpg'),
+(13, '2025-05-04 08:20:00', '아침', 'uploads/breakfast_4.jpg');
 
 select * from users;
 select * from diets;
@@ -152,8 +162,8 @@ select * from users;
 select * from food where name_ko LIKE '%샐러드%';
 select * from food; 
 
-		INSERT INTO users_health_info (user_no, height, weight, illness, allergy, purpose)
- 		 values (2, 0, 0, "", "", "");
+        INSERT INTO users_health_info (user_no, height, weight, illness, allergy, purpose)
+          values (2, 0, 0, "", "", "");
 
 
 -- 식단 음식 구성
@@ -177,6 +187,30 @@ CREATE TABLE IF NOT EXISTS diets_food (
         ON UPDATE CASCADE
 );
 select * from diets_food;
+select * from diets;
+
+delete from diets 
+where diet_no >=40;
+
+
+ INSERT INTO diets_food (
+  diet_no, food_id, food_name, amount, calorie,
+  protein, fat, carbohydrate, sugar, cholesterol
+) VALUES
+-- 아침 식단 (diet_no = 1)
+(21, 102, '계란 프라이', 50, 75, 6.3, 5.5, 0.5, 0.1, 186),
+(21, 102, '밥', 200, 312, 6, 1, 69, 0.1, 0),
+(21, 102, '김치', 50, 15, 1.1, 0.2, 3, 1, 0),
+
+-- 점심 식단 (diet_no = 2)
+(22, 102, '닭가슴살', 150, 165, 31, 3.6, 0, 0, 85),
+(22, 102, '고구마', 100, 86, 1.6, 0.1, 20, 4.2, 0),
+(22, 102, '샐러드', 80, 30, 1, 2, 4, 1, 0),
+
+-- 저녁 식단 (diet_no = 3)
+(24, 102, '연어구이', 120, 206, 22, 13, 0, 0, 55),
+(24, 102, '현미밥', 180, 270, 5, 2, 55, 0.2, 0),
+(24, 102, '브로콜리', 50, 17, 1.9, 0.2, 3.3, 0.5, 0);
 
 select * from users;
 

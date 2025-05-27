@@ -21,7 +21,7 @@
       </form>
       <div class="signup">
         아직 계정이 없으신가요?
-        <a href="#">가입하기</a>
+        <RouterLink :to="{name: 'signup'}">가입하기</RouterLink>
       </div>
 
       <div class="divider">

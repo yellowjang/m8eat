@@ -3,21 +3,6 @@
     <!-- <h3>회원가입</h3> -->
     <h3>회원가입 ({{ userType === "coach" ? "코치" : "일반 회원" }})</h3>
     <div class="signup-box">
-      <!-- <form class="signup-form" @submit.prevent="signup">
-        <label for="name">이름</label>
-        <input id="name" type="text" placeholder="이름을 입력해주세요." v-model.trim="name" />
-
-        <label for="userId">아이디</label>
-        <input id="userId" type="text" placeholder="아이디를 입력해주세요." v-model.trim="id" />
-
-        <label for="password">비밀번호</label>
-        <input id="password" type="password" placeholder="비밀번호를 입력해주세요." v-model.trim="password" />
-
-        <label for="passwordConfirm">비밀번호 확인</label>
-        <input id="passwordConfirm" type="password" placeholder="비밀번호를 한 번 더 입력해주세요." v-model.trim="passwordConfirm" />
-
-        <button type="submit" class="signup-button">회원가입</button>
-      </form> -->
       <form class="signup-form" @submit.prevent="signup">
         <label for="name">이름</label>
         <input id="name" type="text" placeholder="이름을 입력해주세요." v-model.trim="name" />
@@ -33,7 +18,6 @@
 
         <label for="profileImage">프로필 이미지</label>
         <div class="image-upload-container">
-          <!-- 🔽 미리보기 영역: 기본 + or 선택 이미지 -->
           <div class="image-preview">
             <img
               :src="previewUrl || defaultImage"
@@ -41,8 +25,6 @@
               class="preview-img"
             />
           </div>
-
-          <!-- 🔽 파일 선택 버튼 -->
           <input
             id="profileImage"
             type="file"
@@ -51,27 +33,27 @@
           />
         </div>
 
+        <div class="credential" v-if="userRole === 'coach'">
+          <label for="fileRegist">인증 파일 등록</label>
+          <div class="file-upload-container">
+            <input
+              id="fileRegist"
+              type="file"
+              accept="image/*"
+              @change=""
+            />
+          </div>
+        </div>
+
 
         <button type="submit" class="signup-button">회원가입</button>
       </form>
 
       <div class="login-link">
         이미 계정이 있으신가요?
-        <a href="#">로그인하기</a>
+        <RouterLink :to="{name: 'login'}">로그인하기</RouterLink>
       </div>
 
-      <div class="divider">
-        <span></span>
-        <p>OR</p>
-        <span></span>
-      </div>
-    </div>
-    <div class="social-signup">
-      <p>간편 회원가입하기</p>
-      <div class="social-buttons">
-        <a href="#"><img src="@/assets/icon/google.png" /></a>
-        <a href="#"><img src="@/assets/icon/kakao.png" /></a>
-      </div>
     </div>
   </div>
 </template>
@@ -80,8 +62,12 @@
 import { ref } from "vue";
 import { useUserStore } from "@/stores/user";
 import defaultImg from "@/assets/icon/plus.png"; 
+import { useRoute } from "vue-router";
 
 const store = useUserStore();
+const route = useRoute();
+
+const userRole = route.params.role
 
 const props = defineProps({
   userType: {
@@ -127,18 +113,6 @@ const signup = async () => {
   console.log(props.userType);
   console.log(profileImage.value)
 
-  // const formData = new FormData();
-  // formData.append("name", name.value);
-  // formData.append("id", id.value);
-  // formData.append("password", password.value);
-  // formData.append("role", props.userType);
-
-  // if (file.value) {
-  //   formData.append("profileImage", profileImage.value);
-  // }
-
-  // await store.signup(formData)
-
   store.signup({
     name: name.value,
     id: id.value,
@@ -181,47 +155,71 @@ const signup = async () => {
     flex-direction: column;
     align-items: center;
   }
-  .signup-form {
+   #profileImage{
+    // border: none;
+    // display:none;
+  }
+
+  #fileRegist {
+    // border: none;
+    // display: none;
+  }
+  .credential label {
+    // border: none;
+    // display:none;
+    text-decoration: underline;
+  }
+  .credential {
     display: flex;
-    flex-direction: column;
-    text-align: left;
-    width: 80%;
-    label {
-      font-size: 0.9rem;
-      margin: 0.8rem 0 0.2rem;
-    }
+    gap: 20px;
+  }
+  .credential label {
+    padding-top: 10px;
+  }
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  width: 80%; // 로그인과 동일하게 유지
+  max-width: 700px; // 로그인 .login-box와 같은 기준 맞추기
 
-    input {
-      padding: 0.8rem;
-      border: 0.5px solid #ccc;
-      border-radius: 10px;
-      margin-bottom: 0.5rem;
-      outline: none;
+  label {
+    font-size: 0.9rem;
+    margin: 0.8rem 0 0.2rem;
+  }
 
-      &:focus {
-        border-color: #de9c9c;
-      }
-    }
+  input {
+    padding: 0.8rem;
+    border: 0.5px solid #ccc;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    outline: none;
 
-    .signup-button {
-      background-color: #de9c9c;
-      border: none;
-      color: white;
-      padding: 0.8rem;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 0.5rem;
-
-      &:hover {
-        background-color: #d88787;
-      }
+    &:focus {
+      border-color: #de9c9c;
     }
   }
 
+  .signup-button {
+    background-color: #de9c9c;
+    border: none;
+    color: white;
+    padding: 0.8rem;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 0.5rem;
+
+    &:hover {
+      background-color: #d88787;
+    }
+  }
+}
+
+
   .login-link {
     font-size: 0.9rem;
-    margin-top: 1rem;
+    margin-top: 2rem;
 
     a {
       color: #e28e8e;

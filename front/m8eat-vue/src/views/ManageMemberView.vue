@@ -5,11 +5,7 @@
       <div class="w-1/3">
         <h2 class="title">회원 목록</h2>
         <ul class="space-y-2">
-          <li
-            v-for="member in members"
-            :key="member.userNo"
-            class="flex justify-between items-center bg-gray-50 px-4 py-2 rounded cursor-pointer hover:bg-gray-100"
-          >
+          <li v-for="member in members" :key="member.userNo" class="flex justify-between items-center bg-gray-50 px-4 py-2 rounded cursor-pointer hover:bg-gray-100">
             <span>{{ member.name }}</span>
           </li>
         </ul>
@@ -22,20 +18,18 @@
       <div class="profile-boxes">
         <div v-for="member in members" :key="member.userNo" class="profile-box">
           <div class="img-info">
-            <img alt="프로필" class="" />
+            <img alt="프로필" :src="getProfileImage(member.profileImagePath)" class="profile-img" />
             <div class="flex-1">
               <p class="name">{{ member.name }}</p>
-              <p class="text-sm text-gray-500">26세 / 여</p>
+              <!-- <p class="text-sm text-gray-500">26세 / 여</p> -->
             </div>
           </div>
           <div class="button-box">
-            <button
-              @click="selectMember(member.userNo)"
-              class="text-sm text-gray-600 underline"
-            >
-              식단조회
-            </button>
-            <button class="text-sm text-blue-500">💬 채팅</button>
+            <button @click="selectMember(member.userNo)" class="text-sm text-gray-600 underline">식단조회</button>
+            <!-- <span class="text-sm text-blue-500"> -->
+            <button class="text-sm text-blue-500" @click="goToChat(member.id)">💬 채팅</button>
+            <!-- <RouterLink :to="{ name: ChatView, params: { targetId: member.id } }">💬 채팅</RouterLink> -->
+            <!-- </span> -->
             <button class="text-sm text-gray-500">⚙️</button>
           </div>
         </div>
@@ -46,12 +40,7 @@
     <section v-if="selectedMember" class="mt-10">
       <h3 class="sub-title">{{ selectedMemberName }}님의 식단 목록</h3>
       <ul class="space-y-1">
-        <li
-          class="diets-list"
-          v-for="diet in diets"
-          :key="diet.dietNo"
-          @click="selectDietDetail(diet.dietNo)"
-        >
+        <li class="diets-list" v-for="diet in diets" :key="diet.dietNo" @click="selectDietDetail(diet.dietNo)">
           <div class="list">
             <span>{{ diet.dietNo }}</span>
             <span>{{ formatDateTime(diet.mealDate) }}</span>
@@ -63,16 +52,21 @@
 
       <!-- 선택된 식단 상세 -->
       <div v-if="dietDetail" class="diet-detail">
-        <p><strong>식사 종류:</strong> {{ dietDetail.mealType }}</p>
-        <p><strong>식단 날짜:</strong> {{ dietDetail.mealDate }}</p>
-        <p><strong>등록 시간:</strong> {{ dietDetail.regDate }}</p>
+        <p>
+          <strong>식사 종류:</strong>
+          {{ dietDetail.mealType }}
+        </p>
+        <p>
+          <strong>식단 날짜:</strong>
+          {{ dietDetail.mealDate }}
+        </p>
+        <p>
+          <strong>등록 시간:</strong>
+          {{ dietDetail.regDate }}
+        </p>
 
         <div class="image-box" v-if="dietDetail.filePath">
-          <img
-            :src="dietDetail.filePath"
-            alt="식단 이미지"
-            class="diet-image"
-          />
+          <img :src="getImage(dietDetail.filePath)" alt="식단 이미지" class="diet-image" />
         </div>
 
         <h3 class="text-lg font-semibold mt-4">음식 목록</h3>
@@ -83,10 +77,7 @@
             </p>
             <p>섭취량: {{ food.amount }}g</p>
             <p>열량: {{ food.calorie }} kcal</p>
-            <p>
-              탄: {{ food.carbohydrate }}g | 단: {{ food.protein }}g | 지:
-              {{ food.fat }}g
-            </p>
+            <p>탄: {{ food.carbohydrate }}g | 단: {{ food.protein }}g | 지: {{ food.fat }}g</p>
             <p>당: {{ food.sugar }}g | 콜레스테롤: {{ food.cholesterol }}mg</p>
           </li>
         </ul>
@@ -104,6 +95,11 @@ import { useCoachStore } from "@/stores/coach";
 import { useDietStore } from "@/stores/diet";
 import dayjs from "dayjs";
 import NutrientBarChart from "@/components/diet/NutrientBarChart.vue";
+import { RouterLink } from "vue-router";
+import { parseClassNames } from "@fullcalendar/core/internal";
+import router from "@/router";
+import defaultProfile from "@/assets/icon/default-profile.png";
+
 const members = ref([]);
 const selectedMember = ref(null);
 const selectedMemberName = ref("");
@@ -115,6 +111,11 @@ const formatDateTime = (dateStr) => {
 const coachStore = useCoachStore();
 const dietStore = useDietStore();
 const dietDetail = ref(null);
+
+const goToChat = (memberId) => {
+  router.push({ name: "ChatView", params: { targetId: memberId } });
+};
+
 const totalNutrients = computed(() => {
   return dietDetail.value?.foods?.reduce(
     (acc, food) => {
@@ -131,9 +132,20 @@ const totalNutrients = computed(() => {
 const fetchMembers = async () => {
   try {
     members.value = await coachStore.fetchMembers();
+
+    console.log("memmmmm", members.value);
   } catch (err) {
     alert("회원 목록 불러오기 실패");
   }
+};
+
+const getProfileImage = (filePath) => {
+  const img = `http://localhost:8080${filePath}`;
+  return filePath && filePath.trim() !== "" ? img : defaultProfile;
+};
+
+const getImage = (filePath) => {
+  return `http://localhost:8080${filePath}`;
 };
 
 const selectMember = async (userNo) => {
@@ -202,8 +214,9 @@ img {
 }
 .img-info {
   display: flex;
-  gap: 20px;
+  gap: 30px;
   flex-direction: row;
+  align-items: center;
 }
 .diets-list {
   display: flex;
@@ -235,7 +248,7 @@ img {
   margin: auto;
   gap: 20px;
   align-items: center;
-  overflow: scroll;
+  /* overflow: scroll; */
 }
 .profile-box {
   gap: 20px;
@@ -258,7 +271,8 @@ img {
   margin-top: 1rem;
 }
 .diet-image {
-  max-width: 100%;
+  width: 300px;
+  height: 200px;
   border-radius: 8px;
 }
 .food-list {

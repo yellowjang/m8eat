@@ -2,27 +2,14 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 import router from "@/router";
 import api from "@/api";
-import BoardList from "@/components/board/BoardList.vue";
 
 const REST_API_URL = `http://localhost:8080/boards`;
 
-// base64url 디코딩 함수 (한글 깨짐 방지)
-function base64UrlDecode(str) {
-  // base64url -> base64로 변환
-  str = str.replace(/-/g, "+").replace(/_/g, "/");
-  // 패딩 추가
-  while (str.length % 4) {
-    str += "=";
-  }
-  // 디코딩 (한글 지원)
-  try {
-    return decodeURIComponent(Array.prototype.map.call(atob(str), (c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)).join(""));
-  } catch (e) {
-    return atob(str);
-  }
-}
-
 export const useBoardStore = defineStore("board", () => {
+  // 상태
+  const commentsList = ref([]);
+
+  // 게시판 목록
   const getBoardList = async () => {
     try {
       const response = await api.get(`${REST_API_URL}`);
@@ -34,10 +21,10 @@ export const useBoardStore = defineStore("board", () => {
     }
   };
 
+  // 게시글 상세
   const getBoardDetail = async (boardNo) => {
     try {
       const response = await api.get(`${REST_API_URL}/${boardNo}`);
-      console.log(response.data);
       return response.data;
     } catch (error) {
       console.error("게시판 상세 정보 불러오기 실패", error);
@@ -45,40 +32,96 @@ export const useBoardStore = defineStore("board", () => {
     }
   };
 
+  // 게시글 삭제
   const removeBoard = async (boardNo) => {
     try {
-      const response = await api.delete(`${REST_API_URL}/${boardNo}`);
-      console.log(response.data);
-    } catch {
+      await api.delete(`${REST_API_URL}/${boardNo}`);
+    } catch (error) {
       console.error("게시글 삭제 실패", error);
       throw error;
     }
   };
 
+  // 게시글 등록
   const addBoard = async (formData) => {
-    const config = {
-      headers: { "Content-Type": "multipart/form-data" },
-    };
-
     try {
-      await api.post(`${REST_API_URL}`, formData, config);
+      await api.post(`${REST_API_URL}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
     } catch (error) {
       console.error("게시글 등록 실패: ", error);
       throw error;
     }
   };
 
+  // 게시글 수정
   const updateBoard = async (formData, boardNo) => {
-    const config = {
-      headers: { "Content-Type": "multipart/form-data" },
-    };
     try {
-      await api.put(`${REST_API_URL}/${boardNo}`, formData, config);
+      await api.put(`${REST_API_URL}/${boardNo}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
     } catch (error) {
       console.error("게시글 수정 실패: ", error);
       throw error;
     }
   };
 
-  return { getBoardList, getBoardDetail, removeBoard, addBoard, updateBoard };
+  // ✅ 댓글 목록 조회
+  const getComments = async (boardNo) => {
+    try {
+      const response = await api.get(`${REST_API_URL}/${boardNo}/comments`);
+      commentsList.value = response.data;
+    } catch (error) {
+      console.error("댓글 조회 실패", error);
+      throw error;
+    }
+  };
+
+  // ✅ 댓글 작성
+  const writeComment = async (boardNo, commentData) => {
+    try {
+      await api.post(`${REST_API_URL}/${boardNo}/comments`, commentData);
+      await getComments(boardNo); // 등록 후 최신화
+    } catch (error) {
+      console.error("댓글 작성 실패", error);
+      throw error;
+    }
+  };
+
+  // ✅ 댓글 수정
+  const updateComment = async (boardNo, commentNo, content) => {
+    try {
+      await api.put(`${REST_API_URL}/${boardNo}/comments/${commentNo}`, {
+        content,
+      });
+      await getComments(boardNo); // 수정 후 최신화
+    } catch (error) {
+      console.error("댓글 수정 실패", error);
+      throw error;
+    }
+  };
+
+  // ✅ 댓글 삭제
+  const deleteComment = async (boardNo, commentNo) => {
+    try {
+      await api.delete(`${REST_API_URL}/${boardNo}/comments/${commentNo}`);
+      await getComments(boardNo); // 삭제 후 최신화
+    } catch (error) {
+      console.error("댓글 삭제 실패", error);
+      throw error;
+    }
+  };
+
+  return {
+    getBoardList,
+    getBoardDetail,
+    removeBoard,
+    addBoard,
+    updateBoard,
+    commentsList,
+    getComments,
+    writeComment,
+    updateComment,
+    deleteComment,
+  };
 });
