@@ -30,13 +30,13 @@ import { RouterLink } from "vue-router";
   color: #555;
 
   .footer-content {
-    max-width: 1200px;
+    max-width: 1800px;
     margin: 0 auto;
     height: 100%;
     display: flex;
     justify-content: space-between; // 양쪽 정렬
     align-items: center; // 수직 가운데 정렬
-    padding: 0 1rem;
+    padding: 0 4rem;
   }
 
   .footer-left {

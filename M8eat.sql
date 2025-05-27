@@ -87,13 +87,13 @@ CREATE TABLE if not exists users_health_info (
 select * from users_health_info;
 
 -- 코치 선호 태그
-CREATE TABLE if not exists coach_prefer (
-    user_no INT PRIMARY KEY,
-    tags TEXT,
-    FOREIGN KEY (user_no) REFERENCES users(user_no)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
+-- CREATE TABLE if not exists coach_prefer (
+--     user_no INT PRIMARY KEY,
+--     tags TEXT,
+--     FOREIGN KEY (user_no) REFERENCES users(user_no)
+--         ON DELETE CASCADE
+--         ON UPDATE CASCADE
+-- );
 
 -- 식단
 

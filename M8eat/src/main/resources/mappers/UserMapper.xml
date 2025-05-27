@@ -15,6 +15,11 @@
  		 values (#{userNo}, #{height}, #{weight}, #{illness}, #{allergy}, #{purpose});
 	</insert>
 	
+	<insert id="insertHealthInfo">
+		INSERT INTO users_health_info (user_no, height, weight, illness, allergy, purpose)
+ 		 values (#{userNo}, #{height}, #{weight}, #{illness}, #{allergy}, #{purpose});
+	</insert>
+	
 	<!-- 로그인, 내 정보 조회 -->
 	<select id="selectUser" parameterType="String" resultType="User">
 		SELECT * FROM users

@@ -4,23 +4,26 @@
   padding: 0;
   box-sizing: border-box;
 }
-.vuecal--default-theme{
-    --vuecal-primary-color: #ffe4e4 !important;
-    --vuecal-secondary-color: #fff;
-    --vuecal-base-color: #000;
-    --vuecal-contrast-color: #fff;
-    --vuecal-border-color: color-mix(in srgb, var(--vuecal-base-color) 8%, transparent);
-    --vuecal-header-color: var(--vuecal-secondary-color);
-    --vuecal-event-color: var(--vuecal-contrast-color);
-    --vuecal-event-border-color: currentColor;
-    --vuecal-border-radius: 6px;
-    --vuecal-height:700px !important;
-    --vuecal-min-schedule-width: 0;
-    --vuecal-min-cell-width: 1em;
-    position: relative;
-    border-radius: var(--vuecal-border-radius);
-    color: var(--vuecal-base-color);
-    height: var(--vuecal-height);
+.vuecal--default-theme {
+  --vuecal-primary-color: #db9595 !important;
+  --vuecal-secondary-color: #fff;
+  --vuecal-base-color: #000;
+  --vuecal-contrast-color: #fff;
+  --vuecal-border-color: color-mix(in srgb, var(--vuecal-base-color) 8%, transparent);
+  --vuecal-header-color: var(--vuecal-secondary-color);
+  --vuecal-event-color: var(--vuecal-contrast-color);
+  --vuecal-event-border-color: currentColor;
+  --vuecal-border-radius: 6px;
+  --vuecal-height: 700px !important;
+  --vuecal-min-schedule-width: 0;
+  --vuecal-min-cell-width: 1em;
+  position: relative;
+  border-radius: var(--vuecal-border-radius);
+  color: var(--vuecal-base-color);
+  height: var(--vuecal-height);
+}
+.vuecal__event {
+  height: 70px !important;
 }
 html,
 body {
