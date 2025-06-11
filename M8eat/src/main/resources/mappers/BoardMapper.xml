@@ -5,17 +5,42 @@
 <mapper namespace="com.prj.m8eat.model.dao.BoardDao">
 	
 	<!-- 전체 게시글 조회 -->
-	<select id="selectBoardList" >
-		SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,file_path as filePath,
+	<select id="selectBoardList" resultType="Board">
+<!-- 		SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,file_path as filePath,
 		reg_date as regDate
-		FROM board;
+		FROM board; -->
+		SELECT 
+		    b.board_no AS boardNo,
+		    b.user_no AS userNo,
+		    u.name AS userName,
+		    b.title,
+		    b.content,
+		    b.view_cnt AS viewCnt,
+		    b.file_path AS filePath,
+		    b.reg_date AS regDate
+		FROM board b
+		JOIN users u 
+		ON b.user_no = u.user_no
 	</select>
 	
 	<!-- 게시글 상세 조회 -->
 	<select id="selectBoard" resultType="Board" parameterType="int">
-		SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
+<!-- 		SELECT board_no as boardNo, user_no as userNo, title, content, view_cnt as viewCnt,
 		reg_date as regDate, file_path as filePath
 		FROM board
+		WHERE board_no = #{boardNo} -->
+		SELECT 		    
+			b.board_no AS boardNo,
+			b.user_no AS userNo,
+		    u.name AS userName,
+		    b.title,
+		    b.content,
+		    b.view_cnt AS viewCnt,
+		    b.file_path AS filePath,
+		    b.reg_date AS regDate
+		FROM board b
+		JOIN users u 
+		ON b.user_no = u.user_no
 		WHERE board_no = #{boardNo}
 	</select>
 	
@@ -77,4 +102,34 @@
 		DELETE FROM boards_comment
 		WHERE board_no = #{boardNo} AND comment_no =#{commentNo}
 	</delete>
+	
+	<!-- 좋아요를 누르지 않았을  때 좋아요 등록 -->
+	<insert id="insertLike" parameterType="map">
+		  INSERT INTO boards_like (board_no, user_no)
+		  SELECT #{boardNo}, #{userNo}
+		  FROM dual
+		  WHERE NOT EXISTS (
+		    SELECT 1 FROM boards_like
+		    WHERE board_no = #{boardNo} AND user_no = #{userNo}
+		  )
+	</insert>
+	
+	<!-- 해당하는 게시글의 좋아요 수를-->
+	<select id="selectLikes" parameterType="int" resultType="int">
+		SELECT COUNT(*) FROM boards_like
+		WHERE board_no = #{boardNo}
+	</select>
+	
+		<!-- 해당하는 게시글에 해당 사용자가 좋아요 수를 눌렀는지 확인 -->
+	<select id="selectLiked" parameterType="int" resultType="int">
+		SELECT COUNT(*) FROM boards_like
+		WHERE board_no = #{boardNo} AND user_no = #{userNo}
+	</select>
+	
+	<!--게시글 좋아요 삭제 -->
+	<delete id="deleteLike">
+		DELETE FROM boards_like
+		WHERE board_no = #{boardNo} AND user_no = #{userNo}
+	</delete>
+
  </mapper>

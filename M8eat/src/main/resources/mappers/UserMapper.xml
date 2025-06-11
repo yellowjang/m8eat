@@ -6,11 +6,16 @@
 	
 	<!-- 회원가입 -->
 	<insert id="insertUser" parameterType="User" keyProperty="userNo" useGeneratedKeys="true">
-		INSERT INTO users (name, id, password, role)
- 		 values (#{name}, #{id}, #{password}, #{role});
+		INSERT INTO users (name, id, password, role, profile_image_path)
+ 		 values (#{name}, #{id}, #{password}, #{role}, #{profileImagePath});
 	</insert>
 	
 	<insert id="insertUserHealthInfo" parameterType="UserHealthInfo">
+		INSERT INTO users_health_info (user_no, height, weight, illness, allergy, purpose)
+ 		 values (#{userNo}, #{height}, #{weight}, #{illness}, #{allergy}, #{purpose});
+	</insert>
+	
+	<insert id="insertHealthInfo">
 		INSERT INTO users_health_info (user_no, height, weight, illness, allergy, purpose)
  		 values (#{userNo}, #{height}, #{weight}, #{illness}, #{allergy}, #{purpose});
 	</insert>
@@ -19,6 +24,11 @@
 	<select id="selectUser" parameterType="String" resultType="User">
 		SELECT * FROM users
  		 WHERE id = #{id};
+	</select>
+	
+	<select id="selectHealthInfo" parameterType="int" resultType="UserHealthInfo">
+		SELECT * FROM users_health_info
+ 		 WHERE user_no = #{userNo};
 	</select>
 	
 	<!-- 회원탈퇴 -->
@@ -30,7 +40,7 @@
 	<!-- 내 정보 수정 -->
 	<update id="updateUserInfo" parameterType="User">
 		UPDATE users
-		 SET name=#{name}, id=#{id}, password=#{password}, role=#{role}
+		 SET name=#{name}, role=#{role}, profile_image_path=#{profileImagePath}
 		 WHERE user_no=#{userNo};
 	</update>
 	
@@ -40,5 +50,13 @@
 		 SET height=#{height}, weight=#{weight}, illness=#{illness}, allergy=#{allergy}, purpose=#{purpose}
 		 WHERE user_no=#{userNo};
 	</update>
+	
+	<!-- 코치 아이디 찾기 -->
+	<select id="selectCoachId" parameterType="int" resultType="String">
+		SELECT coach.id
+		FROM users AS user
+		JOIN users AS coach ON user.coach_no = coach.user_no
+		WHERE user.user_no = #{userNo};
+	</select>
 	
  </mapper>

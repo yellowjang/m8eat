@@ -50,6 +50,11 @@ public class UserServiceImpl implements UserService {
 	public User getMyInfo(String id) {
 		return userDao.selectUser(id);
 	}
+	
+	@Override
+	public UserHealthInfo getMyHealthInfo(int userNo) {
+		return userDao.selectHealthInfo(userNo);
+	}
 
 	@Override
 	public int updateMyInfo(User user) {
@@ -59,6 +64,27 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public int updateHealthInfo(UserHealthInfo userHealthInfo) {
 		return userDao.updateUserHealthInfo(userHealthInfo);
+	}
+
+	@Override
+	public User socialLogin(User user) {
+		System.out.println("socialLOginnnnnnnnnnn" + user);
+		User existUser = userDao.selectUser(user.getId());
+		if (existUser == null) {
+			user.setPassword(null); // 소셜 로그인은 비밀번호 없음
+			user.setRole("user");
+			userDao.insertUser(user);
+			UserHealthInfo healthInfo = new UserHealthInfo(user.getUserNo(), 0, 0, "", "", "");
+			userDao.insertUserHealthInfo(healthInfo);
+			return user;
+		} else {
+			return existUser;
+		}
+	}
+
+	@Override
+	public String getCoachId(int userNo) {
+		return userDao.selectCoachId(userNo);
 	}
 
 }

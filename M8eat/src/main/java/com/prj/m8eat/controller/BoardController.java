@@ -1,15 +1,19 @@
 package com.prj.m8eat.controller;
 
+import java.beans.PropertyEditorSupport;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,21 +23,34 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prj.m8eat.jwt.JwtUtil;
 import com.prj.m8eat.model.dto.Board;
 import com.prj.m8eat.model.dto.BoardsComment;
+import com.prj.m8eat.model.dto.Food;
+import com.prj.m8eat.model.dto.User;
 import com.prj.m8eat.model.service.BoardService;
 
-@CrossOrigin(origins = "*")
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpSession;
+
+//@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/boards")
 public class BoardController {
-	private final BoardService boardService;
 
-	public BoardController(BoardService boardService) {
+	@Value("${file.upload.dir}")
+	private String uploadDirPath;
+	
+	private final BoardService boardService;
+	private final JwtUtil util;
+	public BoardController(BoardService boardService, JwtUtil util) {
 		this.boardService = boardService;
+		this.util = util;
 	}
 
-	//전체 게시글 조회 
+	// 전체 게시글 조회
 	@GetMapping
 	public ResponseEntity<?> boardList() {
 		List<Board> boardList = boardService.getBoardList();
@@ -43,7 +60,7 @@ public class BoardController {
 		return new ResponseEntity<List<Board>>(boardList, HttpStatus.OK);
 	}
 
-	//게시글 상세 조회 
+	// 게시글 상세 조회
 	@GetMapping("/{boardNo}")
 	public ResponseEntity<Board> boardDetail(@PathVariable int boardNo) {
 		Board board = boardService.getBoardDetail(boardNo);
@@ -53,16 +70,47 @@ public class BoardController {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
 	}
-	
 
-	//게시글 등록 
-	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<String> boardWrite(@ModelAttribute Board board) {
+	private final ObjectMapper objectMapper = new ObjectMapper();
+
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+		binder.registerCustomEditor(List.class, "foods", new PropertyEditorSupport() {
+			@Override
+			public void setAsText(String text) {
+				try {
+					List<Food> foods = objectMapper.readValue(text, new TypeReference<List<Food>>() {
+					});
+					setValue(foods);
+				} catch (IOException e) {
+					throw new IllegalArgumentException("Invalid JSON format for foods", e);
+				}
+			}
+		});
+	}
+
+	// 게시글 등록
+	@PostMapping
+	public ResponseEntity<String> boardWrite(@ModelAttribute Board board, 
+											@CookieValue("access-token") String token) {
+		System.out.println("boardwriteeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+		System.out.println("boardddddddddddddddddddddddd " + board);
+
+	    // ✅ 토큰 검증 + 정보 추출
+	    if (util.validate(token)) {
+	        Claims claims = util.getClaims(token);
+	        Integer userNo = (Integer) claims.get("userNo"); // 또는 Long 형변환 조심
+	        board.setUserNo(userNo); // ✅ 게시글 작성자 정보 설정
+	    } else {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
+	    }
+		
+		
 		MultipartFile file = board.getFile();
-
+		
 		if (file != null && !file.isEmpty()) {
 			String originalFilename = file.getOriginalFilename();
-			String uploadDirPath = "/Users/jang-ayoung/Desktop/m8eat/data";
+//			String uploadDirPath = "/Users/jang-ayoung/Desktop/m8eat/data";
 
 			File uploadDir = new File(uploadDirPath);
 			if (!uploadDir.exists()) {
@@ -86,7 +134,7 @@ public class BoardController {
 		}
 	}
 
-	//게시글 삭제  
+	// 게시글 삭제
 	@DeleteMapping("/{boardNo}")
 	public ResponseEntity<String> deleteBoard(@PathVariable int boardNo) {
 		boolean isDeleted = boardService.removeBoard(boardNo);
@@ -96,16 +144,19 @@ public class BoardController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("없는 게시글 번호입니다");
 	}
 
-	// 게시글 수정 
+	// 게시글 수정
 	@PutMapping(value = "/{boardNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<String> updateBoard(@PathVariable int boardNo, @ModelAttribute Board board) {
+		
+		System.out.println("board updateeeeeeeeeeeeeee "+ board);
+		
 		board.setBoardNo(boardNo);
 		MultipartFile file = board.getFile();
 
 		// 새 파일이 업로드된 경우에만 저장
 		if (file != null && !file.isEmpty()) {
 			String originalFilename = file.getOriginalFilename();
-			String uploadDirPath = "/Users/jang-ayoung/Desktop/m8eat/data";
+//			String uploadDirPath = "/Users/jang-ayoung/Desktop/m8eat/data";
 
 			File uploadDir = new File(uploadDirPath);
 			if (!uploadDir.exists()) {
@@ -131,10 +182,11 @@ public class BoardController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("게시글 수정에 실패하였습니다");
 		}
 	}
-	
-	//게시글 댓글 작성
+
+	// 게시글 댓글 작성
 	@PostMapping("/{boardNo}/comments")
-	public ResponseEntity<String> commentWrite(@ModelAttribute BoardsComment comment) {
+	public ResponseEntity<String> commentWrite(@PathVariable int boardNo, @RequestBody BoardsComment comment) {
+		 comment.setBoardNo(boardNo); 
 		int result = boardService.writeComment(comment);
 		if (result == 1) {
 			return ResponseEntity.ok("댓글 성공적으로 등록되었습니다!");
@@ -142,8 +194,8 @@ public class BoardController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("댓글 작성에 실패했습니다");
 		}
 	}
-	
-	//댓글 전체 조회 
+
+	// 댓글 전체 조회
 	@GetMapping("/{boardNo}/comments")
 	public ResponseEntity<?> commentsList(@PathVariable int boardNo) {
 		List<BoardsComment> commentList = boardService.getCommentList(boardNo);
@@ -152,10 +204,11 @@ public class BoardController {
 		}
 		return new ResponseEntity<List<BoardsComment>>(commentList, HttpStatus.OK);
 	}
-	
-	// 댓글 수정 
+
+	// 댓글 수정
 	@PutMapping("/{boardNo}/comments/{commentNo}")
-	public ResponseEntity<?> updateComment(@PathVariable("boardNo") int boardNo,@PathVariable("commentNo") int commentNo, @RequestBody BoardsComment comment) {
+	public ResponseEntity<?> updateComment(@PathVariable("boardNo") int boardNo,
+			@PathVariable("commentNo") int commentNo, @RequestBody BoardsComment comment) {
 		comment.setCommentNo(commentNo);
 		int isSuccess = boardService.updateComment(comment, boardNo);
 		if (isSuccess >= 0) {
@@ -164,18 +217,72 @@ public class BoardController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("게시글 수정에 실패하였습니다");
 		}
 	}
-	
-	//게시글 삭제  
+
+	// 게시글 삭제
 	@DeleteMapping("/{boardNo}/comments/{commentNo}")
-	public ResponseEntity<String> deleteBoard(@PathVariable("boardNo") int boardNo,@PathVariable("commentNo") int commentNo) {
-		boolean isDeleted = boardService.removeComment(boardNo,commentNo);
+	public ResponseEntity<String> deleteBoard(@PathVariable("boardNo") int boardNo,
+			@PathVariable("commentNo") int commentNo) {
+		boolean isDeleted = boardService.removeComment(boardNo, commentNo);
 		if (isDeleted) {
 			return ResponseEntity.status(HttpStatus.OK).body("댓글이 성공적으로 삭제되었습니다!");
 		} else
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("댓글 삭제에 실패하였습니다");
 	}
 
+	@PostMapping("/{boardNo}/likes")
+	public ResponseEntity<?> addLikes(@PathVariable("boardNo") int boardNo, HttpSession session) {
+		Object userObj = session.getAttribute("loginUser");
+
+		if (userObj == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
+		}
+
+		int userNo = ((User) userObj).getUserNo();
+
+		boolean isLiked = boardService.addLikes(boardNo, userNo); // 서비스 단에 userNo 전달
+
+		if (isLiked) {
+			return ResponseEntity.ok("좋아요가 등록되었습니다");
+		} else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 좋아요를 눌렀습니다");
+		}
+
 	}
 
+	// 게시글 좋아요 수 가져오기 boardNo 가 일치하는것들의 count 를 셈
+	@GetMapping("/{boardNo}/likes")
+	public int countLikes(@PathVariable int boardNo) {
+		return boardService.countLikes(boardNo);
+	}
 
+	// 해당 사용자가 해당 게시글에 좋아요를 눌렀는지 확인하기
+	@GetMapping("/{boardNo}/likes/check")
+	public boolean countLikes(@PathVariable int boardNo, HttpSession session) {
+		Object userObj = session.getAttribute("loginUser");
+		int userNo = ((User) userObj).getUserNo();
 
+		if (boardService.checkLiked(boardNo, userNo) == 1) {
+			return true;
+		} else
+			return false;
+	}
+
+	@DeleteMapping("/{boardNo}/likes")
+	public ResponseEntity<?> removeLikes(@PathVariable("boardNo") int boardNo, HttpSession session) {
+		Object userObj = session.getAttribute("loginUser");
+
+		if (userObj == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
+		}
+		int userNo = ((User) userObj).getUserNo();
+		boolean isUnliked = boardService.removeLikes(boardNo, userNo); // 서비스 단에 userNo 전달
+
+		if (isUnliked) {
+			return ResponseEntity.ok("좋아요가 제거되었습니다.");
+		} else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("좋아요 취소에 실패했습니다");
+		}
+
+	}
+
+}

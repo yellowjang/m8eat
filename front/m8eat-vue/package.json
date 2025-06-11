@@ -9,8 +9,22 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@fullcalendar/core": "^6.1.17",
+    "@fullcalendar/daygrid": "^6.1.17",
+    "@fullcalendar/vue3": "^6.1.17",
+    "@mui/icons-material": "^7.1.0",
+    "@mui/material": "^7.1.0",
+    "@vuepic/vue-datepicker": "^11.0.2",
     "axios": "^1.9.0",
+    "chart.js": "^4.4.9",
+    "chartjs-plugin-datalabels": "^2.2.0",
+    "dayjs": "^1.11.13",
+    "pinia": "^3.0.2",
     "vue": "^3.5.13",
+    "vue-cal": "^5.0.1-rc.25",
+    "vue-chartjs": "^5.3.2",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {

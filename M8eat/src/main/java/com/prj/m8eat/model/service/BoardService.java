@@ -28,5 +28,14 @@ public interface BoardService {
 	public int updateComment(BoardsComment comment, int boardNo);
 
 	public boolean removeComment(int boardNo, int commentNo);
+
+	public boolean addLikes(int boardNo, int userNo);
+
+	public int countLikes(int boardNo);
+
+	public boolean removeLikes(int boardNo, int userNo);
+
+	public int checkLiked(int boardNo, int userNo);
+
 	
 }
