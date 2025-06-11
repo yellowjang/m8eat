@@ -61,6 +61,25 @@
 - 역할에 따라 UI와 기능 차별화 → 코치만 피드백/채팅 가능 등
 
 ---
+## 화면 소개
+### 회원가입/로그인
+<img width="935" alt="스크린샷 2025-06-11 오후 6 04 39" src="https://github.com/user-attachments/assets/cb4c535f-5cc8-490b-bdfb-cb7d4319363f" />
+
+### 회원 유형별 다른 처리
+<img width="937" alt="스크린샷 2025-06-11 오후 6 04 47" src="https://github.com/user-attachments/assets/97952cfb-3fb5-46a5-bdf2-0cd5f2d87488" />
+
+### AI 식단 등록(메인 기능)
+<img width="937" alt="스크린샷 2025-06-11 오후 6 04 56" src="https://github.com/user-attachments/assets/3f3ef01c-a164-41c9-9947-0331594cb201" />
+
+### 식단 분석 결과 (메인 화면)
+<img width="942" alt="스크린샷 2025-06-11 오후 6 05 07" src="https://github.com/user-attachments/assets/d88465b7-f9ff-4ea9-a7e8-d0af1aac90c0" />
+
+### 마이페이지
+<img width="941" alt="스크린샷 2025-06-11 오후 6 05 15" src="https://github.com/user-attachments/assets/c337d37f-7b30-4f54-9b29-ef12412dc851" />
+
+### 채팅
+<img width="942" alt="스크린샷 2025-06-11 오후 6 05 25" src="https://github.com/user-attachments/assets/ac8d2afa-4ae0-4364-bac5-52016ea8138f" />
+
 
 ## 🚧 개발 결과
 ### 전체 시스템 구성
