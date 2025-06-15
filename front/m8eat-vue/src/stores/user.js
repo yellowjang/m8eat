@@ -16,7 +16,14 @@ function base64UrlDecode(str) {
   }
   // 디코딩 (한글 지원)
   try {
-    return decodeURIComponent(Array.prototype.map.call(atob(str), (c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)).join(""));
+    return decodeURIComponent(
+      Array.prototype.map
+        .call(
+          atob(str),
+          (c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)
+        )
+        .join("")
+    );
   } catch (e) {
     return atob(str);
   }
@@ -105,14 +112,23 @@ export const useUserStore = defineStore("user", () => {
       return { success: true, message: "로그인 성공" };
     } catch (err) {
       console.log(err);
-      return { success: false, message: err.response?.data?.message || "로그인 실패" };
+      return {
+        success: false,
+        message: err.response?.data?.message || "로그인 실패",
+      };
     }
   };
 
   const getHealthInfo = async () => {
-    const healthInfo = await api.get(`${REST_API_URL}/user/mypage/healthInfo`);
-    loginUserHealthInfo.value = healthInfo.data;
-    console.log(loginUserHealthInfo.value);
+    try {
+      const healthInfo = await api.get(
+        `${REST_API_URL}/auth/user/mypage/healthInfo`
+      );
+      loginUserHealthInfo.value = healthInfo.data;
+      console.log("✅ 받아온 건강 정보:", loginUserHealthInfo.value); // 여기서 확인!
+    } catch (err) {
+      console.error("❌ 건강 정보 불러오기 실패:", err);
+    }
   };
 
   const checkLogin = async () => {
@@ -174,7 +190,7 @@ export const useUserStore = defineStore("user", () => {
       });
 
       // 성공 후 사용자 정보 다시 가져오기 (선택)
-      
+
       await checkLogin();
     } catch (error) {
       console.error("업데이트 실패", error);
@@ -194,5 +210,17 @@ export const useUserStore = defineStore("user", () => {
     } catch (error) {}
   };
 
-  return { signup, login, loginUser, checkLogin, logout, sessionExpiredNotified, updateUser, getHealthInfo, loginUserHealthInfo, getCoachId, userDel };
+  return {
+    signup,
+    login,
+    loginUser,
+    checkLogin,
+    logout,
+    sessionExpiredNotified,
+    updateUser,
+    getHealthInfo,
+    loginUserHealthInfo,
+    getCoachId,
+    userDel,
+  };
 });

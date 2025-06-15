@@ -23,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/oauth/google")
 @RequiredArgsConstructor
-//@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class GoogleLoginController {
 
     private GoogleOauthService googleOauthService = new GoogleOauthService();
@@ -74,23 +73,5 @@ public class GoogleLoginController {
         	response.sendRedirect(frontendUrl + "/login?error=oauth_failed");
         }
         
-        
-//		if (loginUser != null) {
-////			session.setAttribute("loginUser", loginUser);
-////			return ResponseEntity.ok("구글 로그인 성공: " + loginUser.getName());
-//	        // ✅ 프론트에서 쓸 수 있게 JSON 형태로 응답
-//	        Map<String, Object> response = new HashMap<>();
-//	        response.put("user", loginUser);
-//
-//	        // 👉 JWT 토큰을 생성해서 같이 주는 것도 가능
-//	        String jwt = util.createToken(loginUser);
-//	        String redirectUri = "http://localhost:5173/login?token=" + jwt;
-//	        response.sendRedirect(redirectUri);
-////	        response.put("access-token", jwt);
-//
-//	        return ResponseEntity.ok(response);
-//		} else {
-//			return ResponseEntity.badRequest().body(Map.of("message", "구글 로그인 실패"));
-//		}
     }
 }

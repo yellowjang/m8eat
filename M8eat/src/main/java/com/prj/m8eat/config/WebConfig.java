@@ -8,12 +8,9 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.prj.m8eat.interceptor.JwtInterceptor;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-	@Autowired
-	private JwtInterceptor interceptor;
 	
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -24,13 +21,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true); // withCredentials 사용 시 true
     }
 	
-	@Override
-	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(interceptor).addPathPatterns("/**")
-											.excludePathPatterns("/", "/auth/**", "/oauth/**",
-																"/css/**", "/js/**",
-																"/swagger-ui/**", "/v3/api-docs/**");
-	}
 	
     @Value("${file.upload.dir}")
     private String uploadPath; // 예: C:/Users/kmj/Desktop/SSAFY/imgs

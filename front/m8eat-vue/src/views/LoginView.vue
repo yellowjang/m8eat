@@ -5,11 +5,21 @@
 
       <form class="login-form" @submit.prevent="login">
         <label for="userId">아이디</label>
-        <input id="userId" type="text" placeholder="아이디를 입력해주세요." v-model.trim="id" />
+        <input
+          id="userId"
+          type="text"
+          placeholder="아이디를 입력해주세요."
+          v-model.trim="id"
+        />
 
         <label for="password">비밀번호</label>
         <!-- <div class="password-wrapper"> -->
-        <input id="password" type="password" placeholder="비밀번호를 입력해주세요." v-model.trim="password" />
+        <input
+          id="password"
+          type="password"
+          placeholder="비밀번호를 입력해주세요."
+          v-model.trim="password"
+        />
         <!-- <span class="toggle-eye">👁️</span> -->
         <!-- </div> -->
 
@@ -21,7 +31,7 @@
       </form>
       <div class="signup">
         아직 계정이 없으신가요?
-        <RouterLink :to="{name: 'signup'}">가입하기</RouterLink>
+        <RouterLink :to="{ name: 'signup' }">가입하기</RouterLink>
       </div>
 
       <div class="divider">
@@ -32,8 +42,12 @@
       <div class="social-login">
         <p>간편 로그인하기</p>
         <div class="social-buttons">
-          <a :href="`${REST_API_URL}/oauth/google/login`"><img src="@/assets/icon/google.png" /></a>
-          <a :href="`${REST_API_URL}/oauth/kakao/login`"><img src="@/assets/icon/kakao.png" /></a>
+          <a :href="`${REST_API_URL}/oauth/google/login`"
+            ><img src="@/assets/icon/google.png"
+          /></a>
+          <a :href="`${REST_API_URL}/oauth/kakao/login`"
+            ><img src="@/assets/icon/kakao.png"
+          /></a>
         </div>
       </div>
     </div>
@@ -56,7 +70,7 @@ const login = async () => {
 
   if (res.success) {
     alert(res.message);
-    router.push({ name: "mainpage" });
+    router.push({ name: "diet" });
   } else {
     alert(res.message);
     id.value = "";

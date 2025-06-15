@@ -39,14 +39,7 @@ public class KakaoLoginController {
 	public void kakaoLogin(HttpServletResponse response) throws IOException {
 		String kakaoLoginUrl = kakaoOauthService.getKakaoLoginUrl();
 		response.sendRedirect(kakaoLoginUrl);
-//		return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, kakaoLoginUrl).build();
 	}
-    
-//    @GetMapping("/login")
-//    public void kakaoLogin(HttpServletResponse response) throws IOException {
-//        String kakaoLoginUrl = kakaoOauthService.getKakaoLoginUrl();
-//        response.sendRedirect(kakaoLoginUrl); // ✅ 브라우저가 직접 이동
-//    }
 
 	@GetMapping("/callback")
 	public void kakaoCallback(@RequestParam String code, HttpServletResponse response) throws IOException {
@@ -73,13 +66,6 @@ public class KakaoLoginController {
         	response.sendRedirect(frontendUrl + "/login?error=oauth_failed");
         }
 		
-//		System.out.println();
-//		if (loginUser != null) {
-//			session.setAttribute("loginUser", loginUser);
-//			return ResponseEntity.ok("카카오 로그인 성공: " + loginUser.getName()+loginUser.getRole());
-//		} else {
-//			return ResponseEntity.badRequest().body("카카오 로그인 실패");
-//		}
     }
 		
 	

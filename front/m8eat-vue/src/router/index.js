@@ -21,8 +21,7 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      name: "mainpage",
-      component: DietView2,
+      redirect: "/main/diet",
     },
     //로그인 해야만 들어갈 수 있음
 
@@ -30,6 +29,7 @@ const router = createRouter({
       path: "/main/diet",
       name: "diet",
       component: DietView2,
+      meta: { requiresAuth: true },
     },
 
     {
@@ -115,21 +115,34 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const store = useUserStore();
 
-  // loginUser가 비어 있으면 로그인 복구 시도 (token 여부 상관없이)
-  if (store.loginUser === null) {
+  // 로그인 여부를 명확히 판단
+  const isLoggedIn = !!store.loginUser?.id;
+
+  // 로그인 여부 불확실하면 서버에 다시 확인
+  if (!isLoggedIn) {
     try {
-      await store.checkLogin(); // 쿠키 기반으로 서버에서 판단
+      await store.checkLogin(); // 토큰 → 서버 확인
     } catch (e) {
-      console.warn("세션 복원 실패", e);
+      console.warn("❌ 세션 확인 실패", e);
       store.loginUser = null;
     }
   }
 
-  const isLoggedIn = store.loginUser !== null;
+  const updatedLoggedIn = !!store.loginUser?.id;
+  const publicPages = ["/login", "/signup", "/signup/user", "/signup/coach"];
 
-  if (to.meta.requiresAuth && !isLoggedIn) {
+  if (isLoggedIn && (to.name === "login" || to.name === "signup")) {
+    next({ name: "diet" }); // 또는 "mainpage"
+  }
+  // 인증 필요한 페이지 접근 시 로그인 안 되어 있으면 → 로그인 페이지로
+  if (to.meta.requiresAuth && !updatedLoggedIn) {
     alert("로그인이 필요합니다.");
-    next({ name: "login" });
+    return next({ name: "login" });
+  }
+
+  // 로그인한 사용자가 로그인/회원가입으로 가려는 경우 → 홈으로 리디렉트
+  if (updatedLoggedIn && publicPages.includes(to.path)) {
+    return next({ name: "mainpage" });
   } else {
     next();
   }
