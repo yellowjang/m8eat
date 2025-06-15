@@ -99,6 +99,7 @@
 ### 개발 환경
 - 백엔드: Spring Boot
 - 프론트엔드: Vue.js
+- 인증 관리 : jwt token, spring security
 - 데이터베이스: MySQL
 
 ### 협업 도구
